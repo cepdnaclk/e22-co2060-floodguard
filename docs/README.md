@@ -3,7 +3,7 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and project title
-repository-name: eYY-co2060-project-template
+repository-name: e22-co2060-floodguard
 title: Project Template
 ---
 
@@ -19,14 +19,15 @@ If your followed all the given instructions correctly, your repository will be a
 
 A HTML template integrated with the given GitHub repository templates, based on github.com/cepdnaclk/eYY-project-theme . If you like to remove this default theme and make your own web page, you can remove the file, docs/_config.yml and create the site using HTML. -->
 
-# Project Title
+# FloodGuard
 
 ---
 
 ## Team
--  eNumber, Name, [email](mailto:name@email.com)
--  eNumber, Name, [email](mailto:name@email.com)
--  eNumber, Name, [email](mailto:name@email.com)
+-  e22373, L.Sharmilan, [email](e22373@eng.pdn.ac.lk)
+-  e22382, F.R.Sujeevan, [email](e22382@eng.pdn.ac.lk)
+-  e22193, S.Kishonithan, [email](e22193@eng.pdn.ac.lk)
+-  e22397, R.Thilakshan, [email](e22397@eng.pdn.ac.lk)
 
 <!-- Image (photo/drawing of the final hardware) should be here -->
 
@@ -36,7 +37,7 @@ A HTML template integrated with the given GitHub repository templates, based on 
 
 #### Table of Contents
 1. [Introduction](#introduction)
-2. [Solution Architecture](#solution-architecture )
+2. [Solution Architecture](#solution-architecture)
 3. [Software Designs](#hardware-and-software-designs)
 4. [Testing](#testing)
 5. [Conclusion](#conclusion)
