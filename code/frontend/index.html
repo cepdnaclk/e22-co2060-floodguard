@@ -58,34 +58,32 @@
 
             <!-- TAB 1: LIVE MONITORING -->
             <section id="tab-live" class="tab-content active">
-                <div class="live-grid">
+                <div class="live-grid" id="live-monitoring-dashboard">
                     <!-- Global Risk Status -->
-                    <div class="card risk-card risk-warning">
+                    <div class="card risk-card" id="card-risk">
                         <div class="card-header">
                             <h2>Current Risk Level</h2>
                         </div>
                         <div class="risk-display">
-                            <span class="material-icons-round risk-icon">warning_amber</span>
-                            <h3 class="risk-title">WARNING</h3>
+                            <span class="material-icons-round risk-icon" id="risk-icon">info</span>
+                            <h3 class="risk-title" id="risk-level-text">LOADING...</h3>
                         </div>
-                        <p class="risk-desc">Water levels are rising rapidly. Prepare for possible controlled discharge.</p>
-                        <div class="suggested-action">
-                            <strong>Suggested Action:</strong> Prepare emergency supplies and be ready to move.
+                        <div class="suggested-action" id="suggested-action-container">
+                            <strong>Suggested Action:</strong> <span id="suggested-action-text">Loading...</span>
                         </div>
                     </div>
 
                     <!-- Water Level KPI -->
-                    <div class="card kpi-card">
+                    <div class="card kpi-card" id="card-water-level">
                         <div class="card-header">
                             <h2>Current Water Level</h2>
                             <span class="material-icons-round text-muted">waves</span>
                         </div>
                         <div class="kpi-value-container">
-                            <div class="kpi-value warning-text">81%</div>
-                            <div class="kpi-note">Critical Level: 85%</div>
+                            <div class="kpi-value" id="water-level-text">--%</div>
                         </div>
                         <div class="progress-bar-container">
-                            <div class="progress-bar warning-bg" style="width: 81%;"></div>
+                            <div class="progress-bar" id="water-level-bar" style="width: 0%;"></div>
                         </div>
                     </div>
 
@@ -96,109 +94,35 @@
                             <span class="material-icons-round text-muted">storm</span>
                         </div>
                         <div class="kpi-value-container">
-                            <div class="kpi-value">4.1 <span class="unit">mm/min</span></div>
+                            <div class="kpi-value" id="rainfall-text">-- <span class="unit">mm/hr</span></div>
                         </div>
-                        <p class="insight-text text-muted">High rainfall increases reservoir inflow rapidly.</p>
                     </div>
 
                     <!-- Rise Rate -->
-                    <div class="card kpi-card">
+                    <div class="card kpi-card" id="card-rise-rate">
                         <div class="card-header">
                             <h2>Rise Rate</h2>
                             <span class="material-icons-round text-muted">trending_up</span>
                         </div>
                         <div class="kpi-value-container">
-                            <div class="kpi-value danger-text">0.3 <span class="unit">%/min</span></div>
-                        </div>
-                        <div class="status-panel danger-bg text-white">
-                            <span class="material-icons-round icon-small">error_outline</span>
-                            Rapid/Dangerous Increase
+                            <div class="kpi-value" id="rise-rate-text">-- <span class="unit">%/hr</span></div>
                         </div>
                     </div>
 
                     <!-- Predictive KPIs -->
                     <div class="card predict-card">
                         <div class="card-header">
-                            <h2>Short-Term Prediction</h2>
+                            <h2>Prediction</h2>
                             <span class="material-icons-round text-muted">online_prediction</span>
                         </div>
                         <div class="predict-grid">
                             <div class="predict-item">
-                                <span class="label">Predicted Level (1h)</span>
-                                <span class="value danger-text">89%</span>
+                                <span class="label">Predicted Water Level</span>
+                                <span class="value" id="predicted-level-text">--%</span>
                             </div>
                             <div class="predict-item">
-                                <span class="label">Est. Time to Critical</span>
-                                <span class="value warning-text">12 min</span>
-                            </div>
-                        </div>
-                        <p class="insight-text text-muted mt-2">If rainfall continues at this rate, the reservoir will reach critical levels very soon.</p>
-                    </div>
-
-                    <!-- Mini Charts -->
-                    <div class="card chart-card">
-                        <div class="card-header">
-                            <h2>Recent Reservoir Trend</h2>
-                        </div>
-                        <div class="chart-container-mini">
-                            <canvas id="miniWaterChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="card chart-card">
-                        <div class="card-header">
-                            <h2>Recent Rainfall Trend</h2>
-                        </div>
-                        <div class="chart-container-mini">
-                            <canvas id="miniRainChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Dam Gate & Weather Status -->
-                    <div class="card status-card">
-                        <div class="card-header">
-                            <h2>Dam Gate Status</h2>
-                            <span class="material-icons-round text-muted">voicemail</span>
-                        </div>
-                        <div class="gate-grid">
-                            <div class="gate-item">
-                                <span class="gate-name">Gate 1</span>
-                                <span class="badge badge-success">OPEN (15%)</span>
-                            </div>
-                            <div class="gate-item">
-                                <span class="gate-name">Gate 2</span>
-                                <span class="badge badge-success">OPEN (15%)</span>
-                            </div>
-                            <div class="gate-item">
-                                <span class="gate-name">Gate 3</span>
-                                <span class="badge badge-neutral">CLOSED</span>
-                            </div>
-                        </div>
-                        <div class="release-rate mt-3">
-                            <strong>Total Release Rate:</strong> 120 m³/s
-                        </div>
-                    </div>
-
-                    <div class="card snapshot-card">
-                        <div class="card-header">
-                            <h2>Weather Forecast Snapshot</h2>
-                            <span class="material-icons-round text-muted">cloud</span>
-                        </div>
-                        <div class="weather-forecast">
-                            <div class="forecast-item">
-                                <span class="time">Next 1h</span>
-                                <span class="material-icons-round">thunderstorm</span>
-                                <span class="expected">Heavy</span>
-                            </div>
-                            <div class="forecast-item">
-                                <span class="time">Next 3h</span>
-                                <span class="material-icons-round">rainy</span>
-                                <span class="expected">Moderate</span>
-                            </div>
-                            <div class="forecast-item">
-                                <span class="time">Next 6h</span>
-                                <span class="material-icons-round">cloud</span>
-                                <span class="expected">Clearing</span>
+                                <span class="label">Time to Critical Level</span>
+                                <span class="value" id="time-critical-text">--</span>
                             </div>
                         </div>
                     </div>
@@ -209,60 +133,54 @@
             <section id="tab-trends" class="tab-content">
                 <div class="trends-header">
                     <div class="time-filters">
-                        <button class="filter-btn">Last 1 hour</button>
-                        <button class="filter-btn active">Last 6 hours</button>
-                        <button class="filter-btn">Last 24 hours</button>
-                        <button class="filter-btn">Last 7 days</button>
+                        <button class="filter-btn" onclick="setRange('1h')">Last 1 Hour</button>
+                        <button class="filter-btn" onclick="setRange('6h')">Last 6 Hours</button>
+                        <button class="filter-btn active" onclick="setRange('24h')">Last 24 Hours</button>
+                        <button class="filter-btn" onclick="setRange('7d')">Last 7 Days</button>
                     </div>
                 </div>
-                <div class="trends-grid">
-                    <div class="main-charts">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2>Water Level Trend & Prediction</h2>
-                            </div>
-                            <div class="chart-container-large">
-                                <canvas id="mainWaterChart"></canvas>
-                            </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+                    <!-- 1. Rainfall Trend Graph -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Rainfall Trend</h2>
+                            <span class="material-icons-round text-muted">water_drop</span>
                         </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h2>Rainfall & Rise Rate Trend</h2>
-                            </div>
-                            <div class="chart-container-large">
-                                <canvas id="mainRainChart"></canvas>
-                            </div>
+                        <div class="chart-container-large">
+                            <canvas id="trendRainfallChart"></canvas>
                         </div>
                     </div>
-                    <div class="trends-sidebar">
-                        <div class="card summary-card">
-                            <div class="card-header"><h2>Trend Summary</h2></div>
-                            <ul class="summary-list">
-                                <li><strong>Average Rise Rate:</strong> 0.22 %/min</li>
-                                <li><strong>Peak Rainfall:</strong> 4.5 mm/min</li>
-                                <li><strong>Current Trend:</strong> <span class="danger-text">Accelerating</span></li>
-                                <li><strong>Pred. Level (1h):</strong> 89%</li>
-                            </ul>
+
+                    <!-- 2. Water Level Trend Graph -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Water Level Trend</h2>
+                            <span class="material-icons-round text-muted">waves</span>
                         </div>
-                        <div class="card math-card">
-                            <div class="card-header">
-                                <h2>Math Insights</h2>
-                                <span class="material-icons-round text-muted">calculate</span>
-                            </div>
-                            <div class="math-equations">
-                                <div class="eq-block">
-                                    <span class="eq-title">Rise Rate</span>
-                                    <code class="eq-code">(currentLevel - prevLevel) / timeDiff</code>
-                                </div>
-                                <div class="eq-block">
-                                    <span class="eq-title">Predicted Level (1h)</span>
-                                    <code class="eq-code">currentLevel + (riseRate × 60)</code>
-                                </div>
-                                <div class="eq-block">
-                                    <span class="eq-title">Time to Critical</span>
-                                    <code class="eq-code">(85 - currentLevel) / riseRate</code>
-                                </div>
-                            </div>
+                        <div class="chart-container-large">
+                            <canvas id="trendWaterLevelChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 3. Rise Rate Trend Graph -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Rise Rate Trend</h2>
+                            <span class="material-icons-round text-muted">trending_up</span>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="trendRiseRateChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 4. Prediction Curve Graph -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Prediction Curve</h2>
+                            <span class="material-icons-round text-muted">online_prediction</span>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="trendPredictionChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -348,16 +266,28 @@
                             </div>
                             <ul class="contact-list">
                                 <li>
-                                    <span class="material-icons-round">phone</span>
-                                    <strong>National Emergency:</strong> 911 / 112
+                                    <span class="material-icons-round">local_police</span>
+                                    <strong>Police:</strong> <a href="tel:119" style="color: var(--primary); text-decoration: none; font-weight: 600;">119</a>
                                 </li>
                                 <li>
-                                    <span class="material-icons-round">support_agent</span>
-                                    <strong>Flood Hotline:</strong> 1-800-FLOOD-HELP
+                                    <span class="material-icons-round">emergency</span>
+                                    <strong>Emergency:</strong> <a href="tel:112" style="color: var(--primary); text-decoration: none; font-weight: 600;">112</a>
                                 </li>
                                 <li>
-                                    <span class="material-icons-round">domain</span>
-                                    <strong>Dam Authority Desk:</strong> Ext. 8421
+                                    <span class="material-icons-round">warning</span>
+                                    <strong>Disaster (DMC):</strong> <a href="tel:117" style="color: var(--primary); text-decoration: none; font-weight: 600;">117</a>
+                                </li>
+                                <li>
+                                    <span class="material-icons-round">medical_services</span>
+                                    <strong>Ambulance:</strong> <a href="tel:1990" style="color: var(--primary); text-decoration: none; font-weight: 600;">1990</a>
+                                </li>
+                                <li>
+                                    <span class="material-icons-round">directions_boat</span>
+                                    <strong>Navy Rescue:</strong> <a href="tel:+94112445368" style="color: var(--primary); text-decoration: none; font-weight: 600;">+94 112 445 368</a>
+                                </li>
+                                <li>
+                                    <span class="material-icons-round">tour</span>
+                                    <strong>Tourism Help:</strong> <a href="tel:1912" style="color: var(--primary); text-decoration: none; font-weight: 600;">1912</a>
                                 </li>
                             </ul>
                         </div>
@@ -367,98 +297,79 @@
 
             <!-- TAB 4: HISTORICAL ANALYSIS & DATA ACCESS -->
             <section id="tab-history" class="tab-content">
-                <div class="history-top-actions">
-                    <h2>Past Event Overview & Metrics</h2>
-                    <div class="download-buttons">
-                        <button class="btn btn-outline"><span class="material-icons-round">download</span> 24h Data</button>
-                        <button class="btn btn-outline"><span class="material-icons-round">download</span> 7d Data</button>
-                        <button class="btn btn-primary"><span class="material-icons-round">cloud_download</span> All Records</button>
-                    </div>
+                
+                <!-- Section 1: Event Summary -->
+                <div class="card-header" style="margin-bottom: 1rem;">
+                    <h2>Historical Event Summary</h2>
                 </div>
-
-                <div class="history-kpi-grid">
+                <div class="history-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                     <div class="card minimal-kpi">
-                        <span class="kpi-label">Total Incidents (YTD)</span>
-                        <span class="kpi-big-value">14</span>
+                        <span class="kpi-label">Total Incidents</span>
+                        <span class="kpi-big-value" id="history-total-incidents">--</span>
                     </div>
                     <div class="card minimal-kpi">
                         <span class="kpi-label">Emergency Events</span>
-                        <span class="kpi-big-value danger-text">2</span>
+                        <span class="kpi-big-value danger-text" id="history-total-emergencies">--</span>
                     </div>
                     <div class="card minimal-kpi">
-                        <span class="kpi-label">Highest Level Recorded</span>
-                        <span class="kpi-big-value">92%</span>
-                        <span class="kpi-sub">(Aug 2024)</span>
+                        <span class="kpi-label">Highest Water Level (%)</span>
+                        <span class="kpi-big-value warning-text" id="history-highest-level">--</span>
                     </div>
                     <div class="card minimal-kpi">
-                        <span class="kpi-label">Early W. Success Rate</span>
-                        <span class="kpi-big-value success-text">98.5%</span>
+                        <span class="kpi-label">Longest Incident Duration</span>
+                        <span class="kpi-big-value" id="history-longest-incident">--</span>
                     </div>
                 </div>
 
-                <div class="card table-card">
+                <!-- Section 2: Past Incident List -->
+                <div class="card table-card" style="margin-bottom: 2rem;">
                     <div class="card-header">
-                        <h2>Historical Incidents Log</h2>
-                        <div class="table-controls">
-                            <input type="text" placeholder="Search incidents..." class="search-input">
-                            <button class="btn btn-icon"><span class="material-icons-round">filter_list</span></button>
-                        </div>
+                        <h2>Past Incident List</h2>
                     </div>
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Incident ID</th>
                                     <th>Start Time</th>
                                     <th>Duration</th>
-                                    <th>Peak Level</th>
                                     <th>Highest Risk Level</th>
-                                    <th>Action Taken</th>
+                                    <th>Peak Level (%)</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#EV-2025-042</td>
-                                    <td>Oct 12, 14:30</td>
-                                    <td>6h 15m</td>
-                                    <td>87%</td>
-                                    <td><span class="badge badge-warning">WARNING</span></td>
-                                    <td>Controlled Release</td>
-                                </tr>
-                                <tr>
-                                    <td>#EV-2025-041</td>
-                                    <td>Sep 05, 08:20</td>
-                                    <td>2h 45m</td>
-                                    <td>82%</td>
-                                    <td><span class="badge badge-watch">WATCH</span></td>
-                                    <td>None</td>
-                                </tr>
-                                <tr>
-                                    <td>#EV-2024-118</td>
-                                    <td>Aug 22, 18:00</td>
-                                    <td>14h 30m</td>
-                                    <td>92%</td>
-                                    <td><span class="badge badge-danger">EMERGENCY</span></td>
-                                    <td>Evacuation & Release</td>
-                                </tr>
-                                <tr>
-                                    <td>#EV-2024-094</td>
-                                    <td>Jul 15, 09:10</td>
-                                    <td>4h 10m</td>
-                                    <td>78%</td>
-                                    <td><span class="badge badge-watch">WATCH</span></td>
-                                    <td>None</td>
-                                </tr>
-                                <tr>
-                                    <td>#EV-2024-051</td>
-                                    <td>Apr 02, 22:45</td>
-                                    <td>8h 00m</td>
-                                    <td>86%</td>
-                                    <td><span class="badge badge-warning">WARNING</span></td>
-                                    <td>Gate 1 Opened</td>
-                                </tr>
+                            <tbody id="history-table-body">
+                                <!-- Data populated from app.js -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Section 3: Monitoring Data Download -->
+                <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; text-align: center;">
+                    <h2 style="margin-bottom: 1rem;">Monitoring Data Download</h2>
+                    <div class="download-buttons" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-outline" onclick="window.location.href='/download/24h'"><span class="material-icons-round">download</span> Download 24h Data</button>
+                        <button class="btn btn-outline" onclick="window.location.href='/download/7d'"><span class="material-icons-round">download</span> Download 7d Data</button>
+                        <button class="btn btn-primary" onclick="window.location.href='/download/all'"><span class="material-icons-round">cloud_download</span> Download All Records</button>
+                    </div>
+                </div>
+
+                <!-- Section 4: Preparedness Evaluation -->
+                <div class="card-header" style="margin-bottom: 1rem;">
+                    <h2>System Preparedness Evaluation</h2>
+                </div>
+                <div class="history-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div class="card minimal-kpi" style="border-left: 4px solid var(--success);">
+                        <span class="kpi-label">Early Warning Success Rate</span>
+                        <span class="kpi-big-value success-text" id="eval-success-rate">--</span>
+                    </div>
+                    <div class="card minimal-kpi" style="border-left: 4px solid var(--warning);">
+                        <span class="kpi-label">Avg. Time Before Emergency</span>
+                        <span class="kpi-big-value warning-text" id="eval-avg-time">--</span>
+                    </div>
+                    <div class="card minimal-kpi" style="border-left: 4px solid var(--primary);">
+                        <span class="kpi-label">Stabilized Incidents</span>
+                        <span class="kpi-big-value" style="color: var(--primary);" id="eval-stabilized">--</span>
                     </div>
                 </div>
             </section>

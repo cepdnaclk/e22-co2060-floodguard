@@ -16,26 +16,38 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector(`.tab-btn[data-target="${tabId}"]`).classList.add('active');
         document.getElementById(tabId).classList.add('active');
 
-        // Re-render charts if switching to Trends tab to ensure proper sizing
         if(tabId === 'tab-trends') {
             destroyCharts();
-            renderMainCharts();
+            setRange(currentRange);
         } else if (tabId === 'tab-live') {
             destroyCharts();
-            renderMiniCharts();
+        } else if (tabId === 'tab-history') {
+            loadHistoryData();
         }
     }
 
     // 3. Time Filter Toggle (Trends Tab)
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            // In a real app, fetch new data here. We just trigger a re-render
-            destroyCharts();
-            renderMainCharts();
+    let currentRange = '24h';
+    window.setRange = function(range) {
+        currentRange = range;
+        
+        // Update active UI classes iteratively
+        document.querySelectorAll('.time-filters .filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(range)) {
+                btn.classList.add('active');
+            }
         });
-    });
+
+        // Backend API Requirement Hook
+        fetch(`/api/trends?range=${range}`)
+            .then(res => res.json())
+            .then(data => {
+                destroyCharts(); // Smooth transition wipe
+                renderMainCharts(data, range);
+            })
+            .catch(err => console.error("Could not fetch trends API data:", err));
+    };
 
     // --- Chart.js Configuration ---
     Chart.defaults.font.family = "'Inter', sans-serif";
@@ -62,202 +74,318 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mock Data Generation
     const labels1h = Array.from({length: 12}, (_, i) => `-${60 - i*5}m`);
-    const labels6h = Array.from({length: 12}, (_, i) => `-${6 - i/2}h`);
+    const labels6h = Array.from({length: 12}, (_, i) => `-${(6 - i/2).toFixed(1)}h`);
+    const labels24h = Array.from({length: 24}, (_, i) => `-${24 - i}h`);
+    const labels7d = Array.from({length: 14}, (_, i) => `-${(7 - i/2).toFixed(1)}d`);
 
     // Live Monitoring Mini Charts
-    function renderMiniCharts() {
-        // Mini Water Chart (Last 1 hour)
-        const ctxWaterMini = document.getElementById('miniWaterChart');
-        if(ctxWaterMini) {
-            chartInstances.waterMini = new Chart(ctxWaterMini, {
-                type: 'line',
-                data: {
-                    labels: labels1h,
-                    datasets: [{
-                        label: 'Level (%)',
-                        data: [72, 73, 73.5, 74, 75, 75.8, 76.5, 77.2, 78.1, 79, 80, 81],
-                        borderColor: colors.primary,
-                        backgroundColor: colors.primaryLight,
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Critical Threshold',
-                        data: Array(12).fill(85),
-                        borderColor: colors.danger,
-                        borderWidth: 1,
-                        borderDash: [5, 5],
-                        pointRadius: 0,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                    scales: {
-                        y: { min: 60, max: 100, display: false },
-                        x: { display: false }
-                    },
-                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
-                }
-            });
-        }
+    // Live Monitoring Data Update Loop
+    function startLiveMonitoring() {
+        function updateDashboard() {
+            // Simulate reading from state/API
+            const waterLevel = Math.floor(Math.random() * 50) + 40; // 40% to 90%
+            const rainfall = (Math.random() * 8).toFixed(1);
+            const riseRate = (Math.random() * 1.5).toFixed(2);
+            let predictedLevel = waterLevel + parseFloat(riseRate) * 2;
+            if (predictedLevel > 100) predictedLevel = 100;
 
-        // Mini Rain Chart
-        const ctxRainMini = document.getElementById('miniRainChart');
-        if(ctxRainMini) {
-            chartInstances.rainMini = new Chart(ctxRainMini, {
-                type: 'bar',
-                data: {
-                    labels: labels1h,
-                    datasets: [{
-                        label: 'Rainfall (mm/min)',
-                        data: [1.2, 1.5, 2.1, 2.8, 3.2, 3.5, 4.0, 4.2, 4.5, 4.3, 4.2, 4.1],
-                        backgroundColor: colors.primary,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { display: false },
-                        x: { display: false }
+            // Risk calculation based on Water Level rule: <60 Normal, 60-80 Watch, >80 Critical
+            let risk = { level: 'SAFE', icon: 'check_circle', text: 'Monitor conditions' };
+            
+            if (waterLevel > 80) {
+                // > 80% -> EMERGENCY / Critical (Red)
+                risk = { level: 'EMERGENCY', icon: 'warning', text: 'Immediate action required' };
+            } else if (waterLevel > 70) {
+                // We'll add WARNING for the upper band of the watch range
+                risk = { level: 'WARNING', icon: 'warning_amber', text: 'Prepare mitigation' };
+            } else if (waterLevel >= 60) {
+                // 60-80% -> WATCH (Yellow)
+                risk = { level: 'WATCH', icon: 'visibility', text: 'Stay alert' };
+            }
+
+            // Time to Critical Level (80%)
+            let timeToCritical = '--';
+            if (waterLevel >= 80) {
+                timeToCritical = 'Critical Threshold Reached';
+            } else if (riseRate > 0) {
+                const hours = ((80 - waterLevel) / riseRate).toFixed(1);
+                timeToCritical = `${hours} hours`;
+            }
+
+            // Update Risk Elements
+            const riskCard = document.getElementById('card-risk');
+            const iconEl = document.getElementById('risk-icon');
+            const levelText = document.getElementById('risk-level-text');
+            const textEl = document.getElementById('suggested-action-text');
+
+            if (riskCard && iconEl && levelText && textEl) {
+                let badgeColor = '';
+                if(risk.level === 'SAFE') badgeColor = '#10b981'; // Green
+                else if(risk.level === 'WATCH') badgeColor = '#eab308'; // Yellow
+                else if(risk.level === 'WARNING') badgeColor = '#f97316'; // Orange
+                else badgeColor = '#ef4444'; // Red
+
+                // Assign raw colors seamlessly avoiding missing class issues
+                riskCard.style.borderTop = `4px solid ${badgeColor}`;
+                iconEl.textContent = risk.icon;
+                iconEl.style.color = badgeColor;
+                levelText.textContent = risk.level;
+                levelText.style.color = badgeColor;
+                textEl.textContent = risk.text;
+            }
+
+            // Update KPIS
+            const wlText = document.getElementById('water-level-text');
+            const wlBar = document.getElementById('water-level-bar');
+            if (wlText && wlBar) {
+                // <60% Green, 60-80% Yellow, >80% Red
+                let waterColor = waterLevel > 80 ? '#ef4444' : (waterLevel >= 60 ? '#eab308' : '#10b981');
+                wlText.innerHTML = `${waterLevel}%`;
+                wlText.style.color = waterColor;
+                wlBar.style.width = `${waterLevel}%`;
+                wlBar.style.backgroundColor = waterColor;
+            }
+
+            if (document.getElementById('rainfall-text')) {
+                document.getElementById('rainfall-text').innerHTML = `${rainfall} <span class="unit">mm/hr</span>`;
+            }
+
+            if (document.getElementById('rise-rate-text')) {
+                const riseColor = riseRate > 0.5 ? '#ef4444' : ''; // Red highlight if rising rapidly 
+                const el = document.getElementById('rise-rate-text');
+                el.innerHTML = `${riseRate} <span class="unit">%/hr</span>`;
+                if(riseColor) { el.style.color = riseColor; } else { el.style.color = ''; }
+            }
+
+            // Predictive Updates
+            if (document.getElementById('predicted-level-text')) {
+                document.getElementById('predicted-level-text').textContent = `${predictedLevel.toFixed(1)}%`;
+                
+                const timeCritEl = document.getElementById('time-critical-text');
+                if (timeCritEl) {
+                    timeCritEl.textContent = timeToCritical;
+                    if (waterLevel >= 80 || (riseRate > 0.5 && ((80 - waterLevel) / riseRate) < 5)) {
+                        timeCritEl.style.color = '#ef4444'; // Red highlighting threshold
+                    } else {
+                        timeCritEl.style.color = '';
                     }
                 }
-            });
+            }
         }
+        
+        updateDashboard();
+        setInterval(updateDashboard, 5000);
     }
 
     // Trends & Prediction Main Charts
-    function renderMainCharts() {
-        // Main Water Level + Prediction
-        const ctxWaterMain = document.getElementById('mainWaterChart');
-        if(ctxWaterMain) {
-            // Generate historical data array and prediction array
-            const histData = [65, 66, 67, 68.5, 70, 72, 74.5, 76, 78, 79.5, 80.2, 81];
-            // Prediction starts at current value (index 11) and projects forward 2 hours
-            const predData = Array(12).fill(null);
-            predData[11] = 81;
-            predData.push(84); // +30m
-            predData.push(87); // +60m
-            predData.push(90); // +90m
-            
-            const labels = [...labels6h, '+30m', '+1h', '+1.5h'];
+    function renderMainCharts(data, range) {
+        // Dynamic binding from API explicitly
+        const histWater = data.water_level || [];
+        const histRain = data.rainfall || [];
+        const histRise = data.rise_rate || [];
 
-            chartInstances.waterMain = new Chart(ctxWaterMain, {
+        // Match requested label spans
+        let activeLabels = labels24h;
+        if(range === '1h') activeLabels = labels1h;
+        else if (range === '6h') activeLabels = labels6h;
+        else if (range === '7d') activeLabels = labels7d;
+
+        // 1. Rainfall Trend Chart
+        const ctxRain = document.getElementById('trendRainfallChart');
+        if (ctxRain) {
+            chartInstances.trendRain = new Chart(ctxRain, {
                 type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Recorded Level (%)',
-                            data: [...histData, null, null, null],
-                            borderColor: colors.primary,
-                            backgroundColor: colors.primaryLight,
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 3
-                        },
-                        {
-                            label: 'Predicted Level (%)',
-                            data: predData,
-                            borderColor: colors.warningLine,
-                            borderWidth: 3,
-                            borderDash: [5, 5],
-                            fill: false,
-                            tension: 0.3,
-                            pointRadius: 3,
-                            pointBackgroundColor: colors.warningLine
-                        },
-                        {
-                            label: 'Critical Threshold (85%)',
-                            data: Array(15).fill(85),
-                            borderColor: colors.danger,
-                            borderWidth: 2,
-                            borderDash: [4, 4],
-                            pointRadius: 0,
-                            fill: false
-                        }
-                    ]
+                    labels: activeLabels,
+                    datasets: [{
+                        label: 'Rainfall (mm/hr)',
+                        data: histRain,
+                        borderColor: '#0ea5e9', // Sky blue
+                        backgroundColor: 'rgba(14, 165, 233, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2
+                    }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
-                        tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.parsed.y + '%'; } } }
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
                     scales: {
-                        y: { min: 50, max: 100, title: { display: true, text: 'Reservoir Level (%)' } },
+                        y: { title: { display: true, text: 'Rainfall (mm/hr)' } },
                         x: { title: { display: true, text: 'Time' } }
                     }
                 }
             });
         }
 
-        // Main Rain Chart
-        const ctxRainMain = document.getElementById('mainRainChart');
-        if(ctxRainMain) {
-            chartInstances.rainMain = new Chart(ctxRainMain, {
-                type: 'bar',
+        // 2. Water Level Trend Graph
+        const ctxWater = document.getElementById('trendWaterLevelChart');
+        if (ctxWater) {
+            chartInstances.trendWater = new Chart(ctxWater, {
+                type: 'line',
                 data: {
-                    labels: labels6h,
+                    labels: activeLabels,
+                    datasets: [{
+                        label: 'Water Level (%)',
+                        data: histWater,
+                        borderColor: colors.primary,
+                        backgroundColor: colors.primaryLight,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    },
+                    {
+                        label: 'Critical Threshold (80%)',
+                        data: Array(activeLabels.length).fill(80),
+                        borderColor: colors.danger,
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                    scales: {
+                        y: { min: 50, max: 100, title: { display: true, text: 'Level (%)' } },
+                        x: { title: { display: true, text: 'Time' } }
+                    }
+                }
+            });
+        }
+
+        // 3. Rise Rate Trend
+        const ctxRise = document.getElementById('trendRiseRateChart');
+        if (ctxRise) {
+            // Emphasize spike calculation dynamically
+            const pointColors = histRise.map(r => r > 0.25 ? colors.danger : '#64748b');
+            const pointRadii = histRise.map(r => r > 0.25 ? 5 : 2);
+            chartInstances.trendRise = new Chart(ctxRise, {
+                type: 'line',
+                data: {
+                    labels: activeLabels,
+                    datasets: [{
+                        label: 'Rise Rate (%/hr)',
+                        data: histRise,
+                        borderColor: '#eab308',
+                        backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.2,
+                        pointBackgroundColor: pointColors, 
+                        pointRadius: pointRadii
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                    scales: {
+                        y: { title: { display: true, text: 'Rate (%/hr)' } },
+                        x: { title: { display: true, text: 'Time' } }
+                    }
+                }
+            });
+        }
+
+        // 4. Prediction Curve Graph
+        const ctxPred = document.getElementById('trendPredictionChart');
+        if (ctxPred) {
+            const predDataResponse = data.prediction || [];
+            // Extend labels explicitly for prediction elements
+            const extendedLabels = [...activeLabels, '+1 Unit', '+2 Units', '+3 Units'];
+            
+            // Build explicit past recording gap structure
+            const predDataSeries = Array(activeLabels.length).fill(null);
+            predDataSeries[activeLabels.length - 1] = histWater[histWater.length - 1]; // Connect from current
+            predDataSeries.push(...predDataResponse);
+
+            chartInstances.trendPred = new Chart(ctxPred, {
+                type: 'line',
+                data: {
+                    labels: extendedLabels,
                     datasets: [
                         {
-                            type: 'bar',
-                            label: 'Rainfall Intensity (mm/min)',
-                            data: [0, 0.5, 0.8, 1.2, 2.5, 3.0, 3.8, 4.5, 4.3, 4.2, 4.2, 4.1],
-                            backgroundColor: 'rgba(56, 189, 248, 0.7)',
-                            borderRadius: 4,
-                            yAxisID: 'y'
+                            label: 'Recorded Level (%)',
+                            data: [...histWater, null, null, null],
+                            borderColor: colors.primary,
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.3
                         },
                         {
-                            type: 'line',
-                            label: 'Rise Rate (%/min)',
-                            data: [0, 0.02, 0.05, 0.08, 0.15, 0.18, 0.22, 0.28, 0.27, 0.28, 0.29, 0.3],
+                            label: 'Predicted Next Stage (%)',
+                            data: predDataSeries,
                             borderColor: colors.danger,
-                            borderWidth: 2,
-                            tension: 0.4,
-                            pointRadius: 2,
-                            yAxisID: 'y1'
+                            borderWidth: 3,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3,
+                            pointBackgroundColor: colors.danger
                         }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { tooltip: { mode: 'index', intersect: false } },
                     scales: {
-                        x: { title: { display: true, text: 'Time (Last 6 Hours)' } },
-                        y: { 
-                            type: 'linear', 
-                            display: true, 
-                            position: 'left',
-                            title: { display: true, text: 'Rainfall (mm/min)' }
-                        },
-                        y1: { 
-                            type: 'linear', 
-                            display: true, 
-                            position: 'right',
-                            title: { display: true, text: 'Rise Rate (%/min)' },
-                            grid: { drawOnChartArea: false } // only draw grid lines for one axis
-                        }
+                        y: { min: 50, max: 100, title: { display: true, text: 'Level (%)' } },
+                        x: { title: { display: true, text: 'Time' } }
                     }
                 }
             });
         }
     }
 
+    // History Tab Logic
+    function loadHistoryData() {
+        fetch('/api/history')
+            .then(res => res.json())
+            .then(data => {
+                // Set Section 1: Summary Cards
+                if(document.getElementById('history-total-incidents')) {
+                    document.getElementById('history-total-incidents').textContent = data.summary.total_incidents;
+                    document.getElementById('history-total-emergencies').textContent = data.summary.total_emergencies;
+                    document.getElementById('history-highest-level').textContent = data.summary.highest_water_level + '%';
+                    document.getElementById('history-longest-incident').textContent = data.summary.longest_incident;
+                }
+
+                // Set Section 2: Table
+                const tbody = document.getElementById('history-table-body');
+                if(tbody) {
+                    tbody.innerHTML = '';
+                    data.incidents.forEach(incident => {
+                        let riskBadge = 'badge-watch';
+                        if (incident.risk_level === 'WARNING') riskBadge = 'badge-warning';
+                        if (incident.risk_level === 'EMERGENCY') riskBadge = 'badge-danger';
+                        
+                        const row = `
+                            <tr>
+                                <td>${incident.id}</td>
+                                <td>${incident.start_time}</td>
+                                <td>${incident.duration}</td>
+                                <td><span class="badge ${riskBadge}">${incident.risk_level}</span></td>
+                                <td>${incident.peak_level}%</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                }
+
+                // Set Section 4: Preparedness
+                if(document.getElementById('eval-success-rate')) {
+                    document.getElementById('eval-success-rate').textContent = data.preparedness.early_warning_success + '%';
+                    document.getElementById('eval-avg-time').textContent = data.preparedness.avg_time_before_emergency + ' mins';
+                    document.getElementById('eval-stabilized').textContent = data.preparedness.percent_stabilized + '%';
+                }
+            })
+            .catch(err => console.error("Could not fetch history data:", err));
+    }
+
     // Initial render
-    renderMiniCharts();
+    startLiveMonitoring();
+    setRange('24h');
+    loadHistoryData();
 });
