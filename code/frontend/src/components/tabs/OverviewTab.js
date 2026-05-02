@@ -18,7 +18,7 @@ export default function OverviewTab({ data, history }) {
   if (data.status === 'RED') actionMessage = 'Immediate gate operation required';
 
   // Math for Main Status Panel
-  const diffRaw = Number(data.water_level || 0) - Number(data.adaptive_threshold || 0);
+  const diffRaw = Number(data.l_t || 0) - Number(data.adaptive_threshold || 0);
   const isAbove = diffRaw > 0;
   const diffString = `Reservoir is ${Math.abs(diffRaw).toFixed(1)}% ${isAbove ? 'above' : 'below'} threshold`;
 
@@ -37,7 +37,7 @@ export default function OverviewTab({ data, history }) {
   if (isActive && data.conflict_warning) {
     recMessage = 'Immediate operation required. Full release is limited by downstream capacity.';
   } else if (isActive) {
-    recMessage = `Controlled release recommended: open gate to ${Number(data.gate_opening_percent_rounded || 0)}% for approximately ${Number(data.estimated_duration_minutes || 0).toFixed(0)} minutes.`;
+    recMessage = `Controlled release recommended: open gate to ${Number(data.gate_opening_percent || 0)}% for approximately ${Number(data.est_duration_mins || 0).toFixed(0)} minutes.`;
   } else if (data.status === 'YELLOW') {
     recMessage = 'Prepare controlled release. Downstream level is within safe capacity.';
   }
@@ -63,7 +63,7 @@ export default function OverviewTab({ data, history }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
           <div>
             <div className="text-muted font-mono text-xs">RESERVOIR LEVEL L(t)</div>
-            <div className="text-primary font-mono text-2xl">{Number(data.water_level || 0).toFixed(1)}%</div>
+            <div className="text-primary font-mono text-2xl">{Number(data.l_t || 0).toFixed(1)}%</div>
           </div>
           <div>
             <div className="text-muted font-mono text-xs">ADAPTIVE THRESHOLD AT(t)</div>
@@ -103,7 +103,7 @@ export default function OverviewTab({ data, history }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', backgroundColor: 'var(--bg-secondary)', padding: '1rem', border: '1px solid var(--border-color)', marginBottom: '1.5rem' }}>
             <div>
               <div className="text-muted font-mono text-[10px]">GATE OPENING</div>
-              <div className="font-mono text-2xl text-red">{Number(data.gate_opening_percent_rounded || 0)}%</div>
+              <div className="font-mono text-2xl text-red">{Number(data.gate_opening_percent || 0)}%</div>
             </div>
             <div>
               <div className="text-muted font-mono text-[10px]">RELEASE RATE</div>
@@ -111,7 +111,7 @@ export default function OverviewTab({ data, history }) {
             </div>
             <div>
               <div className="text-muted font-mono text-[10px]">EST. DURATION</div>
-              <div className="font-mono text-2xl">{Number(data.estimated_duration_minutes || 0).toFixed(0)} min</div>
+              <div className="font-mono text-2xl">{Number(data.est_duration_mins || 0).toFixed(0)} min</div>
             </div>
           </div>
         ) : (
@@ -139,10 +139,10 @@ export default function OverviewTab({ data, history }) {
 
       {/* 3. KEY READINGS ROW */}
       <div className="colSpan12" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-        <CompactTile label="RESERVOIR LEVEL" value={Number(data.water_level || 0).toFixed(1)} unit="%" status={Number(data.water_level || 0) > 85 ? 'Critical' : 'Normal'} statusColor={Number(data.water_level || 0) > 85 ? 'var(--status-red)' : 'var(--status-green)'} />
-        <CompactTile label="RAINFALL" value={Number(data.rainfall || 0).toFixed(1)} unit="mm/h" status={Number(data.rainfall || 0) > 50 ? 'High' : 'Normal'} statusColor={Number(data.rainfall || 0) > 50 ? 'var(--status-orange)' : 'var(--text-muted)'} />
-        <CompactTile label="UPSTREAM INFLOW" value={Number(data.inflow || 0).toFixed(0)} unit="m³/s" status={Number(data.inflow || 0) > 100 ? 'Elevated' : 'Normal'} statusColor={Number(data.inflow || 0) > 100 ? 'var(--status-yellow)' : 'var(--text-muted)'} />
-        <CompactTile label="DOWNSTREAM LEVEL" value={Number(data.downstream_level || 0).toFixed(1)} unit="%" status={Number(data.downstream_level || 0) > 80 ? 'Limited' : 'Safe'} statusColor={Number(data.downstream_level || 0) > 80 ? 'var(--status-orange)' : 'var(--status-green)'} />
+        <CompactTile label="RESERVOIR LEVEL" value={Number(data.l_t || 0).toFixed(1)} unit="%" status={Number(data.l_t || 0) > 85 ? 'Critical' : 'Normal'} statusColor={Number(data.l_t || 0) > 85 ? 'var(--status-red)' : 'var(--status-green)'} />
+        <CompactTile label="RAINFALL" value={Number(data.rf_t || 0).toFixed(1)} unit="mm/h" status={Number(data.rf_t || 0) > 50 ? 'High' : 'Normal'} statusColor={Number(data.rf_t || 0) > 50 ? 'var(--status-orange)' : 'var(--text-muted)'} />
+        <CompactTile label="UPSTREAM INFLOW" value={Number(data.if_t || 0).toFixed(0)} unit="m³/s" status={Number(data.if_t || 0) > 100 ? 'Elevated' : 'Normal'} statusColor={Number(data.if_t || 0) > 100 ? 'var(--status-yellow)' : 'var(--text-muted)'} />
+        <CompactTile label="DOWNSTREAM LEVEL" value={Number(data.dl_t || 0).toFixed(1)} unit="%" status={Number(data.dl_t || 0) > 80 ? 'Limited' : 'Safe'} statusColor={Number(data.dl_t || 0) > 80 ? 'var(--status-orange)' : 'var(--status-green)'} />
       </div>
 
       {/* 4. PROCESSED SIGNAL ROW */}
@@ -174,7 +174,7 @@ export default function OverviewTab({ data, history }) {
                 
                 <ReferenceArea y1={Number(data.adaptive_threshold || 75)} y2={100} fill="var(--status-red)" fillOpacity={0.05} />
                 
-                <Line type="monotone" dataKey="water_level" stroke="var(--water-blue)" strokeWidth={2} dot={false} isAnimationActive={false} />
+                <Line type="monotone" dataKey="l_t" stroke="var(--water-blue)" strokeWidth={2} dot={false} isAnimationActive={false} />
                 <Line type="stepAfter" dataKey="adaptive_threshold" stroke="var(--status-red)" strokeWidth={1} strokeDasharray="3 3" dot={false} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
@@ -188,7 +188,7 @@ export default function OverviewTab({ data, history }) {
         <h2 className="text-muted font-mono text-xs mb-3">REASON FOR STATUS</h2>
         <div className="bg-panel p-3">
           <ul className="font-mono text-xs text-primary" style={{ paddingLeft: '1.2rem', margin: 0, lineHeight: 1.8 }}>
-            <li>{data.reason || 'Algorithm evaluated normally.'}</li>
+            <li>{data.action_message || 'Algorithm evaluated normally.'}</li>
             {data.conflict_warning && <li className="text-orange mt-2">Downstream capacity limiting optimal release.</li>}
             {isAbove && <li className="text-red mt-2">Level exceeds dynamic threshold.</li>}
           </ul>

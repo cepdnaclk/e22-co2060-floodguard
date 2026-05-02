@@ -19,7 +19,7 @@ export default function LogsTab({ history }) {
           timestamp: row.timestamp,
           event: `Status changed to ${row.status}`,
           severity: row.status,
-          reason: row.reason || 'Algorithm triggered threshold',
+          reason: row.action_message || 'Algorithm triggered threshold',
           user: 'SYSTEM'
         });
         prevStatus = row.status;
@@ -29,7 +29,7 @@ export default function LogsTab({ history }) {
       if (row.status === 'RED' && changes.length > 0 && changes[changes.length-1].severity !== 'ACK') {
         changes.push({
           timestamp: new Date(new Date(row.timestamp).getTime() + 15000).toISOString(),
-          event: `Gate release ${Number(row.gate_opening_percent_rounded || 0)}% Authorized`,
+          event: `Gate release ${Number(row.gate_opening_percent || 0)}% Authorized`,
           severity: 'ACK',
           reason: 'Manual confirmation',
           user: 'CMD-OP-1'
@@ -87,7 +87,7 @@ export default function LogsTab({ history }) {
                       <span style={{ color: colorVar, fontWeight: 'bold' }}>{ev.severity}</span>
                     </td>
                     <td style={{ padding: '0.75rem 1rem', color: 'var(--text-secondary)' }}>
-                      {ev.reason}
+                      {ev.action_message}
                     </td>
                     <td style={{ padding: '0.75rem 1rem', color: 'var(--text-muted)' }}>
                       {ev.user}

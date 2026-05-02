@@ -28,8 +28,8 @@ export default function AnalysisTab({ data }) {
           <div className="font-mono text-sm">
             <Row label="Base Threshold" value="75.00%" />
             <Row label="Rise Rate Penalty" value={`- ${data.rr_band === 'CRITICAL' ? '30' : (data.rr_band === 'HIGH' ? '18' : (data.rr_band === 'ELEVATED' ? '8' : '0'))}%`} />
-            <Row label="Rainfall Penalty" value={`- ${Number(data.rainfall || 0) > 50 ? '12' : (Number(data.rainfall || 0) > 25 ? '7' : (Number(data.rainfall || 0) > 10 ? '3' : '0'))}%`} />
-            <Row label="Downstream Penalty" value={`- ${Number(data.downstream_level || 0) > 85 ? '15' : (Number(data.downstream_level || 0) > 70 ? '8' : (Number(data.downstream_level || 0) > 50 ? '3' : '0'))}%`} />
+            <Row label="Rainfall Penalty" value={`- ${Number(data.rf_t || 0) > 50 ? '12' : (Number(data.rf_t || 0) > 25 ? '7' : (Number(data.rf_t || 0) > 10 ? '3' : '0'))}%`} />
+            <Row label="Downstream Penalty" value={`- ${Number(data.dl_t || 0) > 85 ? '15' : (Number(data.dl_t || 0) > 70 ? '8' : (Number(data.dl_t || 0) > 50 ? '3' : '0'))}%`} />
             <div style={{ borderTop: '1px solid var(--border-color)', margin: '0.5rem 0' }}></div>
             <Row label="FINAL AT(t)" value={`${Number(data.adaptive_threshold || 0).toFixed(2)}%`} bold />
           </div>
@@ -45,8 +45,8 @@ export default function AnalysisTab({ data }) {
             <Row label="Downstream Safe Limit" value={`${Number(data.max_safe_release || 0).toFixed(1)} m³/s`} />
             <Row label="Applied Release Rate" value={`${Math.min(Number(data.release_rate || 0), Number(data.max_safe_release || 0)).toFixed(1)} m³/s`} highlight={data.conflict_warning ? 'var(--status-orange)' : undefined} />
             <Row label="Converted Gate Opening" value={`${Number(data.gate_opening_percent || 0).toFixed(2)}%`} />
-            <Row label="Rounded Gate Opening" value={`${Number(data.gate_opening_percent_rounded || 0)}%`} bold />
-            <Row label="Calculated Duration" value={`${Number(data.estimated_duration_minutes || 0).toFixed(1)} mins`} />
+            <Row label="Rounded Gate Opening" value={`${Number(data.gate_opening_percent || 0)}%`} bold />
+            <Row label="Calculated Duration" value={`${Number(data.est_duration_mins || 0).toFixed(1)} mins`} />
           </div>
         ) : (
           <div className="text-muted font-mono text-xs">Release recommendation inactive.</div>
