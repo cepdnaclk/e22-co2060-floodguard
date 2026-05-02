@@ -1,11 +1,20 @@
-// App Logic and Data Visualization
+/**
+ * FloodGuard Frontend Application
+ * Real-time flood risk monitoring and early warning system
+ * Displays live data, trends, predictions, and public advisories
+ * Uses Chart.js for data visualization
+ */
+
+// ==================== INITIALIZATION ====================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ==================== TIME & STATUS UPDATES ====================
     // 1. Display Current Time
     const timeEl = document.getElementById('last-updated-time');
     const now = new Date();
     timeEl.innerHTML = `Last updated: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
+    // ==================== TAB NAVIGATION ====================
     // 2. Tab Navigation
     window.switchTab = function(tabId) {
         // Remove active class from all tabs and contents
@@ -26,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ==================== FILTER CONTROLS ====================
     // 3. Time Filter Toggle (Trends Tab)
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {

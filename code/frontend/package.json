@@ -1,12 +1,14 @@
 {
-  "name": "2yp_antigravity",
+  "name": "floodguard-frontend",
   "version": "1.0.0",
+  "description": "Smart Flood Risk Monitoring & Early Warning System - Frontend Dashboard",
   "main": "app.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
+  "keywords": ["flood", "warning", "mahaweli", "sri-lanka", "prediction", "dashboard"],
   "dependencies": {
     "vite": "^8.0.0"
   }

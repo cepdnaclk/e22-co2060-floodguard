@@ -1,3 +1,19 @@
+/**
+ * FloodGuard Frontend - Stylesheet
+ * 
+ * Design System:
+ * - Color Palette: Custom risk-based color scheme (Safe, Watch, Warning, Danger)
+ * - Typography: Inter font family for modern, clean interface
+ * - Layout: Responsive grid-based design supporting desktop and mobile
+ * - Components: Modular CSS for dashboard, charts, status badges, and alerts
+ * 
+ * Color Coding:
+ * - Green (#10b981): Safe conditions
+ * - Yellow (#f59e0b): Watch/Caution status
+ * - Orange (#f97316): Warning status
+ * - Red (#ef4444): Danger/Critical status
+ */
+
 :root {
     /* Color Palette */
     --bg-primary: #f0f4f8;
