@@ -26,9 +26,9 @@ def main():
 
     try:
         # Spawn the simulator process
-        print("[System] Spawning DB Simulator...")
+        print("[System] Spawning DB Simulator at 60x speed to accelerate scenario testing...")
         sim_process = subprocess.Popen(
-            [sys.executable, "-u", simulator_script],
+            [sys.executable, "-u", simulator_script, "--speed", "60.0"],
             stdout=sys.stdout,
             stderr=sys.stderr,
             cwd=os.path.dirname(simulator_script)
