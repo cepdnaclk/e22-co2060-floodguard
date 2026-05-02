@@ -1,0 +1,135 @@
+.dashboard {
+  padding: 2rem 0;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .mainGrid {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+.statusCard {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.statusIndicator {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 30px currentColor;
+  animation: pulse 2s infinite alternate;
+}
+
+.GREEN { background: var(--status-green); color: var(--status-green); }
+.YELLOW { background: var(--status-yellow); color: var(--status-yellow); }
+.ORANGE { background: var(--status-orange); color: var(--status-orange); }
+.RED { background: var(--status-red); color: var(--status-red); }
+
+.cardGREEN { box-shadow: 0 0 40px var(--status-green-glow); border-color: rgba(34, 197, 94, 0.3); }
+.cardYELLOW { box-shadow: 0 0 40px var(--status-yellow-glow); border-color: rgba(234, 179, 8, 0.3); }
+.cardORANGE { box-shadow: 0 0 40px var(--status-orange-glow); border-color: rgba(249, 115, 22, 0.3); }
+.cardRED { box-shadow: 0 0 40px var(--status-red-glow); border-color: rgba(239, 68, 68, 0.3); }
+
+@keyframes pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(1.05); opacity: 1; }
+}
+
+.statusText {
+  color: white;
+}
+
+.actionMessage {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.metricCard {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.metricLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.metricValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.metricSub {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.alertBox {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+}
+
+.alertTitle {
+  color: var(--status-red);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.releaseGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}

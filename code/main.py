@@ -1,65 +1,67 @@
 """
-main.py – FloodGuard Sensor Simulator Entry Point
+main.py – FloodGuard System Orchestrator
+
+This script acts as the master controller for the backend architecture.
+It spawns both the data simulator and the processor engine simultaneously
+so you don't need to manage multiple terminals.
 
 Run with:
-    python code/main.py           (from project root)
-
-Two windows will open:
-  1. Sensor Input       – slider to set the sensor reading (0 – 100 %)
-  2. Live Sensor Graph  – real-time animated graph of readings over time
-
-An Excel log (sensor_readings_temp.xlsx) is updated every 2 seconds
-inside the code/database/ folder.
+    python code/main.py
 """
 
 import sys
 import os
-import tkinter as tk
+import subprocess
+import time
 
-# ── Make sure Python can find sibling packages regardless of CWD ────────────
-_HERE = os.path.dirname(os.path.abspath(__file__))   # …/code/
-sys.path.insert(0, _HERE)
+def main():
+    # Ensure paths are resolved correctly relative to main.py
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    simulator_script = os.path.join(current_dir, "simulation", "db_simulator.py")
+    processor_script = os.path.join(current_dir, "backend", "processor_engine", "processor.py")
 
-# ── Project imports ─────────────────────────────────────────────────────────
-from backend.inputs.sensor    import SensorState
-from frontend.slider_window   import SliderWindow
-from frontend.graph_window    import GraphWindow
-from frontend.excel_logger    import ExcelLogger
+    print("==================================================")
+    print("      Starting FloodGuard Backend Services")
+    print("==================================================\n")
 
+    try:
+        # Spawn the simulator process
+        print("[System] Spawning DB Simulator...")
+        sim_process = subprocess.Popen(
+            [sys.executable, "-u", simulator_script],
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            cwd=os.path.dirname(simulator_script)
+        )
 
-def main() -> None:
-    # ── Shared state ─────────────────────────────────────────────────────
-    sensor = SensorState()
+        # Give the simulator a moment to start and establish its DB connection
+        time.sleep(2)
 
-    # ── Root window → slider ──────────────────────────────────────────────
-    root = tk.Tk()
-    root.geometry("420x300+200+200")
-    SliderWindow(root, sensor)
+        # Spawn the processor engine
+        print("[System] Spawning Processor Engine...\n")
+        proc_process = subprocess.Popen(
+            [sys.executable, "-u", processor_script],
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            cwd=os.path.dirname(processor_script)
+        )
 
-    # ── Second window → live graph ────────────────────────────────────────
-    graph_win = GraphWindow(root, sensor)
-    # Position the graph window to the right of the slider
-    root.update_idletasks()                       # ensure geometry is resolved
-    sw = root.winfo_width()
-    sx = root.winfo_x()
-    sy = root.winfo_y()
-    graph_win._window.geometry(f"760x520+{sx + sw + 20}+{sy}")
+        # Wait infinitely until the user presses Ctrl+C
+        print("[System] Both services are running. Press Ctrl+C to stop.\n")
+        sim_process.wait()
+        proc_process.wait()
 
-    # ── Excel logger (background thread) ─────────────────────────────────
-    excel_path = os.path.join(_HERE, "database", "sensor_readings_temp.xlsx")
-    logger = ExcelLogger(sensor, excel_path)
-    logger.start()
-
-    # ── Graceful shutdown ────────────────────────────────────────────────
-    def on_close() -> None:
-        logger.stop()
-        root.destroy()
-
-    root.protocol("WM_DELETE_WINDOW", on_close)
-
-    # ── Start event loop ──────────────────────────────────────────────────
-    root.mainloop()
-
+    except KeyboardInterrupt:
+        print("\n[System] Shutting down services gracefully...")
+        
+        # Terminate processes if they are still running
+        if 'sim_process' in locals() and sim_process.poll() is None:
+            sim_process.terminate()
+        if 'proc_process' in locals() and proc_process.poll() is None:
+            proc_process.terminate()
+            
+        print("[System] Shutdown complete.")
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()

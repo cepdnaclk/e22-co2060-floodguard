@@ -1,2 +1,10 @@
+.env
 .env.local
-test_env.py
+venv/
+node_modules/
+.next/
+__pycache__/
+*.pyc
+sensor_readings_temp.xlsx
+put-your-code-here.txt
+docs/Algorithm Block 1.pdf
