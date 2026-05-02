@@ -1,64 +1,53 @@
 :root {
-  /* Ultra-modern Light Theme */
-  --bg-color: #f0f4f8;
-  --bg-surface: #ffffff;
-  --bg-surface-glass: rgba(255, 255, 255, 0.65);
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-color: rgba(226, 232, 240, 0.8);
+  /* SCADA Industrial Palette */
+  --bg-primary: #0B0F12;
+  --bg-secondary: #131A1E;
+  --bg-tertiary: #182126;
+  --border-color: #2B3A40;
+  --border-light: rgba(143, 163, 173, 0.18);
   
-  --status-green: #10b981;
-  --status-yellow: #f59e0b;
-  --status-orange: #f97316;
-  --status-red: #ef4444;
-
-  --status-green-glow: rgba(16, 185, 129, 0.25);
-  --status-yellow-glow: rgba(245, 158, 11, 0.25);
-  --status-orange-glow: rgba(249, 115, 22, 0.25);
-  --status-red-glow: rgba(239, 68, 68, 0.25);
-
-  --accent-color: #3b82f6;
-  --accent-glow: rgba(59, 130, 246, 0.25);
+  --text-primary: #E8F1F2;
+  --text-secondary: #B6C7CD;
+  --text-muted: #8FA3AD;
+  
+  /* Semantic Colors */
+  --data-cyan: #3BD6E8;
+  --water-blue: #2F8CFF;
+  --rain-indigo: #7A8CFF;
+  --inflow-teal: #24D2A4;
+  --downstream-amber: #55B7C8;
+  
+  --status-green: #36D399;
+  --status-yellow: #FFD166;
+  --status-orange: #FF9F1C;
+  --status-red: #FF3B3B;
+  --status-disabled: #46545A;
+  
+  --font-mono: var(--font-mono), monospace;
+  --font-inter: var(--font-inter), sans-serif;
 }
 
-[data-theme='dark'], :root {
-  /* Default to Dark Theme since it's a critical dashboard */
-  --bg-color: #050505;
-  --bg-surface: #111111;
-  --bg-surface-glass: rgba(20, 20, 22, 0.7);
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --border-color: rgba(255, 255, 255, 0.08);
-
-  --status-green: #34d399;
-  --status-yellow: #facc15;
-  --status-orange: #fb923c;
-  --status-red: #f87171;
-
-  --status-green-glow: rgba(52, 211, 153, 0.2);
-  --status-yellow-glow: rgba(250, 204, 21, 0.2);
-  --status-orange-glow: rgba(251, 146, 60, 0.2);
-  --status-red-glow: rgba(248, 113, 113, 0.2);
-
-  --accent-color: #60a5fa;
-  --accent-glow: rgba(96, 165, 250, 0.2);
+[data-theme='dark'] {
+  /* Enforce the exact same palette in dark mode */
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
 body {
-  background-color: var(--bg-color);
-  background-image: radial-gradient(circle at top right, rgba(59,130,246,0.05), transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(239,68,68,0.02), transparent 40%);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-image: 
+    linear-gradient(var(--border-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+  background-size: 40px 40px;
   background-attachment: fixed;
-  color: var(--text-main);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  min-height: 100vh;
 }
 
 a {
@@ -66,37 +55,107 @@ a {
   text-decoration: none;
 }
 
-/* Glassmorphism Classes */
-.glass-panel {
-  background: var(--bg-surface-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.glass-panel:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-}
-
-/* Container */
 .container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 1.5rem;
 }
 
-/* Utilities */
-.text-center { text-align: center; }
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.text-cyan { color: var(--data-cyan); }
+.text-green { color: var(--status-green); }
+.text-yellow { color: var(--status-yellow); }
+.text-orange { color: var(--status-orange); }
+.text-red { color: var(--status-red); }
 .text-muted { color: var(--text-muted); }
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-4 { margin-top: 2rem; }
-.mt-8 { margin-top: 4rem; }
-.mb-4 { margin-bottom: 2rem; }
-.flex { display: flex; }
-.justify-between { justify-content: space-between; }
-.items-center { align-items: center; }
+
+.bg-panel {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.card {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.status-pulse-red {
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 59, 59, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0); }
+}
+
+.status-pulse-orange {
+  animation: pulse-orange 2s infinite;
+}
+
+@keyframes pulse-orange {
+  0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(255, 159, 28, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); }
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 150ms ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--border-color);
+  color: #fff;
+}
+
+.btn-emergency {
+  background-color: rgba(255, 59, 59, 0.1);
+  color: var(--status-red);
+  border: 1px solid var(--status-red);
+}
+
+.btn-emergency:hover {
+  background-color: var(--status-red);
+  color: #000;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

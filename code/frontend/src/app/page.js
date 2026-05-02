@@ -3,21 +3,26 @@
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
-import LiveMonitoringTab from '@/components/tabs/LiveMonitoringTab';
-import TrendsPredictionTab from '@/components/tabs/TrendsPredictionTab';
-import EarlyWarningTab from '@/components/tabs/EarlyWarningTab';
-import HistoricalAnalysisTab from '@/components/tabs/HistoricalAnalysisTab';
+// Import Tabs (we will create these next)
+import HomeTab from '@/components/tabs/HomeTab';
+import LiveReadingsTab from '@/components/tabs/LiveReadingsTab';
+import RiskAnalysisTab from '@/components/tabs/RiskAnalysisTab';
+import GateReleaseTab from '@/components/tabs/GateReleaseTab';
+import TrendsGraphsTab from '@/components/tabs/TrendsGraphsTab';
+import AlertsLogTab from '@/components/tabs/AlertsLogTab';
+import ConfigurationTab from '@/components/tabs/ConfigurationTab';
+import ReportsTab from '@/components/tabs/ReportsTab';
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('LIVE'); // LIVE, TRENDS, WARNING, HISTORY
+  const [activeTab, setActiveTab] = useState('HOME');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/processed?limit=60');
+        const res = await fetch('/api/processed?limit=180'); // Fetch 3 hours of data (180 mins)
         const json = await res.json();
 
         if (json && json.length > 0) {
@@ -25,7 +30,7 @@ export default function Dashboard() {
           setData(json[json.length - 1]); // Last item is the most recent
         }
       } catch (e) {
-        console.error(e);
+        console.error("Failed to fetch data:", e);
       } finally {
         setLoading(false);
       }
@@ -36,54 +41,91 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <div className="container text-center mt-8">Loading live data...</div>;
-  if (!data) return <div className="container text-center mt-8 text-muted">No processed data available. Please ensure simulator and processor are running.</div>;
+  if (loading) {
+    return (
+      <div className={styles.loadingScreen}>
+        <div className={styles.spinner}></div>
+        <div>INITIALIZING SCADA TERMINAL...</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className={styles.loadingScreen}>
+        <div className="text-red font-mono">CONNECTION FAILED</div>
+        <div className="text-muted mt-4">NO DATA STREAMS DETECTED. VERIFY TELEMETRY LINK.</div>
+      </div>
+    );
+  }
+
+  // Derive top-bar properties
+  const isStale = (new Date() - new Date(data.timestamp)) > 120000; // 2 minutes
+  const freshness = isStale ? 'DELAYED' : 'LIVE';
 
   return (
     <div className={styles.dashboard}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>FloodGuard Dashboard</h1>
-          <p className={styles.subtitle}>Last Updated: {new Date(data.timestamp).toLocaleTimeString()}</p>
+      
+      {/* TOP COMMAND BAR */}
+      <header className={styles.commandBar}>
+        <div className={styles.commandLeft}>
+          <span className={styles.systemName}>Adaptive Dam Reservoir Management System</span>
+          <span className="text-muted">STATION: FLD-ALPHA-01</span>
+        </div>
+        
+        <div className={styles.commandCenter}>
+          <div className={`${styles.statusBadge} ${styles[`status-${data.status}`]}`}>
+            {data.status}
+          </div>
+          <span>UPDATED: {new Date(data.timestamp).toLocaleTimeString()}</span>
+          <div className={styles.dataFreshness}>
+            <div className={isStale ? '' : styles.pulseDot} style={{backgroundColor: isStale ? 'var(--status-orange)' : 'var(--status-green)'}}></div>
+            <span style={{color: isStale ? 'var(--status-orange)' : 'var(--status-green)'}}>{freshness}</span>
+          </div>
+        </div>
+
+        <div className={styles.commandRight}>
+          <span>{new Date().toLocaleDateString()}</span>
+          <span className="text-cyan">AUTH: DAM OFFICER</span>
+          {['ORANGE', 'RED'].includes(data.status) && (
+            <span className="text-red font-weight-bold" style={{border: '1px solid var(--status-red)', padding: '2px 6px'}}>EMERGENCY MODE</span>
+          )}
         </div>
       </header>
 
-      {/* Navigation Tabs */}
+      {/* NAVIGATION TABS */}
       <div className={styles.tabsContainer}>
-        <button
-          className={`${styles.tabButton} ${activeTab === 'LIVE' ? styles.tabButtonActive : ''}`}
-          onClick={() => setActiveTab('LIVE')}
-        >
-          Live Monitoring
-        </button>
-        <button
-          className={`${styles.tabButton} ${activeTab === 'TRENDS' ? styles.tabButtonActive : ''}`}
-          onClick={() => setActiveTab('TRENDS')}
-        >
-          Trends & Prediction
-        </button>
-        <button
-          className={`${styles.tabButton} ${activeTab === 'WARNING' ? styles.tabButtonActive : ''}`}
-          onClick={() => setActiveTab('WARNING')}
-        >
-          Early Warning & Advisory
-        </button>
-        <button
-          className={`${styles.tabButton} ${activeTab === 'HISTORY' ? styles.tabButtonActive : ''}`}
-          onClick={() => setActiveTab('HISTORY')}
-        >
-          Historical Analysis
-        </button>
+        {[
+          { id: 'HOME', label: 'Home / Overview' },
+          { id: 'LIVE', label: 'Live Sensors' },
+          { id: 'RISK', label: 'Risk Analysis' },
+          { id: 'GATE', label: 'Gate Control' },
+          { id: 'TRENDS', label: 'Trends & Graphs' },
+          { id: 'LOGS', label: 'Alerts & Event Log' },
+          { id: 'CONFIG', label: 'Configuration' },
+          { id: 'REPORTS', label: 'Reports / Export' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabButtonActive : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Tab Content Rendering */}
-      <div>
-        {activeTab === 'LIVE' && <LiveMonitoringTab data={data} />}
-        {activeTab === 'TRENDS' && <TrendsPredictionTab history={history} />}
-        {activeTab === 'WARNING' && <EarlyWarningTab data={data} />}
-        {activeTab === 'HISTORY' && <HistoricalAnalysisTab />}
+      {/* MAIN CONTENT AREA */}
+      <div className={styles.contentArea}>
+        {activeTab === 'HOME' && <HomeTab data={data} history={history} setActiveTab={setActiveTab} />}
+        {activeTab === 'LIVE' && <LiveReadingsTab data={data} history={history} />}
+        {activeTab === 'RISK' && <RiskAnalysisTab data={data} />}
+        {activeTab === 'GATE' && <GateReleaseTab data={data} />}
+        {activeTab === 'TRENDS' && <TrendsGraphsTab history={history} />}
+        {activeTab === 'LOGS' && <AlertsLogTab history={history} />}
+        {activeTab === 'CONFIG' && <ConfigurationTab />}
+        {activeTab === 'REPORTS' && <ReportsTab data={data} history={history} />}
       </div>
     </div>
   );
 }
-
