@@ -152,8 +152,10 @@ def determine_status_full(L: float, AT: float, rr_band: str, DL: float, acc: Opt
 
 def calculate_release_recommendation(L: float, AT: float, IF: float, DL: float) -> dict:
     # Step 1: ReleaseRate
-    safe_storage_rate = (AT - L) * config.ReservoirCapacity / 60.0
+    safe_storage_rate = ((AT - L) / 100.0) * config.ReservoirCapacity / (config.SHORT_WINDOW_MINUTES * 60.0)
     release_rate = IF - safe_storage_rate
+    if release_rate < 0:
+        release_rate = 0.0
     
     # Step 2: MaxSafeRelease
     max_safe_release = round(config.DownstreamCapacity * (1.0 - (DL / 100.0)), 2)
