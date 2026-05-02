@@ -1,0 +1,18 @@
+[Unit]
+Description=FloodGuard Python Backend Orchestrator
+After=network.target
+
+[Service]
+# IMPORTANT: Adjust the 'User' and 'WorkingDirectory' to match your EC2 instance setup
+User=ubuntu
+WorkingDirectory=/home/ubuntu/e22-co2060-floodguard
+Environment="PATH=/home/ubuntu/e22-co2060-floodguard/venv/bin:/usr/bin"
+ExecStart=/home/ubuntu/e22-co2060-floodguard/venv/bin/python code/main.py
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=floodguard-backend
+
+[Install]
+WantedBy=multi-user.target
