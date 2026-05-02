@@ -3,31 +3,26 @@
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
-// Import Tabs (we will create these next)
-import HomeTab from '@/components/tabs/HomeTab';
-import LiveReadingsTab from '@/components/tabs/LiveReadingsTab';
-import RiskAnalysisTab from '@/components/tabs/RiskAnalysisTab';
-import GateReleaseTab from '@/components/tabs/GateReleaseTab';
-import TrendsGraphsTab from '@/components/tabs/TrendsGraphsTab';
-import AlertsLogTab from '@/components/tabs/AlertsLogTab';
-import ConfigurationTab from '@/components/tabs/ConfigurationTab';
-import ReportsTab from '@/components/tabs/ReportsTab';
+// Import Tabs
+import OverviewTab from '@/components/tabs/OverviewTab';
+import AnalysisTab from '@/components/tabs/AnalysisTab';
+import LogsTab from '@/components/tabs/LogsTab';
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('HOME');
+  const [activeTab, setActiveTab] = useState('OVERVIEW');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/processed?limit=180'); // Fetch 3 hours of data (180 mins)
+        const res = await fetch('/api/processed?limit=180');
         const json = await res.json();
 
         if (json && json.length > 0) {
           setHistory(json);
-          setData(json[json.length - 1]); // Last item is the most recent
+          setData(json[json.length - 1]);
         }
       } catch (e) {
         console.error("Failed to fetch data:", e);
@@ -69,41 +64,26 @@ export default function Dashboard() {
       {/* TOP COMMAND BAR */}
       <header className={styles.commandBar}>
         <div className={styles.commandLeft}>
-          <span className={styles.systemName}>Adaptive Dam Reservoir Management System</span>
-          <span className="text-muted">STATION: FLD-ALPHA-01</span>
+          <span className={styles.systemName}>FloodGuard OP-CENTER</span>
+          <span className="text-muted">|</span>
+          <span className="text-primary font-mono">STATION: FLD-ALPHA-01</span>
         </div>
         
-        <div className={styles.commandCenter}>
-          <div className={`${styles.statusBadge} ${styles[`status-${data.status}`]}`}>
-            {data.status}
-          </div>
-          <span>UPDATED: {new Date(data.timestamp).toLocaleTimeString()}</span>
+        <div className={styles.commandRight}>
+          <span>{new Date(data.timestamp).toLocaleTimeString()}</span>
           <div className={styles.dataFreshness}>
             <div className={isStale ? '' : styles.pulseDot} style={{backgroundColor: isStale ? 'var(--status-orange)' : 'var(--status-green)'}}></div>
             <span style={{color: isStale ? 'var(--status-orange)' : 'var(--status-green)'}}>{freshness}</span>
           </div>
-        </div>
-
-        <div className={styles.commandRight}>
-          <span>{new Date().toLocaleDateString()}</span>
-          <span className="text-cyan">AUTH: DAM OFFICER</span>
-          {['ORANGE', 'RED'].includes(data.status) && (
-            <span className="text-red font-weight-bold" style={{border: '1px solid var(--status-red)', padding: '2px 6px'}}>EMERGENCY MODE</span>
-          )}
         </div>
       </header>
 
       {/* NAVIGATION TABS */}
       <div className={styles.tabsContainer}>
         {[
-          { id: 'HOME', label: 'Home / Overview' },
-          { id: 'LIVE', label: 'Live Sensors' },
-          { id: 'RISK', label: 'Risk Analysis' },
-          { id: 'GATE', label: 'Gate Control' },
-          { id: 'TRENDS', label: 'Trends & Graphs' },
-          { id: 'LOGS', label: 'Alerts & Event Log' },
-          { id: 'CONFIG', label: 'Configuration' },
-          { id: 'REPORTS', label: 'Reports / Export' }
+          { id: 'OVERVIEW', label: 'Overview' },
+          { id: 'ANALYSIS', label: 'Analysis' },
+          { id: 'LOGS', label: 'Logs' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -117,14 +97,9 @@ export default function Dashboard() {
 
       {/* MAIN CONTENT AREA */}
       <div className={styles.contentArea}>
-        {activeTab === 'HOME' && <HomeTab data={data} history={history} setActiveTab={setActiveTab} />}
-        {activeTab === 'LIVE' && <LiveReadingsTab data={data} history={history} />}
-        {activeTab === 'RISK' && <RiskAnalysisTab data={data} />}
-        {activeTab === 'GATE' && <GateReleaseTab data={data} />}
-        {activeTab === 'TRENDS' && <TrendsGraphsTab history={history} />}
-        {activeTab === 'LOGS' && <AlertsLogTab history={history} />}
-        {activeTab === 'CONFIG' && <ConfigurationTab />}
-        {activeTab === 'REPORTS' && <ReportsTab data={data} history={history} />}
+        {activeTab === 'OVERVIEW' && <OverviewTab data={data} history={history} />}
+        {activeTab === 'ANALYSIS' && <AnalysisTab data={data} />}
+        {activeTab === 'LOGS' && <LogsTab history={history} />}
       </div>
     </div>
   );

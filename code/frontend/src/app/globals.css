@@ -1,10 +1,10 @@
 :root {
-  /* SCADA Industrial Palette */
+  /* SCADA Industrial Palette - Simplified */
   --bg-primary: #0B0F12;
-  --bg-secondary: #131A1E;
-  --bg-tertiary: #182126;
-  --border-color: #2B3A40;
-  --border-light: rgba(143, 163, 173, 0.18);
+  --bg-secondary: #141B20;
+  --bg-tertiary: #192227;
+  --border-color: #2A363C;
+  --border-light: rgba(143, 163, 173, 0.1);
   
   --text-primary: #E8F1F2;
   --text-secondary: #B6C7CD;
@@ -27,10 +27,6 @@
   --font-inter: var(--font-inter), sans-serif;
 }
 
-[data-theme='dark'] {
-  /* Enforce the exact same palette in dark mode */
-}
-
 * {
   box-sizing: border-box;
   padding: 0;
@@ -46,7 +42,7 @@ body {
   background-image: 
     linear-gradient(var(--border-light) 1px, transparent 1px),
     linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-size: 80px 80px; /* Subtle grid */
   background-attachment: fixed;
 }
 
@@ -56,9 +52,9 @@ a {
 }
 
 .container {
-  max-width: 1600px;
+  max-width: 1800px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -76,39 +72,28 @@ h1, h2, h3, h4, h5, h6 {
 .text-orange { color: var(--status-orange); }
 .text-red { color: var(--status-red); }
 .text-muted { color: var(--text-muted); }
+.text-primary { color: var(--text-primary); }
 
 .bg-panel {
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 .card {
   background-color: var(--bg-tertiary);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.25rem;
+  padding: 1rem;
 }
 
+/* Minimal glow/pulse for critical states only */
 .status-pulse-red {
-  animation: pulse-red 1.5s infinite;
+  animation: pulse-red 2s infinite;
 }
 
 @keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 59, 59, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.2); }
+  70% { box-shadow: 0 0 0 6px rgba(255, 59, 59, 0); }
   100% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0); }
-}
-
-.status-pulse-orange {
-  animation: pulse-orange 2s infinite;
-}
-
-@keyframes pulse-orange {
-  0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.3); }
-  70% { box-shadow: 0 0 0 8px rgba(255, 159, 28, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); }
 }
 
 button {
@@ -119,11 +104,10 @@ button {
 }
 
 .btn-primary {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   padding: 0.5rem 1rem;
-  border-radius: 6px;
   font-weight: 500;
   transition: all 150ms ease;
 }
@@ -137,6 +121,7 @@ button {
   background-color: rgba(255, 59, 59, 0.1);
   color: var(--status-red);
   border: 1px solid var(--status-red);
+  font-weight: 600;
 }
 
 .btn-emergency:hover {
@@ -146,15 +131,14 @@ button {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
-  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);

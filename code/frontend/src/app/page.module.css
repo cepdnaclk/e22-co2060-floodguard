@@ -11,11 +11,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
@@ -32,84 +32,62 @@
   text-transform: uppercase;
 }
 
-.statusBadge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.status-GREEN { background-color: rgba(54, 211, 153, 0.15); color: var(--status-green); border: 1px solid var(--status-green); }
-.status-YELLOW { background-color: rgba(255, 209, 102, 0.15); color: var(--status-yellow); border: 1px solid var(--status-yellow); }
-.status-ORANGE { background-color: rgba(255, 159, 28, 0.15); color: var(--status-orange); border: 1px solid var(--status-orange); }
-.status-RED { background-color: rgba(255, 59, 59, 0.15); color: var(--status-red); border: 1px solid var(--status-red); }
-
 .dataFreshness {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border-color);
 }
 
 .pulseDot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background-color: var(--status-green);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--status-green);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.4; }
-  100% { opacity: 1; }
+  box-shadow: 0 0 4px var(--status-green);
 }
 
 /* NAVIGATION TABS */
 .tabsContainer {
   display: flex;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
-  padding: 0 1.5rem;
-  overflow-x: auto;
+  padding: 0 1rem;
 }
 
 .tabButton {
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1.5rem;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  letter-spacing: 1px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease;
 }
 
 .tabButton:hover {
   color: var(--text-primary);
-  background-color: rgba(255,255,255,0.02);
 }
 
 .tabButtonActive {
-  color: var(--data-cyan);
+  color: var(--text-primary);
   border-bottom-color: var(--data-cyan);
-  background-color: rgba(59, 214, 232, 0.05);
 }
 
 /* MAIN CONTENT AREA */
 .contentArea {
   flex: 1;
-  padding: 1.5rem;
+  padding: 1rem;
   overflow-y: auto;
 }
 
-/* SCADA GRID LAYOUT (Used in HomeTab) */
+/* SCADA GRID LAYOUT */
 .scadaGrid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .colSpan3 { grid-column: span 3; }
@@ -128,7 +106,7 @@
 
 @media (max-width: 768px) {
   .scadaGrid > div { grid-column: span 12 !important; }
-  .commandBar { flex-direction: column; gap: 1rem; align-items: flex-start; }
+  .commandBar { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
 }
 
 .loadingScreen {
@@ -143,9 +121,9 @@
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--border-color);
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--border-color);
   border-top-color: var(--data-cyan);
   border-radius: 50%;
   animation: spin 1s linear infinite;
