@@ -1,0 +1,811 @@
+timestamp,water_level_pct,rainfall_mm_hr,inflow_m3s,downstream_lvl_pct,phase_note,scenario
+2024-06-01 00:00:00,39.96,2.33,115.91,35.2,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:01:00,40.1,3.45,116.23,35.26,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:02:00,39.97,1.69,118.03,34.82,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:03:00,39.96,3.59,120.24,35.33,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:04:00,39.99,3.16,121.64,34.67,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:05:00,40.04,3.41,122.36,34.85,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:06:00,39.99,2.46,121.28,34.98,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:07:00,40.07,3.0,119.81,34.97,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:08:00,40.07,3.23,120.97,35.21,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:09:00,39.95,2.28,117.09,34.86,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:10:00,40.02,3.03,118.83,35.06,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:11:00,40.08,3.21,114.14,35.04,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:12:00,40.05,3.96,117.42,35.46,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:13:00,39.94,2.41,121.6,34.98,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:14:00,40.07,2.42,123.8,34.42,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:15:00,40.18,3.56,121.97,35.16,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:16:00,40.07,3.64,118.4,35.81,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:17:00,40.13,2.79,119.0,34.63,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:18:00,40.09,3.64,116.07,35.58,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:19:00,40.07,3.09,119.26,35.05,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:20:00,40.15,3.5,121.46,34.98,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:21:00,40.09,3.31,120.59,35.6,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:22:00,40.18,2.77,120.97,34.72,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:23:00,40.2,3.53,121.13,34.72,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:24:00,40.11,3.21,117.98,35.04,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:25:00,40.24,2.66,120.58,35.32,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:26:00,40.24,2.34,118.88,35.05,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:27:00,40.21,3.37,120.37,34.65,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:28:00,40.24,3.17,117.63,35.0,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:29:00,40.21,3.54,121.3,35.26,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:30:00,40.37,3.04,121.5,35.13,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:31:00,40.26,3.22,121.58,34.4,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:32:00,40.25,3.1,120.45,34.98,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:33:00,40.31,3.67,119.77,34.53,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:34:00,40.35,2.32,121.15,34.82,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:35:00,40.37,2.88,121.36,35.2,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:36:00,40.37,3.08,121.13,35.38,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:37:00,40.43,4.02,122.11,34.92,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:38:00,40.38,3.09,118.69,35.11,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:39:00,40.52,2.82,119.49,35.07,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:40:00,40.52,4.05,116.93,35.02,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:41:00,40.56,2.45,122.35,35.1,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:42:00,40.51,3.19,117.06,34.74,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:43:00,40.63,2.22,121.43,35.29,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:44:00,40.58,2.71,117.03,35.18,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:45:00,40.65,3.71,124.01,35.39,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:46:00,40.67,3.18,121.75,35.53,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:47:00,40.64,3.1,116.25,35.3,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:48:00,40.68,3.54,118.94,35.1,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:49:00,40.68,3.86,119.14,34.96,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:50:00,40.74,3.55,121.45,34.99,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:51:00,40.77,3.08,120.34,34.87,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:52:00,40.78,1.8,119.79,35.38,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:53:00,40.9,2.67,118.92,34.67,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:54:00,40.86,3.27,123.47,34.83,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:55:00,40.91,2.94,119.5,35.08,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:56:00,40.91,3.22,122.54,34.88,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:57:00,40.88,2.0,118.43,34.82,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:58:00,40.99,2.75,119.76,34.63,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 00:59:00,41.0,3.29,118.7,34.46,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:00:00,41.02,2.85,117.55,35.19,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:01:00,40.94,3.28,119.51,35.4,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:02:00,41.03,3.53,120.45,34.65,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:03:00,41.17,2.83,121.97,34.56,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:04:00,41.15,2.83,118.19,35.18,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:05:00,41.17,2.65,119.77,34.84,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:06:00,41.18,3.18,117.15,35.33,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:07:00,41.22,2.96,121.71,34.94,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:08:00,41.1,3.25,120.49,35.44,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:09:00,41.23,3.09,119.09,34.7,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:10:00,41.28,3.48,121.79,35.43,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:11:00,41.27,3.15,118.99,34.73,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:12:00,41.18,2.94,119.42,34.52,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:13:00,41.36,2.91,116.02,35.01,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:14:00,41.36,2.65,119.81,35.11,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:15:00,41.37,3.63,120.75,34.04,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:16:00,41.39,2.29,117.13,34.96,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:17:00,41.41,3.62,119.68,35.09,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:18:00,41.46,2.41,118.97,35.26,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:19:00,41.47,3.02,122.66,35.13,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:20:00,41.49,3.21,117.25,34.46,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:21:00,41.58,2.36,123.81,34.53,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:22:00,41.56,3.32,118.5,35.17,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:23:00,41.63,2.49,120.17,35.04,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:24:00,41.67,3.72,121.61,34.78,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:25:00,41.73,2.82,119.08,35.25,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:26:00,41.65,2.89,120.92,34.8,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:27:00,41.7,3.24,122.58,34.71,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:28:00,41.65,3.01,117.9,34.99,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:29:00,41.69,3.22,119.98,34.82,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:30:00,41.68,3.0,117.41,35.04,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:31:00,41.66,3.0,118.69,35.05,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:32:00,41.77,3.74,117.62,34.93,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:33:00,41.74,2.96,115.98,34.58,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:34:00,41.76,3.93,120.03,35.14,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:35:00,41.75,2.63,118.86,34.7,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:36:00,41.79,2.82,120.65,35.11,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:37:00,41.79,2.17,117.27,35.1,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:38:00,41.8,3.55,120.8,35.42,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:39:00,41.84,3.3,121.52,34.84,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:40:00,41.9,2.76,118.43,35.14,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:41:00,41.87,3.11,119.09,35.1,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:42:00,41.82,3.48,121.53,34.91,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:43:00,41.88,3.16,120.56,34.83,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:44:00,41.96,2.93,115.94,35.62,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:45:00,41.92,2.65,116.96,35.14,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:46:00,42.05,2.72,119.18,35.24,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:47:00,41.92,2.85,116.45,35.25,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:48:00,41.99,2.28,119.12,34.64,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:49:00,41.88,3.07,117.97,35.03,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:50:00,41.95,2.69,122.53,35.25,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:51:00,42.03,3.41,119.03,35.31,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:52:00,42.06,2.46,118.1,34.86,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:53:00,42.07,2.54,118.27,35.46,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:54:00,41.97,2.6,120.11,35.63,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:55:00,42.03,3.23,121.54,35.18,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:56:00,41.92,3.18,121.51,35.08,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:57:00,41.96,2.95,120.5,34.64,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:58:00,41.88,2.89,118.89,35.2,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 01:59:00,42.07,2.81,122.13,35.11,S2-Calm baseline,Scenario_2_Heavy_Rain
+2024-06-01 02:00:00,41.94,2.76,121.96,34.93,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:01:00,41.96,3.7,119.37,35.0,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:02:00,41.94,2.0,119.51,34.92,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:03:00,42.07,3.4,119.41,35.03,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:04:00,42.04,3.49,119.73,35.45,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:05:00,42.13,2.32,120.26,34.91,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:06:00,42.11,3.5,119.81,35.0,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:07:00,42.14,3.7,123.63,35.21,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:08:00,42.12,3.08,120.85,34.95,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:09:00,42.17,3.77,124.18,35.21,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:10:00,42.23,3.67,121.4,35.09,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:11:00,42.21,4.48,121.69,35.59,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:12:00,42.34,4.12,122.16,35.47,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:13:00,42.47,4.5,126.51,35.3,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:14:00,42.5,5.31,123.57,35.47,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:15:00,42.55,4.32,124.83,35.37,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:16:00,42.7,5.5,124.78,35.19,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:17:00,42.69,4.96,125.25,35.63,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:18:00,42.77,6.35,124.76,35.93,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:19:00,42.85,6.19,126.0,35.48,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:20:00,43.04,6.96,129.58,34.87,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:21:00,43.05,7.51,128.95,35.25,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:22:00,43.33,7.02,130.88,35.4,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:23:00,43.2,7.92,129.83,35.39,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:24:00,43.37,8.58,134.3,35.3,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:25:00,43.41,8.1,134.16,35.55,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:26:00,43.55,8.48,131.54,35.94,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:27:00,43.69,8.62,136.85,35.67,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:28:00,43.8,10.21,139.76,35.82,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:29:00,43.88,9.47,139.51,35.52,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:30:00,44.01,10.67,135.6,36.14,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:31:00,44.08,10.5,141.08,36.21,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:32:00,44.22,10.36,137.89,35.6,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:33:00,44.39,11.46,143.63,36.49,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:34:00,44.37,11.97,141.47,35.59,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:35:00,44.5,12.6,139.73,36.63,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:36:00,44.66,12.39,144.38,36.31,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:37:00,44.75,12.92,145.61,36.57,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:38:00,44.83,13.87,146.19,36.65,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:39:00,44.87,13.56,143.43,36.72,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:40:00,45.05,13.68,147.86,36.34,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:41:00,45.1,14.16,145.83,36.93,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:42:00,45.24,15.2,149.65,36.39,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:43:00,45.24,15.27,148.1,36.98,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:44:00,45.41,15.47,146.71,36.8,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:45:00,45.39,14.9,147.81,36.65,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:46:00,45.51,16.09,151.68,36.7,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:47:00,45.6,16.76,152.77,36.75,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:48:00,45.54,16.13,152.11,37.28,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:49:00,45.64,16.99,151.82,36.93,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:50:00,45.68,16.9,157.08,36.96,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:51:00,45.82,17.3,153.0,36.76,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:52:00,45.86,17.46,156.02,36.63,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:53:00,45.86,17.11,152.07,36.94,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:54:00,45.93,16.92,152.66,36.94,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:55:00,45.89,17.2,156.62,36.95,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:56:00,45.95,18.1,155.23,36.86,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:57:00,45.82,17.41,150.73,36.78,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:58:00,46.0,19.14,153.12,36.62,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 02:59:00,46.06,18.0,154.92,37.55,S2-Rain building [YELLOW expected],Scenario_2_Heavy_Rain
+2024-06-01 03:00:00,45.96,17.95,155.59,37.3,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:01:00,46.0,17.58,152.81,37.36,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:02:00,45.98,17.29,156.83,37.28,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:03:00,46.06,17.23,157.02,36.82,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:04:00,46.16,18.34,153.07,37.14,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:05:00,46.04,17.59,157.0,36.93,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:06:00,46.12,18.56,158.47,37.49,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:07:00,46.16,18.13,157.41,36.77,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:08:00,46.1,18.66,156.84,37.44,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:09:00,46.18,18.41,158.09,36.61,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:10:00,46.37,18.36,157.26,36.71,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:11:00,46.29,18.78,161.92,37.01,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:12:00,46.47,18.34,161.51,36.6,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:13:00,46.49,19.48,160.28,37.65,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:14:00,46.58,18.81,163.45,37.69,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:15:00,46.65,19.98,160.84,37.51,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:16:00,46.68,19.35,164.88,37.57,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:17:00,46.82,19.07,163.93,36.82,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:18:00,47.03,19.37,166.91,36.98,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:19:00,47.09,19.15,164.37,37.55,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:20:00,47.22,20.01,166.6,37.8,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:21:00,47.29,20.72,168.69,37.97,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:22:00,47.34,20.19,172.82,37.42,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:23:00,47.54,21.45,170.96,37.73,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:24:00,47.53,21.17,173.99,38.17,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:25:00,47.74,22.15,175.96,38.17,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:26:00,47.86,21.52,176.39,38.17,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:27:00,48.03,22.65,178.95,38.35,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:28:00,48.19,22.92,181.5,38.29,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:29:00,48.39,22.63,180.23,38.39,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:30:00,48.45,23.52,186.95,38.3,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:31:00,48.65,22.91,183.27,37.84,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:32:00,48.84,22.88,182.22,38.28,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:33:00,48.95,23.37,187.95,38.84,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:34:00,49.2,25.54,188.1,38.31,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:35:00,49.29,23.67,193.59,38.58,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:36:00,49.43,25.08,192.19,38.79,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:37:00,49.63,25.29,192.09,39.03,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:38:00,49.82,26.24,197.67,38.81,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:39:00,49.96,26.16,199.92,38.92,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:40:00,50.13,26.34,201.16,38.98,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:41:00,50.23,26.1,202.39,39.3,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:42:00,50.51,27.25,202.98,39.18,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:43:00,50.74,26.09,207.96,38.79,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:44:00,50.77,28.02,207.91,39.55,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:45:00,51.03,28.29,209.5,39.55,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:46:00,51.12,28.22,213.4,39.67,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:47:00,51.29,28.03,217.15,39.66,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:48:00,51.53,28.82,217.1,39.64,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:49:00,51.7,29.43,211.45,40.1,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:50:00,52.01,29.31,221.16,40.11,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:51:00,52.1,30.2,222.04,40.08,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:52:00,52.23,30.54,223.9,40.04,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:53:00,52.43,31.38,225.96,40.55,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:54:00,52.54,31.91,224.93,40.32,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:55:00,52.66,31.97,230.72,40.12,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:56:00,52.9,31.81,231.69,40.48,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:57:00,53.0,32.93,231.59,40.45,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:58:00,53.27,32.35,231.83,40.75,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 03:59:00,53.36,32.99,234.93,40.28,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:00:00,53.55,33.35,235.55,41.06,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:01:00,53.59,33.98,238.87,40.79,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:02:00,53.68,32.8,241.73,40.84,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:03:00,53.88,34.44,241.75,41.18,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:04:00,54.07,33.67,244.55,41.09,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:05:00,54.24,34.37,243.1,40.28,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:06:00,54.39,35.26,245.62,41.75,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:07:00,54.53,34.68,242.42,41.85,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:08:00,54.65,35.15,249.7,41.02,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:09:00,54.76,35.86,249.11,41.53,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:10:00,54.89,35.59,252.76,41.13,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:11:00,54.96,35.24,252.45,41.83,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:12:00,54.93,36.87,253.24,41.38,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:13:00,55.19,36.82,256.77,41.78,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:14:00,55.18,36.47,258.44,41.72,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:15:00,55.39,35.68,255.19,41.66,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:16:00,55.44,37.2,254.69,41.41,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:17:00,55.44,37.19,257.63,42.03,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:18:00,55.54,37.77,257.46,42.33,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:19:00,55.56,37.33,259.78,42.05,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:20:00,55.7,37.82,262.24,41.26,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:21:00,55.77,37.29,262.11,41.64,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:22:00,55.77,36.75,262.12,41.68,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:23:00,55.84,37.79,260.05,42.37,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:24:00,55.96,38.0,266.87,41.44,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:25:00,55.96,37.29,261.93,41.83,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:26:00,55.97,38.0,267.23,42.72,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:27:00,56.04,37.77,263.32,41.35,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:28:00,55.97,36.98,264.17,42.01,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:29:00,56.0,39.01,265.09,41.49,S2-Heavy rain inflow surge [ORANGE expected],Scenario_2_Heavy_Rain
+2024-06-01 04:30:00,55.99,38.11,263.73,42.54,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:31:00,56.03,39.14,263.97,41.81,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:32:00,56.03,37.14,260.07,42.02,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:33:00,56.01,37.84,266.26,41.93,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:34:00,56.08,37.38,266.62,42.46,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:35:00,56.09,37.96,264.91,42.32,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:36:00,56.1,37.78,264.81,42.0,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:37:00,56.26,38.37,266.72,41.74,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:38:00,56.19,38.34,267.8,41.56,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:39:00,56.31,38.71,274.8,42.33,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:40:00,56.28,38.71,268.26,42.25,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:41:00,56.33,39.09,273.67,42.43,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:42:00,56.49,38.87,272.01,42.47,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:43:00,56.5,38.7,271.5,42.66,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:44:00,56.67,37.83,274.7,43.11,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:45:00,56.74,38.83,277.82,42.7,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:46:00,56.77,39.16,276.29,42.99,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:47:00,56.98,39.12,278.98,43.18,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:48:00,57.01,40.47,279.9,43.16,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:49:00,57.07,38.95,285.39,43.39,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:50:00,57.18,39.56,281.92,43.59,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:51:00,57.38,40.07,282.77,43.59,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:52:00,57.51,40.06,285.97,43.89,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:53:00,57.64,40.26,287.22,44.09,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:54:00,57.79,40.6,290.58,44.11,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:55:00,57.82,40.62,291.38,44.26,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:56:00,57.95,40.35,290.96,44.0,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:57:00,58.15,41.23,292.62,44.16,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:58:00,58.29,40.88,296.1,44.73,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 04:59:00,58.32,40.24,299.91,44.23,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:00:00,58.41,40.94,300.54,45.54,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:01:00,58.55,40.99,305.51,45.31,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:02:00,58.77,42.44,302.16,45.58,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:03:00,58.91,41.68,303.26,45.54,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:04:00,59.02,42.55,306.52,45.25,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:05:00,59.11,41.43,310.36,45.37,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:06:00,59.3,43.23,311.28,45.78,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:07:00,59.44,43.2,314.75,45.74,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:08:00,59.55,42.9,313.1,46.07,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:09:00,59.66,43.26,318.3,46.59,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:10:00,59.76,42.89,315.73,46.59,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:11:00,59.93,43.23,316.87,46.72,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:12:00,59.91,43.84,323.62,47.13,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:13:00,60.08,42.89,325.82,46.62,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:14:00,60.15,43.41,323.64,46.96,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:15:00,60.23,42.96,327.35,47.01,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:16:00,60.34,44.5,329.14,47.63,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:17:00,60.41,44.81,325.19,47.6,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:18:00,60.47,43.69,332.91,47.72,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:19:00,60.62,45.35,331.1,47.73,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:20:00,60.64,44.59,335.9,47.53,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:21:00,60.73,44.14,335.42,48.03,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:22:00,60.79,44.53,330.52,47.31,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:23:00,60.81,45.36,334.47,47.18,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:24:00,60.82,44.8,336.06,47.56,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:25:00,60.96,44.36,336.36,48.64,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:26:00,60.91,44.04,330.36,48.03,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:27:00,61.01,43.89,336.49,47.67,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:28:00,61.07,44.46,337.18,48.21,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:29:00,60.89,45.0,335.12,48.2,S2-Approaching adaptive threshold,Scenario_2_Heavy_Rain
+2024-06-01 05:30:00,61.05,45.02,337.15,48.22,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:31:00,61.07,45.35,334.94,47.98,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:32:00,61.04,44.6,334.48,47.88,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:33:00,60.98,45.11,336.55,48.0,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:34:00,61.0,45.73,337.04,47.81,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:35:00,60.88,45.22,335.42,47.9,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:36:00,60.89,44.89,336.06,47.42,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:37:00,60.87,44.69,336.07,47.98,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:38:00,60.91,44.34,332.69,48.16,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:39:00,60.94,44.77,335.96,47.79,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:40:00,60.86,44.78,329.8,48.21,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:41:00,60.85,44.4,336.12,48.29,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:42:00,60.82,43.85,335.16,47.59,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:43:00,60.81,44.38,333.53,47.98,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:44:00,60.76,44.31,332.39,48.13,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:45:00,60.69,44.36,332.38,48.14,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:46:00,60.69,44.33,332.68,48.38,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:47:00,60.64,44.21,330.66,48.94,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:48:00,60.62,43.9,330.52,47.92,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:49:00,60.51,43.85,334.28,48.06,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:50:00,60.56,44.24,333.52,47.88,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:51:00,60.44,44.06,332.25,48.18,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:52:00,60.4,43.54,326.42,48.14,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:53:00,60.51,43.83,323.49,48.58,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:54:00,60.34,44.05,327.9,48.62,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:55:00,60.32,43.99,328.3,48.44,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:56:00,60.19,43.36,327.03,48.78,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:57:00,60.14,42.59,329.61,48.7,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:58:00,60.09,43.79,322.59,48.54,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 05:59:00,59.98,42.99,319.76,48.33,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:00:00,59.93,42.55,322.83,48.27,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:01:00,59.97,42.43,318.81,48.89,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:02:00,59.9,42.85,318.98,48.73,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:03:00,59.76,42.29,322.9,48.78,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:04:00,59.71,42.54,318.65,48.97,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:05:00,59.7,42.11,319.13,48.52,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:06:00,59.46,42.45,321.07,49.11,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:07:00,59.46,42.65,315.18,48.8,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:08:00,59.37,41.39,314.44,48.51,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:09:00,59.32,41.02,311.29,48.41,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:10:00,59.24,40.64,311.04,49.09,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:11:00,59.17,40.1,308.89,48.97,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:12:00,59.15,41.05,310.3,49.46,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:13:00,59.05,40.82,309.9,49.27,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:14:00,58.94,41.03,305.2,48.97,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:15:00,58.92,40.35,305.58,49.09,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:16:00,58.7,40.14,303.18,48.75,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:17:00,58.68,40.23,302.82,49.95,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:18:00,58.58,40.19,304.19,49.39,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:19:00,58.46,38.86,300.34,49.59,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:20:00,58.4,39.13,300.75,49.83,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:21:00,58.39,38.76,297.19,49.58,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:22:00,58.25,39.83,291.81,49.61,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:23:00,58.13,39.21,298.09,49.65,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:24:00,58.04,38.64,292.16,49.61,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:25:00,58.03,38.47,291.27,49.99,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:26:00,57.93,37.24,291.37,49.86,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:27:00,57.77,38.43,289.79,50.04,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:28:00,57.68,37.7,288.32,50.08,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:29:00,57.51,38.02,289.78,50.06,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:30:00,57.47,38.2,290.7,49.78,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:31:00,57.38,37.4,286.07,49.48,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:32:00,57.3,36.91,286.38,50.09,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:33:00,57.32,37.14,284.97,50.14,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:34:00,57.09,37.47,284.28,49.89,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:35:00,56.98,37.47,282.52,50.07,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:36:00,57.03,36.24,281.13,50.45,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:37:00,56.87,35.74,279.36,50.66,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:38:00,56.81,34.57,280.23,50.27,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:39:00,56.7,34.92,280.7,50.31,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:40:00,56.6,36.11,277.25,50.63,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:41:00,56.53,34.49,275.53,50.73,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:42:00,56.36,35.29,275.33,51.13,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:43:00,56.35,34.64,272.17,50.78,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:44:00,56.19,34.48,270.65,50.81,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:45:00,56.14,34.57,270.12,50.82,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:46:00,56.04,35.04,267.32,51.03,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:47:00,55.91,34.35,269.24,50.83,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:48:00,55.93,35.13,264.46,51.31,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:49:00,55.86,33.33,264.75,50.94,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:50:00,55.76,33.77,264.71,50.67,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:51:00,55.62,34.25,266.56,51.31,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:52:00,55.58,33.01,259.1,50.68,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:53:00,55.5,32.27,260.95,51.04,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:54:00,55.45,33.37,261.74,51.15,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:55:00,55.22,32.09,259.09,51.83,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:56:00,55.31,33.59,259.44,51.29,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:57:00,55.19,32.83,256.7,51.36,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:58:00,55.13,31.77,256.84,51.3,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 06:59:00,55.05,32.29,255.52,51.94,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:00:00,54.95,33.04,252.41,51.33,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:01:00,54.94,31.36,250.7,51.25,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:02:00,54.82,32.48,249.83,51.61,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:03:00,54.81,31.72,251.88,50.93,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:04:00,54.81,32.51,248.92,51.87,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:05:00,54.74,33.26,250.08,51.83,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:06:00,54.61,31.47,248.49,51.78,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:07:00,54.61,31.47,247.21,51.48,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:08:00,54.54,32.07,248.15,51.79,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:09:00,54.5,31.56,246.64,51.9,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:10:00,54.49,31.15,246.19,51.38,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:11:00,54.39,31.24,246.22,51.32,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:12:00,54.44,31.39,244.89,51.94,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:13:00,54.35,30.33,243.74,51.54,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:14:00,54.3,30.95,241.76,51.49,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:15:00,54.29,30.35,240.19,51.21,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:16:00,54.19,30.08,244.7,52.05,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:17:00,54.14,30.62,244.9,51.75,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:18:00,54.18,30.37,241.13,51.63,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:19:00,54.08,30.79,243.63,52.06,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:20:00,54.12,30.45,240.98,51.97,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:21:00,54.1,30.31,236.16,52.12,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:22:00,54.07,29.39,240.48,51.67,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:23:00,54.07,30.17,240.24,51.95,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:24:00,54.07,30.01,241.73,52.22,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:25:00,54.0,30.1,238.92,51.83,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:26:00,53.92,30.49,239.6,52.27,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:27:00,53.98,31.26,240.26,51.49,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:28:00,54.03,29.98,240.29,52.29,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:29:00,54.03,30.98,242.19,51.94,S2-Controlled release active,Scenario_2_Heavy_Rain
+2024-06-01 07:30:00,54.05,29.35,241.68,52.39,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:31:00,53.98,29.64,244.42,52.31,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:32:00,54.0,30.17,243.69,52.24,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:33:00,54.04,29.28,241.59,52.08,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:34:00,53.98,31.23,239.85,52.01,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:35:00,53.9,29.9,238.87,52.37,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:36:00,53.9,30.21,238.56,51.92,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:37:00,53.89,29.83,238.42,52.47,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:38:00,53.95,29.16,241.57,52.44,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:39:00,53.84,30.7,239.0,52.11,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:40:00,53.89,29.32,238.88,51.32,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:41:00,53.95,30.28,240.13,52.04,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:42:00,53.76,29.45,237.53,51.86,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:43:00,53.82,28.96,238.6,51.7,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:44:00,53.9,29.55,236.23,51.97,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:45:00,53.72,28.94,236.59,51.59,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:46:00,53.71,28.47,236.51,51.57,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:47:00,53.66,29.94,236.12,51.54,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:48:00,53.61,28.95,234.54,51.96,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:49:00,53.51,28.44,234.7,52.38,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:50:00,53.54,28.74,234.37,51.41,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:51:00,53.43,28.4,233.52,51.77,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:52:00,53.48,28.56,232.7,51.74,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:53:00,53.42,28.79,234.86,51.39,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:54:00,53.35,28.68,233.23,51.63,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:55:00,53.32,28.26,230.87,51.43,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:56:00,53.16,28.5,227.52,51.35,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:57:00,53.11,29.03,230.73,51.65,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:58:00,53.08,28.79,227.73,51.6,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 07:59:00,53.01,27.52,226.24,51.55,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:00:00,53.03,27.85,226.41,51.23,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:01:00,52.94,27.05,225.69,51.09,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:02:00,52.83,27.14,226.73,50.79,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:03:00,52.7,27.24,224.71,51.61,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:04:00,52.71,27.42,225.0,51.17,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:05:00,52.65,27.33,224.96,51.59,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:06:00,52.58,26.76,220.94,51.14,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:07:00,52.4,26.93,223.59,51.85,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:08:00,52.31,26.77,216.86,51.04,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:09:00,52.36,26.57,219.17,51.01,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:10:00,52.18,25.59,223.47,50.79,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:11:00,52.19,25.98,218.28,50.72,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:12:00,52.09,26.33,220.39,50.67,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:13:00,51.95,25.83,217.13,50.91,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:14:00,51.89,25.39,216.0,50.54,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:15:00,51.84,25.5,214.8,50.94,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:16:00,51.81,24.67,213.93,50.01,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:17:00,51.67,24.5,214.69,50.67,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:18:00,51.58,24.22,211.82,50.69,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:19:00,51.52,25.02,211.84,50.57,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:20:00,51.4,23.63,207.53,50.3,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:21:00,51.27,23.2,207.46,50.34,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:22:00,51.21,23.83,203.23,51.17,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:23:00,51.2,23.15,205.78,50.78,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:24:00,50.94,23.25,204.93,50.57,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:25:00,50.88,22.47,201.11,50.42,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:26:00,50.77,23.26,205.36,50.18,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:27:00,50.84,22.71,199.86,50.24,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:28:00,50.63,22.03,200.25,50.31,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:29:00,50.51,21.96,200.72,50.37,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:30:00,50.68,22.24,202.28,49.4,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:31:00,50.44,21.49,194.83,50.34,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:32:00,50.28,20.8,198.62,50.33,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:33:00,50.21,22.13,196.35,50.62,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:34:00,50.13,20.37,196.65,49.6,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:35:00,50.02,20.97,196.07,49.69,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:36:00,49.99,20.2,192.61,49.61,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:37:00,49.87,21.01,193.98,48.99,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:38:00,49.77,20.37,188.82,49.34,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:39:00,49.62,20.43,185.99,49.47,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:40:00,49.58,19.85,187.22,48.92,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:41:00,49.61,20.12,183.67,49.03,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:42:00,49.34,19.82,185.36,49.12,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:43:00,49.26,19.29,184.06,49.3,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:44:00,49.26,19.4,181.77,49.26,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:45:00,49.18,19.31,180.05,49.51,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:46:00,49.1,19.38,180.06,49.47,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:47:00,48.99,18.82,178.31,49.42,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:48:00,49.03,18.64,178.18,48.78,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:49:00,48.86,18.25,175.97,49.28,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:50:00,48.79,18.15,180.74,48.82,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:51:00,48.65,17.3,173.32,48.58,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:52:00,48.59,17.07,174.05,48.73,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:53:00,48.51,18.02,176.4,48.72,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:54:00,48.53,17.47,173.56,48.79,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:55:00,48.4,16.58,176.14,48.83,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:56:00,48.35,17.2,171.69,48.34,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:57:00,48.12,16.8,171.2,48.89,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:58:00,48.33,16.63,166.86,48.8,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 08:59:00,48.12,16.58,169.59,48.53,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:00:00,48.11,15.9,168.19,48.16,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:01:00,47.94,17.03,166.4,48.96,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:02:00,47.93,15.8,167.26,48.8,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:03:00,47.86,15.7,166.32,48.65,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:04:00,47.79,15.96,166.15,48.63,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:05:00,47.77,16.42,164.08,48.49,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:06:00,47.7,15.82,163.94,48.45,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:07:00,47.7,15.76,163.36,47.85,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:08:00,47.6,15.94,165.04,48.48,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:09:00,47.53,15.73,161.14,48.45,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:10:00,47.49,14.75,161.56,48.31,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:11:00,47.49,14.71,162.84,47.86,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:12:00,47.37,15.06,161.93,48.17,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:13:00,47.49,13.79,158.32,48.4,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:14:00,47.3,15.0,159.55,48.15,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:15:00,47.28,14.1,158.11,47.74,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:16:00,47.16,14.71,157.02,48.36,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:17:00,47.18,14.96,158.28,48.58,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:18:00,47.27,14.76,158.12,48.58,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:19:00,47.03,14.23,157.6,47.94,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:20:00,47.12,15.07,160.31,48.45,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:21:00,47.07,13.44,158.32,48.16,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:22:00,46.97,13.14,151.82,48.31,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:23:00,47.09,13.75,157.61,48.45,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:24:00,47.11,13.4,158.27,47.86,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:25:00,46.98,14.33,158.41,47.63,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:26:00,47.04,14.22,152.82,48.02,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:27:00,46.92,13.48,155.32,48.0,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:28:00,47.08,14.8,157.8,48.09,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:29:00,47.03,13.29,156.17,47.52,"S2-Rain reducing, recovery begins [YELLOW]",Scenario_2_Heavy_Rain
+2024-06-01 09:30:00,46.99,13.72,158.86,48.15,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:31:00,47.03,14.11,157.9,47.76,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:32:00,46.98,14.27,153.85,48.01,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:33:00,46.95,14.41,154.4,47.71,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:34:00,47.01,13.28,153.56,47.55,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:35:00,47.04,13.8,159.79,47.85,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:36:00,46.91,13.67,155.43,48.69,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:37:00,46.88,12.81,154.1,47.63,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:38:00,46.98,13.69,159.11,48.04,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:39:00,46.82,14.21,153.33,47.46,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:40:00,46.85,13.63,159.58,47.79,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:41:00,46.89,13.98,153.78,47.52,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:42:00,46.83,14.02,150.18,48.31,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:43:00,46.83,14.43,156.55,47.9,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:44:00,46.88,14.04,156.15,48.0,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:45:00,46.81,13.96,154.81,47.89,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:46:00,46.75,13.98,156.3,47.82,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:47:00,46.7,13.14,151.77,47.77,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:48:00,46.64,13.42,153.06,47.34,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:49:00,46.65,13.18,154.69,47.44,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:50:00,46.58,13.58,155.84,47.32,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:51:00,46.57,14.0,155.01,47.34,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:52:00,46.51,12.89,150.05,47.8,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:53:00,46.54,12.96,150.06,47.41,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:54:00,46.5,12.16,154.21,47.86,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:55:00,46.4,12.03,150.9,47.03,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:56:00,46.41,13.77,148.77,46.86,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:57:00,46.28,12.74,151.74,46.95,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:58:00,46.23,12.84,153.38,46.79,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 09:59:00,46.17,12.64,150.05,46.7,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:00:00,46.04,12.77,152.9,46.8,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:01:00,46.08,11.62,152.72,46.66,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:02:00,46.02,11.18,149.89,46.25,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:03:00,46.0,12.63,147.78,46.45,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:04:00,45.92,12.47,148.27,46.52,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:05:00,45.82,12.6,148.87,46.43,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:06:00,45.82,12.63,151.24,46.49,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:07:00,45.59,11.89,146.92,45.98,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:08:00,45.6,12.11,149.84,45.93,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:09:00,45.43,11.46,144.34,45.7,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:10:00,45.46,11.45,149.09,46.11,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:11:00,45.44,11.11,148.2,46.02,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:12:00,45.32,12.23,143.51,45.68,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:13:00,45.32,11.04,142.35,45.46,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:14:00,45.29,11.4,146.86,45.39,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:15:00,45.12,10.97,146.77,44.79,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:16:00,45.09,10.31,144.11,45.75,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:17:00,44.98,10.53,143.28,45.22,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:18:00,44.93,10.67,143.25,44.89,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:19:00,44.8,10.49,146.52,45.68,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:20:00,44.73,10.23,142.95,44.92,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:21:00,44.69,9.84,143.58,44.61,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:22:00,44.61,9.67,144.83,44.68,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:23:00,44.52,10.17,139.9,44.78,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:24:00,44.44,10.06,139.43,43.96,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:25:00,44.35,10.89,143.71,44.23,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:26:00,44.28,9.41,141.05,44.61,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:27:00,44.32,8.85,139.14,44.73,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:28:00,44.16,9.62,137.33,44.11,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:29:00,44.09,9.9,141.58,44.23,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:30:00,44.07,10.0,137.42,44.43,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:31:00,44.0,9.03,138.22,43.88,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:32:00,43.87,8.36,136.26,43.66,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:33:00,43.69,8.5,138.0,43.91,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:34:00,43.69,9.15,136.82,43.41,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:35:00,43.59,8.67,136.12,43.33,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:36:00,43.48,8.76,133.6,43.42,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:37:00,43.53,7.52,136.81,43.23,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:38:00,43.37,7.89,135.44,42.71,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:39:00,43.29,7.95,133.53,42.75,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:40:00,43.14,7.8,134.68,43.27,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:41:00,43.17,7.94,135.97,42.39,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:42:00,43.08,7.62,133.2,42.9,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:43:00,43.01,7.41,133.19,42.85,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:44:00,42.98,6.77,131.04,42.54,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:45:00,42.91,6.97,128.95,42.14,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:46:00,42.69,7.62,131.55,42.37,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:47:00,42.7,6.34,129.68,42.13,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:48:00,42.65,7.36,128.31,42.11,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:49:00,42.57,6.42,124.91,42.11,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:50:00,42.58,6.53,127.24,41.99,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:51:00,42.43,6.44,127.81,41.87,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:52:00,42.28,5.33,124.47,42.02,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:53:00,42.27,7.49,126.38,42.21,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:54:00,42.18,5.4,128.36,42.0,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:55:00,42.2,5.63,128.37,41.97,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:56:00,42.04,5.65,129.31,41.38,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:57:00,42.06,5.94,125.57,41.64,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:58:00,42.01,4.35,125.47,41.8,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 10:59:00,41.91,5.55,127.55,41.33,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:00:00,41.83,5.04,122.03,41.14,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:01:00,41.89,4.95,128.01,41.47,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:02:00,41.66,5.54,122.35,41.0,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:03:00,41.67,5.62,125.27,41.39,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:04:00,41.63,5.85,127.58,40.68,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:05:00,41.65,4.96,125.71,41.33,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:06:00,41.63,5.48,122.83,40.68,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:07:00,41.58,5.54,122.26,40.99,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:08:00,41.44,4.44,123.35,40.25,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:09:00,41.48,5.02,122.11,40.46,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:10:00,41.36,5.1,124.84,40.45,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:11:00,41.37,4.37,123.01,39.98,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:12:00,41.21,4.53,123.47,40.39,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:13:00,41.31,4.78,121.01,40.27,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:14:00,41.27,4.82,121.72,40.84,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:15:00,41.24,4.66,119.05,40.19,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:16:00,41.21,4.37,118.33,40.39,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:17:00,41.19,3.77,120.23,40.7,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:18:00,41.11,3.01,122.28,40.36,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:19:00,41.14,4.8,123.48,39.63,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:20:00,41.18,4.31,118.57,40.27,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:21:00,41.09,3.94,117.37,39.8,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:22:00,41.02,4.53,124.66,40.59,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:23:00,41.22,4.57,122.61,40.14,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:24:00,41.04,4.32,116.75,39.85,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:25:00,41.08,3.22,121.34,39.98,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:26:00,41.02,3.43,120.46,39.74,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:27:00,41.0,4.73,122.42,39.78,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:28:00,40.99,3.14,119.46,39.97,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:29:00,41.0,4.65,118.31,39.92,S2-Full recovery [GREEN],Scenario_2_Heavy_Rain
+2024-06-01 11:30:00,40.96,3.35,116.93,39.46,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:31:00,40.97,3.86,118.36,39.86,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:32:00,41.0,3.92,123.22,40.1,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:33:00,40.98,3.32,118.43,39.99,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:34:00,41.07,3.68,116.6,40.14,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:35:00,41.08,4.57,120.13,40.35,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:36:00,40.94,3.85,118.41,41.0,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:37:00,41.01,3.04,120.83,40.38,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:38:00,40.82,2.9,119.56,39.37,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:39:00,40.98,4.47,119.49,40.03,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:40:00,40.92,4.58,118.39,40.23,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:41:00,40.9,4.26,120.03,40.32,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:42:00,40.96,4.81,120.35,40.15,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:43:00,40.96,3.95,120.1,40.17,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:44:00,40.87,3.91,120.33,39.84,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:45:00,40.92,4.14,120.36,39.6,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:46:00,41.0,4.85,120.83,40.56,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:47:00,40.92,4.41,117.18,39.49,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:48:00,40.99,4.74,118.6,39.72,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:49:00,41.01,3.96,119.76,39.68,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:50:00,40.92,3.09,120.12,39.77,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:51:00,40.97,3.44,116.78,39.54,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:52:00,41.02,3.66,119.02,39.61,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:53:00,40.86,4.13,117.6,39.57,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:54:00,40.95,4.46,116.93,39.37,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:55:00,40.88,3.78,118.78,39.7,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:56:00,40.85,4.79,120.31,39.33,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:57:00,40.83,3.27,114.28,39.63,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:58:00,40.86,3.32,115.88,38.95,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 11:59:00,40.91,2.94,118.09,39.64,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:00:00,40.85,3.36,115.93,38.97,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:01:00,40.8,3.52,115.09,39.94,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:02:00,40.88,3.76,120.35,39.78,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:03:00,40.71,3.27,116.73,39.42,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:04:00,40.84,3.77,119.34,38.93,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:05:00,40.78,3.2,117.86,39.31,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:06:00,40.73,3.17,116.94,38.94,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:07:00,40.77,3.73,115.32,39.59,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:08:00,40.78,3.17,122.67,39.25,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:09:00,40.67,3.02,115.33,38.94,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:10:00,40.66,3.34,115.12,39.31,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:11:00,40.58,2.76,114.18,38.91,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:12:00,40.74,2.86,119.35,38.5,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:13:00,40.72,3.11,113.54,38.34,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:14:00,40.68,3.62,115.4,38.57,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:15:00,40.76,2.9,116.21,38.38,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:16:00,40.72,3.69,115.8,39.18,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:17:00,40.72,3.85,114.21,39.03,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:18:00,40.72,2.12,118.99,39.19,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:19:00,40.64,2.9,116.67,39.14,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:20:00,40.58,3.32,115.73,38.37,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:21:00,40.61,3.42,114.43,38.63,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:22:00,40.57,2.71,115.3,38.61,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:23:00,40.46,3.21,115.65,38.18,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:24:00,40.62,3.68,114.55,38.54,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:25:00,40.59,2.78,118.04,38.06,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:26:00,40.57,3.62,115.36,38.08,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:27:00,40.57,3.6,113.55,37.34,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:28:00,40.47,3.78,117.03,38.07,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:29:00,40.47,2.8,112.08,38.25,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:30:00,40.51,3.21,112.1,38.39,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:31:00,40.57,2.78,110.0,38.05,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:32:00,40.51,2.59,113.8,37.54,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:33:00,40.5,2.3,112.12,38.05,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:34:00,40.45,3.19,111.99,37.48,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:35:00,40.5,2.42,109.55,37.77,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:36:00,40.46,2.13,111.32,37.96,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:37:00,40.36,3.14,111.39,37.59,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:38:00,40.43,2.37,113.41,37.6,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:39:00,40.39,1.49,110.11,37.42,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:40:00,40.27,1.92,111.0,37.08,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:41:00,40.37,2.71,112.14,37.44,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:42:00,40.32,2.95,111.48,37.23,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:43:00,40.26,2.21,113.29,37.01,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:44:00,40.33,2.84,111.7,37.24,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:45:00,40.27,2.51,108.82,37.99,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:46:00,40.3,2.12,113.23,36.82,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:47:00,40.28,2.45,110.27,37.27,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:48:00,40.25,2.03,114.03,37.16,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:49:00,40.26,1.53,113.47,37.03,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:50:00,40.18,2.05,109.83,36.66,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:51:00,40.19,1.28,107.6,36.88,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:52:00,40.19,2.44,112.59,37.19,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:53:00,40.12,1.77,111.72,36.75,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:54:00,40.17,2.72,109.97,36.89,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:55:00,40.15,1.34,110.23,36.62,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:56:00,40.18,2.13,109.65,36.38,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:57:00,40.12,2.67,110.05,35.89,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:58:00,40.22,1.78,113.61,36.6,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 12:59:00,40.09,2.77,110.06,36.45,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:00:00,40.21,1.64,109.29,36.56,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:01:00,40.11,1.84,110.83,36.22,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:02:00,40.14,2.55,109.5,36.61,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:03:00,40.19,1.31,108.41,36.03,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:04:00,40.12,2.44,106.0,36.25,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:05:00,40.02,1.59,112.59,36.48,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:06:00,40.09,1.36,109.51,35.93,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:07:00,40.13,2.39,110.05,36.84,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:08:00,40.04,1.64,110.38,35.83,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:09:00,40.07,1.27,109.45,36.84,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:10:00,40.13,1.75,107.34,36.39,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:11:00,40.0,2.37,108.33,36.28,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:12:00,40.01,1.99,108.44,35.99,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:13:00,40.0,1.42,109.49,36.49,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:14:00,40.03,0.68,107.16,36.54,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:15:00,40.06,1.77,110.63,36.42,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:16:00,40.09,1.24,109.93,35.97,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:17:00,40.11,1.45,104.3,35.96,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:18:00,40.12,0.76,111.31,35.81,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:19:00,40.01,2.31,103.24,36.59,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:20:00,40.02,0.98,111.73,36.13,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:21:00,40.02,2.21,110.3,35.94,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:22:00,39.95,1.76,107.99,36.1,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:23:00,40.05,0.58,106.97,35.74,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:24:00,40.01,2.0,107.02,35.56,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:25:00,40.04,1.4,109.26,35.97,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:26:00,40.07,2.21,105.85,35.67,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:27:00,40.0,1.23,110.07,36.28,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:28:00,40.06,1.09,109.8,35.72,S2-Stable normal,Scenario_2_Heavy_Rain
+2024-06-01 13:29:00,39.91,1.63,108.78,35.8,S2-Stable normal,Scenario_2_Heavy_Rain
