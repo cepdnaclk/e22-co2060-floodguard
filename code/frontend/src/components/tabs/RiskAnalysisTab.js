@@ -16,19 +16,19 @@ export default function RiskAnalysisTab({ data }) {
         
         <div className="mb-4">
           <div className="text-muted font-mono text-xs">SHORT-TERM RATE (RR_SHORT)</div>
-          <div className="font-mono text-xl">{data.rr_short?.toFixed(2)} %/hr</div>
+          <div className="font-mono text-xl">{Number(data.rr_short || 0).toFixed(2)} %/hr</div>
           <div className="text-muted font-mono text-[10px] mt-1">Spike detector (15 min extrapolation)</div>
         </div>
         
         <div className="mb-4">
           <div className="text-muted font-mono text-xs">LONG-TERM RATE (RR_LONG)</div>
-          <div className="font-mono text-xl">{data.rr_long?.toFixed(2)} %/hr</div>
+          <div className="font-mono text-xl">{Number(data.rr_long || 0).toFixed(2)} %/hr</div>
           <div className="text-muted font-mono text-[10px] mt-1">Sustained trend (60 min window)</div>
         </div>
 
         <div className="mb-4">
           <div className="text-muted font-mono text-xs">ACCELERATION (ACC)</div>
-          <div className="font-mono text-xl">{data.acceleration?.toFixed(2)}</div>
+          <div className="font-mono text-xl">{Number(data.acceleration || 0).toFixed(2)}</div>
           <div className="text-muted font-mono text-[10px] mt-1">Rate of change of RR_LONG over 1 hr</div>
         </div>
 
@@ -69,7 +69,7 @@ export default function RiskAnalysisTab({ data }) {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '1.2rem' }}>
             <span className="text-cyan">FINAL AT(t)</span>
-            <span>{data.adaptive_threshold?.toFixed(2)}%</span>
+            <span>{Number(data.adaptive_threshold || 0).toFixed(2)}%</span>
           </div>
           <div className="text-muted font-mono text-[10px] mt-2 text-right">Must be between 30% and 75%</div>
         </div>
@@ -80,12 +80,12 @@ export default function RiskAnalysisTab({ data }) {
         
         <div className="mb-4">
           <div className="text-muted font-mono text-xs">ROLLING AVERAGE (3HR)</div>
-          <div className="font-mono text-xl">{data.rolling_avg?.toFixed(2)} %/hr</div>
+          <div className="font-mono text-xl">{Number(data.rolling_avg || 0).toFixed(2)} %/hr</div>
         </div>
 
         <div className="mb-4">
           <div className="text-muted font-mono text-xs">CURRENT DEVIATION (DEV)</div>
-          <div className="font-mono text-xl">{data.deviation?.toFixed(2)}</div>
+          <div className="font-mono text-xl">{Number(data.deviation || 0).toFixed(2)}</div>
           <div className="text-muted font-mono text-[10px] mt-1">DEV = |RR_SHORT - RA(t)|</div>
         </div>
 

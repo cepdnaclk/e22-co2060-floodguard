@@ -87,8 +87,8 @@ export default function AlertsLogTab({ history }) {
                       </span>
                     </td>
                     <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{ev.reason || 'Status change detected'}</td>
-                    <td style={{ padding: '1rem', color: 'var(--water-blue)' }}>{ev.level?.toFixed(2)}%</td>
-                    <td style={{ padding: '1rem', color: 'var(--rain-indigo)' }}>{ev.rf?.toFixed(2)}mm</td>
+                    <td style={{ padding: '1rem', color: 'var(--water-blue)' }}>{Number(ev.level || 0).toFixed(2)}%</td>
+                    <td style={{ padding: '1rem', color: 'var(--rain-indigo)' }}>{Number(ev.rf || 0).toFixed(2)}mm</td>
                   </tr>
                 );
               })}

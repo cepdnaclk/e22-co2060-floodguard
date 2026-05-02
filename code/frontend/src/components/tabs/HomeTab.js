@@ -47,16 +47,16 @@ export default function HomeTab({ data, history, setActiveTab }) {
           <div>
             <div className="text-muted font-mono text-xs">ESTIMATED DURATION</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>
-              {['ORANGE', 'RED'].includes(data.status) ? `${data.estimated_duration_minutes?.toFixed(1) || 0} MINS` : 'N/A'}
+              {['ORANGE', 'RED'].includes(data.status) ? `${Number(data.estimated_duration_minutes || 0).toFixed(1) || 0} MINS` : 'N/A'}
             </div>
           </div>
           <div>
             <div className="text-muted font-mono text-xs">ADAPTIVE THRESHOLD AT(t)</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{data.adaptive_threshold?.toFixed(2)}%</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{Number(data.adaptive_threshold || 0).toFixed(2)}%</div>
           </div>
           <div>
             <div className="text-muted font-mono text-xs">CURRENT LEVEL L(t)</div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{data.water_level?.toFixed(2)}%</div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>{Number(data.water_level || 0).toFixed(2)}%</div>
           </div>
         </div>
 

@@ -54,21 +54,21 @@ export default function ReportsTab({ data, history }) {
           
           <div className="font-mono text-sm" style={{ whiteSpace: 'pre-wrap' }}>
             {`1. SENSOR READINGS
-   - Reservoir Level:    ${data.water_level?.toFixed(2)}%
-   - Upstream Rainfall:  ${data.rainfall?.toFixed(2)} mm/h
-   - Upstream Inflow:    ${data.inflow?.toFixed(2)} m³/s
-   - Downstream Level:   ${data.downstream_level?.toFixed(2)}%
+   - Reservoir Level:    ${Number(data.water_level || 0).toFixed(2)}%
+   - Upstream Rainfall:  ${Number(data.rainfall || 0).toFixed(2)} mm/h
+   - Upstream Inflow:    ${Number(data.inflow || 0).toFixed(2)} m³/s
+   - Downstream Level:   ${Number(data.downstream_level || 0).toFixed(2)}%
 
 2. ALGORITHMIC ANALYSIS
-   - Short-Term Rise:    ${data.rr_short?.toFixed(2)} %/hr
-   - Acceleration:       ${data.acceleration?.toFixed(2)}
-   - Deviation:          ${data.deviation?.toFixed(2)}
-   - Adaptive Threshold: ${data.adaptive_threshold?.toFixed(2)}%
+   - Short-Term Rise:    ${Number(data.rr_short || 0).toFixed(2)} %/hr
+   - Acceleration:       ${Number(data.acceleration || 0).toFixed(2)}
+   - Deviation:          ${Number(data.deviation || 0).toFixed(2)}
+   - Adaptive Threshold: ${Number(data.adaptive_threshold || 0).toFixed(2)}%
 
 3. RECOMMENDED ACTION
    - Gate Opening:       ${data.gate_opening_percent_rounded || 0}%
-   - Release Rate:       ${data.release_rate?.toFixed(1) || 0} m³/s
-   - Est. Duration:      ${data.estimated_duration_minutes?.toFixed(1) || 0} mins
+   - Release Rate:       ${Number(data.release_rate || 0).toFixed(1) || 0} m³/s
+   - Est. Duration:      ${Number(data.estimated_duration_minutes || 0).toFixed(1) || 0} mins
    - Conflict Warning:   ${data.conflict_warning ? 'YES (Downstream Capacity Exceeded)' : 'NONE'}
 
 4. AUTOMATED SUMMARY

@@ -13,7 +13,7 @@ export default function LiveReadingsTab({ data, history }) {
 
       <div className="colSpan3 card">
         <div className="text-cyan font-mono text-xs mb-2">RESERVOIR LEVEL PROBE</div>
-        <div className="font-mono text-2xl">{data.water_level?.toFixed(2)}%</div>
+        <div className="font-mono text-2xl">{Number(data.water_level || 0).toFixed(2)}%</div>
         <div className="text-muted font-mono text-xs mt-4">
           <div>STATUS: ONLINE</div>
           <div>LATENCY: 42ms</div>
@@ -23,7 +23,7 @@ export default function LiveReadingsTab({ data, history }) {
 
       <div className="colSpan3 card">
         <div className="text-cyan font-mono text-xs mb-2">UPSTREAM RAIN GAUGE</div>
-        <div className="font-mono text-2xl">{data.rainfall?.toFixed(2)} mm/h</div>
+        <div className="font-mono text-2xl">{Number(data.rainfall || 0).toFixed(2)} mm/h</div>
         <div className="text-muted font-mono text-xs mt-4">
           <div>STATUS: ONLINE</div>
           <div>LATENCY: 115ms</div>
@@ -33,7 +33,7 @@ export default function LiveReadingsTab({ data, history }) {
 
       <div className="colSpan3 card">
         <div className="text-cyan font-mono text-xs mb-2">INFLOW FLOWMETER</div>
-        <div className="font-mono text-2xl">{data.inflow?.toFixed(2)} m³/s</div>
+        <div className="font-mono text-2xl">{Number(data.inflow || 0).toFixed(2)} m³/s</div>
         <div className="text-muted font-mono text-xs mt-4">
           <div>STATUS: ONLINE</div>
           <div>LATENCY: 88ms</div>
@@ -43,7 +43,7 @@ export default function LiveReadingsTab({ data, history }) {
 
       <div className="colSpan3 card">
         <div className="text-cyan font-mono text-xs mb-2">DOWNSTREAM RADAR</div>
-        <div className="font-mono text-2xl">{data.downstream_level?.toFixed(2)}%</div>
+        <div className="font-mono text-2xl">{Number(data.downstream_level || 0).toFixed(2)}%</div>
         <div className="text-muted font-mono text-xs mt-4">
           <div>STATUS: ONLINE</div>
           <div>LATENCY: 55ms</div>
@@ -69,10 +69,10 @@ export default function LiveReadingsTab({ data, history }) {
               {[...history].reverse().slice(0, 50).map((row, idx) => (
                 <tr key={idx} style={{ borderBottom: '1px solid rgba(143, 163, 173, 0.1)' }}>
                   <td style={{ padding: '0.5rem' }}>{new Date(row.timestamp).toLocaleTimeString()}</td>
-                  <td style={{ padding: '0.5rem', color: 'var(--water-blue)' }}>{row.water_level?.toFixed(2)}</td>
-                  <td style={{ padding: '0.5rem', color: 'var(--rain-indigo)' }}>{row.rainfall?.toFixed(2)}</td>
-                  <td style={{ padding: '0.5rem', color: 'var(--inflow-teal)' }}>{row.inflow?.toFixed(2)}</td>
-                  <td style={{ padding: '0.5rem', color: 'var(--downstream-amber)' }}>{row.downstream_level?.toFixed(2)}</td>
+                  <td style={{ padding: '0.5rem', color: 'var(--water-blue)' }}>{Number(row.water_level || 0).toFixed(2)}</td>
+                  <td style={{ padding: '0.5rem', color: 'var(--rain-indigo)' }}>{Number(row.rainfall || 0).toFixed(2)}</td>
+                  <td style={{ padding: '0.5rem', color: 'var(--inflow-teal)' }}>{Number(row.inflow || 0).toFixed(2)}</td>
+                  <td style={{ padding: '0.5rem', color: 'var(--downstream-amber)' }}>{Number(row.downstream_level || 0).toFixed(2)}</td>
                   <td style={{ padding: '0.5rem', color: 'var(--status-green)' }}>VALID</td>
                 </tr>
               ))}

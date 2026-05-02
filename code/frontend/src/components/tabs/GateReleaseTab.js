@@ -29,15 +29,15 @@ export default function GateReleaseTab({ data }) {
               <div>
                 <div className="text-muted font-mono text-xs">GATE OPENING</div>
                 <div className="font-mono text-3xl text-red font-bold">{data.gate_opening_percent_rounded || 0}%</div>
-                <div className="text-muted font-mono text-[10px] mt-1">Exact calculation: {data.gate_opening_percent?.toFixed(1) || 0}%</div>
+                <div className="text-muted font-mono text-[10px] mt-1">Exact calculation: {Number(data.gate_opening_percent || 0).toFixed(1) || 0}%</div>
               </div>
               <div>
                 <div className="text-muted font-mono text-xs">RELEASE RATE</div>
-                <div className="font-mono text-3xl font-bold">{data.release_rate?.toFixed(1) || 0} m³/s</div>
+                <div className="font-mono text-3xl font-bold">{Number(data.release_rate || 0).toFixed(1) || 0} m³/s</div>
               </div>
               <div>
                 <div className="text-muted font-mono text-xs">ESTIMATED DURATION</div>
-                <div className="font-mono text-2xl">{data.estimated_duration_minutes?.toFixed(1) || 0} MINS</div>
+                <div className="font-mono text-2xl">{Number(data.estimated_duration_minutes || 0).toFixed(1) || 0} MINS</div>
               </div>
               <div>
                 <div className="text-muted font-mono text-xs">TARGET SAFE LEVEL</div>
@@ -56,19 +56,19 @@ export default function GateReleaseTab({ data }) {
             
             <div className="mb-4">
               <div className="text-muted font-mono text-xs">DOWNSTREAM LEVEL DL(t)</div>
-              <div className="font-mono text-2xl text-downstream-amber">{data.downstream_level?.toFixed(2)}%</div>
+              <div className="font-mono text-2xl text-downstream-amber">{Number(data.downstream_level || 0).toFixed(2)}%</div>
             </div>
 
             <div className="mb-4">
               <div className="text-muted font-mono text-xs">MAXIMUM SAFE RELEASE</div>
-              <div className="font-mono text-2xl">{data.max_safe_release?.toFixed(1) || "CALCULATING..."} m³/s</div>
+              <div className="font-mono text-2xl">{Number(data.max_safe_release || 0).toFixed(1) || "CALCULATING..."} m³/s</div>
               <div className="text-muted font-mono text-[10px] mt-1">Capacity remaining in downstream river channel</div>
             </div>
 
             {isConflict ? (
               <div className="bg-panel p-4 mt-4 border border-[var(--status-orange)]">
                 <div className="font-mono text-orange font-bold text-sm mb-1">⚠️ CONFLICT WARNING</div>
-                <div className="font-mono text-xs text-muted">Full required release exceeds downstream capacity. The algorithm has artificially capped the release rate to {data.max_safe_release?.toFixed(1)} m³/s to prevent downstream flooding. Reservoir level may continue to rise.</div>
+                <div className="font-mono text-xs text-muted">Full required release exceeds downstream capacity. The algorithm has artificially capped the release rate to {Number(data.max_safe_release || 0).toFixed(1)} m³/s to prevent downstream flooding. Reservoir level may continue to rise.</div>
               </div>
             ) : (
               <div className="bg-panel p-4 mt-4 border border-[var(--status-green)]">
