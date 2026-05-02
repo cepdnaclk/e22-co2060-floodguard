@@ -443,7 +443,7 @@ body {
 
 /* Tab 4: History */
 .history-top-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); }
-.history-top-actions h2 { font-size: 1.25rem; color: var(--text-primary); }
+.history-top-actions h2 { font-size,,,: 1.25rem; color: var(--text-primary); }
 .download-buttons { display: flex; gap: var(--space-3); }
 .btn { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; font-family: inherit; }
 .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
