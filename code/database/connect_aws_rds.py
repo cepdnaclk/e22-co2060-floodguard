@@ -4,7 +4,8 @@ import boto3
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+load_dotenv(os.path.join(project_root, ".env"))
 
 password = os.getenv("DB_PASSWORD")
 database = os.getenv("DB_NAME")
@@ -19,7 +20,7 @@ try:
         user=user,
         password=password,
         sslmode='verify-full',
-    sslrootcert='./global-bundle.pem'
+        sslrootcert=os.path.join(project_root, "global-bundle.pem")
     )
     cur = conn.cursor()
     cur.execute('SELECT version();')
