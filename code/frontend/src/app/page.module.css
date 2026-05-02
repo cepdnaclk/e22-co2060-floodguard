@@ -1,19 +1,75 @@
 .dashboard {
   padding: 2rem 0;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .header {
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
   color: var(--text-muted);
+  font-weight: 500;
+}
+
+.tabsContainer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.tabButton {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tabButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+}
+
+.tabButtonActive {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .mainGrid {
@@ -55,19 +111,56 @@
   animation: pulse 2s infinite alternate;
 }
 
-.GREEN { background: var(--status-green); color: var(--status-green); }
-.YELLOW { background: var(--status-yellow); color: var(--status-yellow); }
-.ORANGE { background: var(--status-orange); color: var(--status-orange); }
-.RED { background: var(--status-red); color: var(--status-red); }
+.GREEN {
+  background: var(--status-green);
+  color: var(--status-green);
+}
 
-.cardGREEN { box-shadow: 0 0 40px var(--status-green-glow); border-color: rgba(34, 197, 94, 0.3); }
-.cardYELLOW { box-shadow: 0 0 40px var(--status-yellow-glow); border-color: rgba(234, 179, 8, 0.3); }
-.cardORANGE { box-shadow: 0 0 40px var(--status-orange-glow); border-color: rgba(249, 115, 22, 0.3); }
-.cardRED { box-shadow: 0 0 40px var(--status-red-glow); border-color: rgba(239, 68, 68, 0.3); }
+.YELLOW {
+  background: var(--status-yellow);
+  color: var(--status-yellow);
+}
+
+.ORANGE {
+  background: var(--status-orange);
+  color: var(--status-orange);
+}
+
+.RED {
+  background: var(--status-red);
+  color: var(--status-red);
+}
+
+.cardGREEN {
+  box-shadow: 0 0 40px var(--status-green-glow);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.cardYELLOW {
+  box-shadow: 0 0 40px var(--status-yellow-glow);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.cardORANGE {
+  box-shadow: 0 0 40px var(--status-orange-glow);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.cardRED {
+  box-shadow: 0 0 40px var(--status-red-glow);
+  border-color: rgba(239, 68, 68, 0.3);
+}
 
 @keyframes pulse {
-  from { transform: scale(1); opacity: 0.9; }
-  to { transform: scale(1.05); opacity: 1; }
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  to {
+    transform: scale(1.05);
+    opacity: 1;
+  }
 }
 
 .statusText {
@@ -93,21 +186,28 @@
 }
 
 .metricLabel {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .metricValue {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #fff, #e2e8f0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
 }
 
 .metricSub {
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  color: var(--text-muted);
 }
 
 .alertBox {

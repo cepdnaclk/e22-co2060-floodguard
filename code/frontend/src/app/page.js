@@ -1,26 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Info } from 'lucide-react';
 import styles from './page.module.css';
+
+import LiveMonitoringTab from '@/components/tabs/LiveMonitoringTab';
+import TrendsPredictionTab from '@/components/tabs/TrendsPredictionTab';
+import EarlyWarningTab from '@/components/tabs/EarlyWarningTab';
+import HistoricalAnalysisTab from '@/components/tabs/HistoricalAnalysisTab';
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('LIVE'); // LIVE, TRENDS, WARNING, HISTORY
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/processed');
+        const res = await fetch('/api/processed?limit=60');
         const json = await res.json();
-        setData(json);
+
+        if (json && json.length > 0) {
+          setHistory(json);
+          setData(json[json.length - 1]); // Last item is the most recent
+        }
       } catch (e) {
         console.error(e);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchData();
     const interval = setInterval(fetchData, 5000); // Poll every 5s
     return () => clearInterval(interval);
@@ -29,84 +39,51 @@ export default function Dashboard() {
   if (loading) return <div className="container text-center mt-8">Loading live data...</div>;
   if (!data) return <div className="container text-center mt-8 text-muted">No processed data available. Please ensure simulator and processor are running.</div>;
 
-  const statusClass = styles[data.status] || styles.GREEN;
-  const cardGlowClass = styles[`card${data.status}`] || '';
-
   return (
     <div className={styles.dashboard}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Live Dashboard</h1>
-        <p className={styles.subtitle}>Last Updated: {new Date(data.timestamp).toLocaleTimeString()}</p>
+        <div>
+          <h1 className={styles.title}>FloodGuard Dashboard</h1>
+          <p className={styles.subtitle}>Last Updated: {new Date(data.timestamp).toLocaleTimeString()}</p>
+        </div>
       </header>
 
-      <div className={styles.mainGrid}>
-        {/* Left Col: Main Status */}
-        <div className={`glass-panel ${styles.statusCard} ${cardGlowClass}`}>
-          <div className={`${styles.statusIndicator} ${statusClass}`}>
-            <span className={styles.statusText}>{data.status}</span>
-          </div>
-          <div className={styles.actionMessage}>{data.action_message}</div>
-          <div className="text-muted mt-1">Risk Band: {data.rr_band}</div>
-        </div>
+      {/* Navigation Tabs */}
+      <div className={styles.tabsContainer}>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'LIVE' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('LIVE')}
+        >
+          Live Monitoring
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'TRENDS' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('TRENDS')}
+        >
+          Trends & Prediction
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'WARNING' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('WARNING')}
+        >
+          Early Warning & Advisory
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'HISTORY' ? styles.tabButtonActive : ''}`}
+          onClick={() => setActiveTab('HISTORY')}
+        >
+          Historical Analysis
+        </button>
+      </div>
 
-        {/* Right Col: Metrics */}
-        <div>
-          <div className={styles.metricsGrid}>
-            <div className={`glass-panel ${styles.metricCard}`}>
-              <span className={styles.metricLabel}>Reservoir Level</span>
-              <span className={styles.metricValue}>{parseFloat(data.l_t).toFixed(1)}%</span>
-              <span className={styles.metricSub}>Adaptive Threshold: <span style={{color: 'var(--status-orange)'}}>{parseFloat(data.adaptive_threshold).toFixed(1)}%</span></span>
-            </div>
-            <div className={`glass-panel ${styles.metricCard}`}>
-              <span className={styles.metricLabel}>Rise Rate (1H)</span>
-              <span className={styles.metricValue}>{parseFloat(data.rr_long).toFixed(1)}% / hr</span>
-              <span className={styles.metricSub}>Acceleration: {parseFloat(data.acc).toFixed(1)}</span>
-            </div>
-            <div className={`glass-panel ${styles.metricCard}`}>
-              <span className={styles.metricLabel}>Rainfall</span>
-              <span className={styles.metricValue}>{parseFloat(data.rf_t).toFixed(1)} mm/hr</span>
-            </div>
-            <div className={`glass-panel ${styles.metricCard}`}>
-              <span className={styles.metricLabel}>Inflow</span>
-              <span className={styles.metricValue}>{parseFloat(data.if_t).toFixed(0)} m³/s</span>
-            </div>
-          </div>
-
-          {/* Release Recommendation Box */}
-          {data.release_active && (
-            <div className={styles.alertBox}>
-              <div className={styles.alertTitle}>
-                <AlertTriangle size={20} />
-                GATE RELEASE RECOMMENDED
-              </div>
-              <div className={styles.releaseGrid}>
-                <div>
-                  <div className={styles.metricLabel}>Gate Opening</div>
-                  <div className={styles.metricValue} style={{color: 'var(--text-main)'}}>{data.gate_opening_percent}%</div>
-                </div>
-                <div>
-                  <div className={styles.metricLabel}>Required Rate</div>
-                  <div className={styles.metricValue} style={{color: 'var(--text-main)'}}>{parseFloat(data.release_rate).toFixed(0)} m³/s</div>
-                </div>
-                <div>
-                  <div className={styles.metricLabel}>Est. Duration</div>
-                  <div className={styles.metricValue} style={{color: 'var(--text-main)'}}>{data.est_duration_mins} mins</div>
-                </div>
-                <div>
-                  <div className={styles.metricLabel}>Target Level</div>
-                  <div className={styles.metricValue} style={{color: 'var(--text-main)'}}>{parseFloat(data.target_safe_level).toFixed(1)}%</div>
-                </div>
-              </div>
-              {data.conflict_warning && (
-                <div style={{color: 'var(--status-red)', marginTop: '1rem', fontSize: '0.875rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start'}}>
-                  <Info size={16} />
-                  <span>{data.conflict_warning}</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+      {/* Tab Content Rendering */}
+      <div>
+        {activeTab === 'LIVE' && <LiveMonitoringTab data={data} />}
+        {activeTab === 'TRENDS' && <TrendsPredictionTab history={history} />}
+        {activeTab === 'WARNING' && <EarlyWarningTab data={data} />}
+        {activeTab === 'HISTORY' && <HistoricalAnalysisTab />}
       </div>
     </div>
   );
 }
+
