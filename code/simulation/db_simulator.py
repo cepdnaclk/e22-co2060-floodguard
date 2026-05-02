@@ -142,7 +142,7 @@ def run_simulation(live=True, speed_multiplier=1.0):
         while True: # Loop scenarios endlessly if live
             for phase in phases:
                 duration_minutes = phase['duration_minutes']
-                steps = duration_minutes * 2  # 2 updates per minute (every 30 seconds)
+                steps = duration_minutes * 1  # 1 update per minute
                 
                 # Pre-calculate smooth transitions for this phase
                 wl_vals = smooth_transition(phase['wl_s'], phase['wl_e'], steps)
@@ -165,9 +165,9 @@ def run_simulation(live=True, speed_multiplier=1.0):
                         
                         if live:
                             print(f"[{reading['timestamp'].strftime('%H:%M:%S')}] Inserted -> WL: {reading['water_level_pct']}% | RF: {reading['rainfall_mm_hr']}mm/h | IF: {reading['inflow_m3s']}m³/s | Phase: {phase['note']}")
-                            time.sleep(30.0 / speed_multiplier) # Simulate real-time by sleeping (30 seconds)
+                            time.sleep(60.0 / speed_multiplier) # Simulate real-time by sleeping (60 seconds)
                     
-                    current_time += timedelta(seconds=30)
+                    current_time += timedelta(minutes=1)
                 
                 # carry forward for smooth transition to next phase
                 prev_rf = phase['rf']
