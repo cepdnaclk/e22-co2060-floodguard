@@ -141,15 +141,16 @@ def run_simulation(live=True, speed_multiplier=1.0):
     try:
         while True: # Loop scenarios endlessly if live
             for phase in phases:
-                duration = phase['duration_minutes']
+                duration_minutes = phase['duration_minutes']
+                steps = duration_minutes * 2  # 2 updates per minute (every 30 seconds)
                 
                 # Pre-calculate smooth transitions for this phase
-                wl_vals = smooth_transition(phase['wl_s'], phase['wl_e'], duration)
-                rf_vals = smooth_transition(prev_rf, phase['rf'], duration)
-                if_vals = smooth_transition(prev_inflow, phase['inflow_mult'] * IF_BASELINE, duration)
-                dl_vals = smooth_transition(prev_dl, phase['dl'], duration)
+                wl_vals = smooth_transition(phase['wl_s'], phase['wl_e'], steps)
+                rf_vals = smooth_transition(prev_rf, phase['rf'], steps)
+                if_vals = smooth_transition(prev_inflow, phase['inflow_mult'] * IF_BASELINE, steps)
+                dl_vals = smooth_transition(prev_dl, phase['dl'], steps)
                 
-                for i in range(duration):
+                for i in range(steps):
                     reading = {
                         'timestamp': current_time,
                         'water_level_pct': round(clamp(noise(wl_vals[i], 0.05), 0, 100), 2),
@@ -164,9 +165,9 @@ def run_simulation(live=True, speed_multiplier=1.0):
                         
                         if live:
                             print(f"[{reading['timestamp'].strftime('%H:%M:%S')}] Inserted -> WL: {reading['water_level_pct']}% | RF: {reading['rainfall_mm_hr']}mm/h | IF: {reading['inflow_m3s']}m³/s | Phase: {phase['note']}")
-                            time.sleep(60.0 / speed_multiplier) # Simulate real-time by sleeping (60 seconds = 1 minute simulation time)
+                            time.sleep(30.0 / speed_multiplier) # Simulate real-time by sleeping (30 seconds)
                     
-                    current_time += timedelta(minutes=1)
+                    current_time += timedelta(seconds=30)
                 
                 # carry forward for smooth transition to next phase
                 prev_rf = phase['rf']
