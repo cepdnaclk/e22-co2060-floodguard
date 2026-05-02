@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 # IMPORTANT: Adjust the 'User' and 'WorkingDirectory' to match your EC2 instance setup
-User=ubuntu
-WorkingDirectory=/home/ubuntu/e22-co2060-floodguard
-Environment="PATH=/home/ubuntu/e22-co2060-floodguard/venv/bin:/usr/bin"
-ExecStart=/home/ubuntu/e22-co2060-floodguard/venv/bin/python code/main.py
+User=admin
+WorkingDirectory=/home/admin/e22-co2060-floodguard
+Environment="PATH=/home/admin/e22-co2060-floodguard/venv/bin:/usr/bin"
+ExecStart=/home/admin/e22-co2060-floodguard/venv/bin/python code/main.py
 Restart=always
 RestartSec=5
 StandardOutput=syslog
