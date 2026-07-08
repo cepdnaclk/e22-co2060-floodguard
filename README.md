@@ -6,7 +6,7 @@
 
 ---
 
-## 🚀 What This System Does
+## What This System Does
 
 The core idea: a fixed danger threshold is not enough. By the time water crosses a static line, the safe response window has often already closed. FloodGuard uses an **adaptive threshold** that moves dynamically based on four live inputs — rise rate, upstream rainfall, inflow rate, and downstream channel capacity.
 
@@ -21,7 +21,7 @@ The pipeline runs every minute:
 
 ---
 
-## ✅ Completed
+## Completed
 
 - **Database system** — Full PostgreSQL schema with 9 tables:
   - `dams` (static config), `engineers`, `sensor_readings`
@@ -33,7 +33,7 @@ The pipeline runs every minute:
 
 ---
 
-## 🔜 Upcoming
+## Upcoming
 
 - **Frontend dashboard** — Engineer-facing UI for live status, charts, and release recommendations
 - **Formula fine-tuning** — Calibrating rise-rate band thresholds and adjustment weights against realistic data
@@ -43,7 +43,7 @@ The pipeline runs every minute:
 
 ---
 
-## 👥 The Team (E22 Batch)
+## The Team (E22 Batch)
 * **L. Sharmilan** - E/22/373 - [e22373@eng.pdn.ac.lk]
 * **F. R. Sujeevan** - E/22/382 - [e22382@eng.pdn.ac.lk]
 * **S. Kishonithan** - E/22/193 - [e22193@eng.pdn.ac.lk]
@@ -53,7 +53,7 @@ The pipeline runs every minute:
 
 ---
 
-## 🔗 Links
+## Links
 
 - **Project Site:** <https://cepdnaclk.github.io/e22-co2060-floodguard/>
 - **Full Documentation:** [docs/README.md](./docs/README.md)
