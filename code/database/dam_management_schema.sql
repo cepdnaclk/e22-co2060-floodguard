@@ -2,18 +2,21 @@
 -- Dam Management System — PostgreSQL Schema
 -- Covers: sensor ingestion, algorithm-derived metrics,
 -- adaptive threshold, risk status, release recommendations,
--- de-escalation tracking, alerts, engineers, and simulation config.
+-- de-escalation tracking, and alerts.
 -- ============================================================
 
 -- Drop existing objects (safe re-run during development)
-DROP TABLE IF EXISTS simulation_config CASCADE;
 DROP TABLE IF EXISTS alerts_log CASCADE;
 DROP TABLE IF EXISTS deescalation_tracking CASCADE;
 DROP TABLE IF EXISTS release_recommendations CASCADE;
 DROP TABLE IF EXISTS risk_status CASCADE;
 DROP TABLE IF EXISTS threshold_calculations CASCADE;
 DROP TABLE IF EXISTS calculated_metrics CASCADE;
-DROP TABLE IF EXISTS sensor_readings CASCADE;
+DROP TABLE IF EXISTS rainfall_readings CASCADE;
+DROP TABLE IF EXISTS water_level_readings CASCADE;
+DROP TABLE IF EXISTS inflow_readings CASCADE;
+DROP TABLE IF EXISTS downstream_level_readings CASCADE;
+DROP TABLE IF EXISTS rainfall_locations CASCADE;
 DROP TABLE IF EXISTS engineers CASCADE;
 DROP TABLE IF EXISTS dams CASCADE;
 
@@ -56,25 +59,98 @@ CREATE TABLE engineers (
 );
 
 -- ============================================================
--- 3. sensor_readings — raw sensor / weather input (Block 1)
---    Written every 1 minute, also by the simulation generator
+-- 3. rainfall_locations — geographic stations that measure rainfall.
+--    A single storm event can be captured across multiple stations
+--    to provide a spatial picture of precipitation in a catchment area.
 -- ============================================================
-CREATE TABLE sensor_readings (
+CREATE TABLE rainfall_locations (
+    location_id             SERIAL PRIMARY KEY,
+    location_name           VARCHAR(200) NOT NULL,          -- e.g. "Kandy Meteorological Station"
+    description             TEXT,                           -- optional free-text notes
+    latitude                DOUBLE PRECISION NOT NULL,      -- decimal degrees, WGS-84
+    longitude               DOUBLE PRECISION NOT NULL,      -- decimal degrees, WGS-84
+    elevation_m             DOUBLE PRECISION,               -- height above mean sea level, metres
+    district                VARCHAR(100),                   -- administrative district
+    province                VARCHAR(100),                   -- administrative province / region
+    country                 VARCHAR(100) NOT NULL DEFAULT 'Sri Lanka',
+    nearest_dam_id          INT REFERENCES dams(dam_id) ON DELETE SET NULL,  -- closest dam in the catchment
+    station_code            VARCHAR(50) UNIQUE,             -- official met-department station code (if any)
+    is_active               BOOLEAN NOT NULL DEFAULT TRUE,  -- whether the station is currently operational
+    installed_at            DATE,                           -- date the station was commissioned
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_rainfall_locations_dam ON rainfall_locations (nearest_dam_id);
+
+-- ============================================================
+-- 4a. water_level_readings — reservoir water level sensor (3NF)
+--     One row per dam per timestamp.
+--     L(t) as a percentage of full reservoir capacity.
+-- ============================================================
+CREATE TABLE water_level_readings (
     reading_id              BIGSERIAL PRIMARY KEY,
     dam_id                  INT NOT NULL REFERENCES dams(dam_id) ON DELETE CASCADE,
-    reading_time            TIMESTAMPTZ NOT NULL,          -- t
+    reading_time            TIMESTAMPTZ NOT NULL,
     water_level_pct         DOUBLE PRECISION NOT NULL,      -- L(t), %
-    rainfall_mm_hr          DOUBLE PRECISION NOT NULL,      -- RF(t), mm/hour
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (dam_id, reading_time)
+);
+
+CREATE INDEX idx_water_level_dam_time ON water_level_readings (dam_id, reading_time DESC);
+
+-- ============================================================
+-- 4b. inflow_readings — upstream inflow rate sensor (3NF)
+--     One row per dam per timestamp.
+--     IF(t) in m^3/s.
+-- ============================================================
+CREATE TABLE inflow_readings (
+    reading_id              BIGSERIAL PRIMARY KEY,
+    dam_id                  INT NOT NULL REFERENCES dams(dam_id) ON DELETE CASCADE,
+    reading_time            TIMESTAMPTZ NOT NULL,
     inflow_rate_m3s         DOUBLE PRECISION NOT NULL,      -- IF(t), m^3/s
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (dam_id, reading_time)
+);
+
+CREATE INDEX idx_inflow_dam_time ON inflow_readings (dam_id, reading_time DESC);
+
+-- ============================================================
+-- 4c. downstream_level_readings — downstream channel level sensor (3NF)
+--     One row per dam per timestamp.
+--     DL(t) as a percentage of safe downstream capacity.
+-- ============================================================
+CREATE TABLE downstream_level_readings (
+    reading_id              BIGSERIAL PRIMARY KEY,
+    dam_id                  INT NOT NULL REFERENCES dams(dam_id) ON DELETE CASCADE,
+    reading_time            TIMESTAMPTZ NOT NULL,
     downstream_level_pct    DOUBLE PRECISION NOT NULL,      -- DL(t), % of safe capacity
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (dam_id, reading_time)
 );
 
-CREATE INDEX idx_sensor_readings_dam_time ON sensor_readings (dam_id, reading_time DESC);
+CREATE INDEX idx_downstream_level_dam_time ON downstream_level_readings (dam_id, reading_time DESC);
 
 -- ============================================================
--- 4. calculated_metrics — rise rate, acceleration, deviation
+-- 4d. rainfall_readings — precipitation measured at a specific
+--     geographic location (3NF). Multiple stations can report
+--     rainfall for the same catchment area simultaneously,
+--     enabling spatial rainfall mapping across the watershed.
+--     RF(t) in mm/hour.
+-- ============================================================
+CREATE TABLE rainfall_readings (
+    reading_id              BIGSERIAL PRIMARY KEY,
+    location_id             INT NOT NULL REFERENCES rainfall_locations(location_id) ON DELETE CASCADE,
+    reading_time            TIMESTAMPTZ NOT NULL,
+    rainfall_mm_hr          DOUBLE PRECISION NOT NULL,      -- RF(t), mm/hour
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (location_id, reading_time)
+);
+
+CREATE INDEX idx_rainfall_readings_location_time ON rainfall_readings (location_id, reading_time DESC);
+
+-- ============================================================
+-- 5. calculated_metrics — rise rate, acceleration, deviation
 --    (Blocks 2, 3, 4, 5)
 -- ============================================================
 CREATE TABLE calculated_metrics (
@@ -94,7 +170,7 @@ CREATE TABLE calculated_metrics (
 CREATE INDEX idx_calculated_metrics_dam_time ON calculated_metrics (dam_id, calc_time DESC);
 
 -- ============================================================
--- 5. threshold_calculations — adaptive threshold (Blocks 6, 7)
+-- 6. threshold_calculations — adaptive threshold (Blocks 6, 7)
 -- ============================================================
 CREATE TABLE threshold_calculations (
     calc_id                 BIGSERIAL PRIMARY KEY,
@@ -114,7 +190,7 @@ CREATE TABLE threshold_calculations (
 CREATE INDEX idx_threshold_calc_dam_time ON threshold_calculations (dam_id, calc_time DESC);
 
 -- ============================================================
--- 6. risk_status — GREEN/YELLOW/ORANGE/RED status (Block 8)
+-- 7. risk_status — GREEN/YELLOW/ORANGE/RED status (Block 8)
 -- ============================================================
 CREATE TABLE risk_status (
     status_id               BIGSERIAL PRIMARY KEY,
@@ -133,7 +209,7 @@ CREATE TABLE risk_status (
 CREATE INDEX idx_risk_status_dam_time ON risk_status (dam_id, status_time DESC);
 
 -- ============================================================
--- 7. release_recommendations — gate release plan (Block 9)
+-- 8. release_recommendations — gate release plan (Block 9)
 --    Only populated when status is ORANGE or RED
 -- ============================================================
 CREATE TABLE release_recommendations (
@@ -154,7 +230,7 @@ CREATE TABLE release_recommendations (
 CREATE INDEX idx_release_reco_dam_time ON release_recommendations (dam_id, calc_time DESC);
 
 -- ============================================================
--- 8. deescalation_tracking — sustained improvement tracking (Block 10)
+-- 9. deescalation_tracking — sustained improvement tracking (Block 10)
 -- ============================================================
 CREATE TABLE deescalation_tracking (
     tracking_id             BIGSERIAL PRIMARY KEY,
@@ -171,7 +247,7 @@ CREATE TABLE deescalation_tracking (
 CREATE INDEX idx_deescalation_dam ON deescalation_tracking (dam_id);
 
 -- ============================================================
--- 9. alerts_log — alert history for engineers (Flow Summary step 10)
+-- 10. alerts_log — alert history for engineers (Flow Summary step 10)
 -- ============================================================
 CREATE TABLE alerts_log (
     alert_id                BIGSERIAL PRIMARY KEY,
@@ -185,21 +261,6 @@ CREATE TABLE alerts_log (
 );
 
 CREATE INDEX idx_alerts_log_dam_time ON alerts_log (dam_id, alert_time DESC);
-
--- ============================================================
--- 10. simulation_config — test data generator settings
--- ============================================================
-CREATE TABLE simulation_config (
-    config_id               SERIAL PRIMARY KEY,
-    dam_id                  INT NOT NULL REFERENCES dams(dam_id) ON DELETE CASCADE,
-    scenario_name           VARCHAR(150) NOT NULL,
-    start_time              TIMESTAMPTZ NOT NULL,
-    end_time                TIMESTAMPTZ,
-    description             TEXT,
-    created_at              TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX idx_simulation_config_dam ON simulation_config (dam_id);
 
 -- ============================================================
 -- End of schema
