@@ -1,44 +1,45 @@
-# Machine Learning Assisted Flood Early-Warning System for the Mahaweli River Basin
+# FloodGuard — Dam Management & Early-Warning System
 
-Flooding in the Mahaweli River Basin causes severe social and economic damage. One of the major reasons identified is the lack of early prediction mechanisms that consider rainfall trends and reservoir inflow rates. Current systems mainly monitor the current water level of dams, which is insufficient for timely decision-making.
+**FloodGuard** is a real-time dam monitoring and predictive flood-risk management platform. It ingests sensor and weather data, computes hydrological risk indicators, determines a dam's current risk status, and recommends safe water-release actions to on-site engineers — before conditions become dangerous.
 
-**FloodGuard** is a decision-support application developed as a second-year undergraduate project. It aims to predict short-term future water levels and flood risk using rainfall data and reservoir water-level trends.
-
----
-
-## 🚀 Project Overview
-This project focuses on software development to provide a scalable and industry-ready system architecture. 
-
-### Key Objectives
-* **Predictive Monitoring**: Forecast short-term future water levels (30-60 minutes ahead).
-* **Risk Categorization**: Generate automated flood risk levels categorized as Safe, Watch, or Danger.
-* **Deterministic Logic**: While the system is designed to eventually integrate Machine Learning, this version utilizes a rule-based prediction engine that calculates water-level rise rates using trend-based extrapolation.
-* **High-Fidelity Simulation**: In the absence of live public sensor access in Sri Lanka, the system uses simulated data that closely follows realistic environmental and hydrological behavior.
+> 📖 For full technical detail — database schema, formula derivations, ERD, ML integration contract — see **[docs/README.md](./docs/README.md)** or the [project site](https://cepdnaclk.github.io/e22-co2060-floodguard/).
 
 ---
 
-## 🛠️ System Architecture
-The system consists of four main components:
-1. **Frontend Dashboard**: For real-time visualization.
-2. **Backend APIs**: For data processing.
-3. **Rule-Based Prediction Engine**: Handling short-term trend extrapolation.
-4. **ML Enhancement Module**: A modular component designed for future integration of advanced models.
+## 🚀 What This System Does
+
+The core idea: a fixed danger threshold is not enough. By the time water crosses a static line, the safe response window has often already closed. FloodGuard uses an **adaptive threshold** that moves dynamically based on four live inputs — rise rate, upstream rainfall, inflow rate, and downstream channel capacity.
+
+The pipeline runs every minute:
+
+1. Reads sensor data (water level, rainfall, inflow, downstream level)
+2. Computes rise rate, acceleration, deviation score, and a risk-band classification
+3. Calculates an adaptive safety threshold (floor: 30%, ceiling: 75%)
+4. Assigns a risk status — 🟢 Green / 🟡 Yellow / 🟠 Orange / 🔴 Red
+5. At Orange/Red: generates a gate-release recommendation (rate, opening %, estimated duration)
+6. De-escalates only after sustained improvement (15 / 30 / 60 minutes, depending on transition)
 
 ---
 
-## 📊 Data & Simulation Strategy
-To ensure academic and practical justification, our simulated data is grounded in official sources:
-* **Rainfall Patterns**: Derived from historical characteristics in Sri Lanka's central highlands and NASA GPM satellite estimates.
-* **Reservoir Behavior**: Informed by historical operation reports from the Irrigation Department and the Mahaweli Authority of Sri Lanka.
-* **Natural Lag**: Includes a time-delay mechanism to represent the lag between upstream rainfall and reservoir inflow.
+## ✅ Completed
+
+- **Database system** — Full PostgreSQL schema with 9 tables:
+  - `dams` (static config), `engineers`, `sensor_readings`
+  - `calculated_metrics`, `threshold_calculations`, `risk_status`
+  - `release_recommendations`, `deescalation_tracking`, `alerts_log`, `simulation_config`
+- **Prediction formula** — A deterministic reference algorithm covering rise rate (short & long term), acceleration, rolling average, deviation score, adaptive threshold calculation, and a 4-level risk classification with gate-release logic
+- **Database–backend connection** — Direct database connection from the backend processor engine (no API layer between them)
+- **Simulation engine** — Configurable scenario generator that writes realistic sensor data into the database, enabling full end-to-end testing without physical hardware; supports scenarios like monsoon spikes, sustained rises, downstream congestion, and recovery
 
 ---
 
-## 📖 Documentation
-Detailed technical documentation regarding the methodology, data sources, and system design can be found in the `docs/` folder.
+## 🔜 Upcoming
 
-* **Project Site**: [https://cepdnaclk.github.io/e22-co2060-FloodGuard/](https://cepdnaclk.github.io/e22-co2060-FloodGuard/)
-* **Methodology & Data Sources**: [See /docs/README.md](./docs/README.md)
+- **Frontend dashboard** — Engineer-facing UI for live status, charts, and release recommendations
+- **Formula fine-tuning** — Calibrating rise-rate band thresholds and adjustment weights against realistic data
+- **Simulator fine-tuning** — Improving realism of generated sensor sequences
+- **Manual simulator controls** — Allow engineers to trigger specific scenarios on demand
+- **API layer** — REST endpoints to connect the backend and database to the frontend
 
 ---
 
@@ -52,5 +53,13 @@ Detailed technical documentation regarding the methodology, data sources, and sy
 
 ---
 
-### Special Configurations
-This project is automatically added to the [CO2060 Projects Gallery](https://projects.ce.pdn.ac.lk). Detailed project parameters are maintained in `docs/index.json`.
+## 🔗 Links
+
+- **Project Site:** <https://cepdnaclk.github.io/e22-co2060-floodguard/>
+- **Full Documentation:** [docs/README.md](./docs/README.md)
+- **Department of Computer Engineering:** <http://www.ce.pdn.ac.lk/>
+- **University of Peradeniya:** <https://eng.pdn.ac.lk/>
+
+---
+
+*This project is automatically listed in the [CO2060 Projects Gallery](https://projects.ce.pdn.ac.lk). Project metadata is maintained in `docs/index.json`.*
