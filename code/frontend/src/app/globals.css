@@ -1,28 +1,41 @@
 :root {
-  /* SCADA Industrial Palette - Simplified */
+  /* ========================================================
+     1. SCADA Industrial Palette - Base Backgrounds & Borders
+     ======================================================== */
   --bg-primary: #0B0F12;
   --bg-secondary: #141B20;
   --bg-tertiary: #192227;
   --border-color: #2A363C;
   --border-light: rgba(143, 163, 173, 0.1);
   
+  /* ========================================================
+     2. Typography Colors
+     ======================================================== */
   --text-primary: #E8F1F2;
   --text-secondary: #B6C7CD;
   --text-muted: #8FA3AD;
   
-  /* Semantic Colors */
+  /* ========================================================
+     3. Semantic Data Colors (Sensors & Charts)
+     ======================================================== */
   --data-cyan: #3BD6E8;
   --water-blue: #2F8CFF;
   --rain-indigo: #7A8CFF;
   --inflow-teal: #24D2A4;
   --downstream-amber: #55B7C8;
   
+  /* ========================================================
+     4. Alert & Risk Status Colors
+     ======================================================== */
   --status-green: #36D399;
   --status-yellow: #FFD166;
   --status-orange: #FF9F1C;
   --status-red: #FF3B3B;
   --status-disabled: #46545A;
   
+  /* ========================================================
+     5. Font Families
+     ======================================================== */
   --font-mono: var(--font-mono), monospace;
   --font-inter: var(--font-inter), sans-serif;
 }
