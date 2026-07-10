@@ -1,67 +1,168 @@
 import unittest
-from algorithm import *
-import config
+from datetime import datetime, timedelta
+import algorithm
 
 class TestAlgorithm(unittest.TestCase):
 
-    def setUp(self):
-        config.BASE_THRESHOLD = 75.0
-        config.IF_baseline = 120.0
-        config.ReservoirCapacity = 10000000.0
-        config.MaxGateCapacity = 5000.0
-        config.DownstreamCapacity = 2000.0
+    def test_newton_interpolation_linear(self):
+        # 2 nodes: linear extrapolation
+        # (0, 10), (10, 20) -> Target 20 should be 30
+        x_nodes = [0.0, 10.0]
+        y_nodes = [10.0, 20.0]
+        val = algorithm.newton_extrapolate(x_nodes, y_nodes, 20.0)
+        self.assertAlmostEqual(val, 30.0)
 
-    def test_21_1_normal_case(self):
-        rr_band = determine_rr_band(rr_short=1.5, rr_long=0.5, acc=0.2, dev=0.5)
-        self.assertEqual(rr_band, "NORMAL")
-        rr_adj, rf_adj, if_adj, dl_adj = calculate_adjustments(rr_band, RF=5.0, IF=100.0, DL=40.0)
-        at = calculate_adaptive_threshold(rr_adj, rf_adj, if_adj, dl_adj)
-        self.assertEqual(at, 75.0)
-        status, _ = determine_status_full(L=40.0, AT=at, rr_band=rr_band, DL=40.0, acc=0.2)
-        self.assertEqual(status, "GREEN")
+    def test_newton_interpolation_quadratic(self):
+        # 3 nodes: quadratic extrapolation
+        # (0, 0), (1, 1), (2, 4) -> P(x) = x^2. Target 3 should be 9
+        x_nodes = [0.0, 1.0, 2.0]
+        y_nodes = [0.0, 1.0, 4.0]
+        val = algorithm.newton_extrapolate(x_nodes, y_nodes, 3.0)
+        self.assertAlmostEqual(val, 9.0)
 
-    def test_21_2_sudden_spike(self):
-        rr_short, rr_long = calculate_rise_rates(L_now=48.0, L_15=46.5, L_60=44.0)
-        self.assertEqual(rr_short, 6.0)
-        self.assertEqual(rr_long, 4.0)
-        
-        rr_band = determine_rr_band(rr_short=rr_short, rr_long=rr_long, acc=1.0, dev=1.0)
-        # Should be HIGH because rr_short is 6.0 (between 4.0 and 7.0)
-        self.assertEqual(rr_band, "HIGH")
+    def test_newton_avoid_high_degree_runge(self):
+        # If we supply 5 nodes, Newton should select the last 3 for quadratic fit
+        # nodes: (0, 100), (1, 200), (2, 4), (3, 9), (4, 16) -> last 3: (2, 4), (3, 9), (4, 16)
+        # quadratic fit: P(x) = x^2. Target 5 should be 25
+        x_nodes = [0.0, 1.0, 2.0, 3.0, 4.0]
+        y_nodes = [100.0, 200.0, 4.0, 9.0, 16.0]
+        val = algorithm.newton_extrapolate(x_nodes, y_nodes, 5.0)
+        self.assertAlmostEqual(val, 25.0)
 
-    def test_21_3_critical_deviation(self):
-        dev = calculate_deviation(rr_short=6.0, ra=1.0)
-        self.assertEqual(dev, 5.0)
-        # Exact rule: DEV > 5.0 for critical. So DEV=5.0 is HIGH, not CRITICAL.
-        # But if RR_short=6.0, it triggers HIGH directly.
-        rr_band = determine_rr_band(rr_short=6.0, rr_long=1.0, acc=0.0, dev=5.0)
-        self.assertEqual(rr_band, "HIGH")
-        
-        rr_band_crit = determine_rr_band(rr_short=6.0, rr_long=1.0, acc=0.0, dev=5.1)
-        self.assertEqual(rr_band_crit, "CRITICAL")
-
-    def test_21_4_adaptive_threshold(self):
-        at = calculate_adaptive_threshold(rr_adj=18, rf_adj=7, if_adj=8, dl_adj=3)
+    def test_worked_example_1_threshold(self):
+        # base_threshold = 75%, RR_adj = 18% (High), RF_adj = 7%, IF_adj = 8%, DL_adj = 3%
+        # AT = 75 - 18 - 7 - 8 - 3 = 39%
+        at, floor, ceil = algorithm.calculate_adaptive_threshold(
+            base_threshold=75.0,
+            threshold_floor=30.0,
+            rr_adj=18.0,
+            rf_adj=7.0,
+            if_adj=8.0,
+            dl_adj=3.0
+        )
         self.assertEqual(at, 39.0)
+        self.assertFalse(floor)
+        self.assertFalse(ceil)
 
-    def test_21_5_red_status(self):
-        status, _ = determine_status_full(L=40.0, AT=39.0, rr_band="HIGH", DL=50.0, acc=1.0)
-        self.assertEqual(status, "RED")
+    def test_worked_example_2_release_recommendation(self):
+        # r = 3.2%/hr -> GateOpening_base% = 30 + ((3.2 - 2.5)/1.5)*40 = 30 + 0.7/1.5*40 = 30 + 18.66% = 48.66%, rounded to 50%
+        # MaxGateCapacity = 150 m³/s -> Q_desired = 75 m³/s
+        # DownstreamCapacity = 300 m³/s, DL(t) = 60% -> Q_downstream_available = 300 * 0.4 = 120 m³/s
+        # Q_release = min(75, 120, 150) = 75 m³/s
+        # GateOpening_applied% = 50%
+        # conflict_warning = False
+        rec = algorithm.calculate_release_recommendation(
+            rr_pred_15=3.2,
+            max_gate_capacity=150.0,
+            downstream_capacity=300.0,
+            dl_now=60.0,
+            l_now=40.0,
+            adaptive_threshold_now=39.0,
+            threshold_floor=30.0,
+            reservoir_capacity=10000000.0,
+            inflow_now=80.0
+        )
+        self.assertEqual(rec["gate_opening_base_pct"], 50.0)
+        self.assertEqual(rec["q_desired"], 75.0)
+        self.assertEqual(rec["q_downstream_available"], 120.0)
+        self.assertEqual(rec["q_release"], 75.0)
+        self.assertEqual(rec["gate_opening_applied_pct"], 50.0)
+        self.assertFalse(rec["conflict_warning"])
 
-    def test_21_6_orange_status(self):
-        # L > AT - 3 but <= AT
-        # Example: AT=39.0. margin_3 = 36.0. If L=38.0, it is > 36.0 and <= 39.0.
-        status, _ = determine_status_full(L=38.0, AT=39.0, rr_band="NORMAL", DL=50.0, acc=0.0)
-        self.assertEqual(status, "ORANGE")
+    def test_ttc_null_comparison_guard(self):
+        # TTC is None (no crossing predicted)
+        status, reason = algorithm.classify_risk_status(
+            gap_current=10.0,
+            ttc=None,
+            rr_band="NORMAL",
+            gap_trend="stable"
+        )
+        self.assertEqual(status, "GREEN")
+        
+        # When gap is decreasing and TTC is None, status should be YELLOW
+        status, reason = algorithm.classify_risk_status(
+            gap_current=10.0,
+            ttc=None,
+            rr_band="NORMAL",
+            gap_trend="decreasing"
+        )
+        self.assertEqual(status, "YELLOW")
 
-    def test_21_7_downstream_conflict(self):
-        # AT=39, L=70 -> safe_storage_rate = (39 - 70) * 10M / 60 = -31 * 166666 = -5,166,666
-        # release_rate = IF (2000) - (-5,166,666) = 5,168,666
-        # max_safe_release = 2000 * (1 - 90/100) = 200
-        rec = calculate_release_recommendation(L=70.0, AT=39.0, IF=2000.0, DL=90.0)
-        self.assertEqual(rec["MaxSafeRelease"], 200.0)
-        self.assertEqual(rec["ReleaseRate"], 200.0)
-        self.assertEqual(rec["conflict_warning"], "Full required release exceeds downstream capacity | Release rate is not greater than inflow; reservoir level may not decrease.")
+    def test_insufficient_history_newton(self):
+        # Empty nodes should raise InsufficientDataError
+        with self.assertRaises(algorithm.InsufficientDataError):
+            algorithm.newton_extrapolate([], [], 15.0)
+
+    def test_net_outflow_zero_duration_guard(self):
+        # NetOutflow = Q_release - Inflow = 50 - 60 = -10 (which is <= 0)
+        # verify estimated duration is None (not negative or infinite)
+        rec = algorithm.calculate_release_recommendation(
+            rr_pred_15=3.2,
+            max_gate_capacity=100.0,
+            downstream_capacity=200.0,
+            dl_now=50.0,
+            l_now=40.0,
+            adaptive_threshold_now=39.0,
+            threshold_floor=30.0,
+            reservoir_capacity=10000000.0,
+            inflow_now=90.0 # exceeding release (q_desired=50.0, release=50.0)
+        )
+        self.assertIsNone(rec["estimated_duration_minutes"])
+
+    def test_worst_band_wins(self):
+        # If multiple parameters are true, critical beats high, elevated
+        # RR_pred = 4.5 (Critical > 4.0)
+        # RR_short = 1.0 (Normal)
+        # ACC = 0.2 (Normal)
+        # DEV = 0.5 (Normal)
+        band = algorithm.determine_rr_band(rr_pred_or_long=4.5, rr_short=1.0, acc=0.2, dev=0.5)
+        self.assertEqual(band, "CRITICAL")
+        
+        # RR_pred = 2.8 (High)
+        # RR_short = 5.0 (High)
+        # ACC = 0.2 (Normal)
+        # DEV = 0.5 (Normal)
+        band = algorithm.determine_rr_band(rr_pred_or_long=2.8, rr_short=5.0, acc=0.2, dev=0.5)
+        self.assertEqual(band, "HIGH")
+
+    def test_deescalation_transition_checks(self):
+        # RED -> ORANGE de-escalation:
+        # RR_band below High (Elevated/Normal) AND ACC < 0 AND L stable or dropping
+        res = algorithm.check_deescalation_conditions(
+            transition="RED -> ORANGE",
+            rr_band="ELEVATED",
+            acc=-0.5,
+            l_now=40.0,
+            l_prev=40.0,
+            r_net_now=5.0,
+            r_net_prev=5.0
+        )
+        self.assertTrue(res)
+        
+        # Fail due to positive ACC
+        res_fail = algorithm.check_deescalation_conditions(
+            transition="RED -> ORANGE",
+            rr_band="ELEVATED",
+            acc=0.1,
+            l_now=40.0,
+            l_prev=40.0,
+            r_net_now=5.0,
+            r_net_prev=5.0
+        )
+        self.assertFalse(res_fail)
+
+        # ORANGE -> YELLOW de-escalation:
+        # RR_band within Elevated AND ACC <= 0 AND R_net decreasing
+        res_orange = algorithm.check_deescalation_conditions(
+            transition="ORANGE -> YELLOW",
+            rr_band="ELEVATED",
+            acc=0.0,
+            l_now=40.0,
+            l_prev=40.0,
+            r_net_now=4.0,
+            r_net_prev=5.0 # R_net is decreasing
+        )
+        self.assertTrue(res_orange)
 
 if __name__ == '__main__':
     unittest.main()

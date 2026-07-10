@@ -1,196 +1,362 @@
 """
 Stateless deterministic mathematical algorithms for the FloodGuard processor engine.
+Implements Newton divided-difference extrapolation, adaptive threshold calculations,
+time-to-crossing risk status classification, and proportional gate release logic.
 """
 
-from typing import Tuple, Optional
-import config
+from typing import Tuple, Optional, List, Dict
+import math
 
-def validate_input(L: float, RF: float, IF: float, DL: float) -> Tuple[bool, list]:
+class InsufficientDataError(Exception):
+    """Raised when there is insufficient historical data to perform a calculation."""
+    pass
+
+def validate_input(l_t: Optional[float], r_net_t: Optional[float], if_t: Optional[float], dl_t: Optional[float]) -> Tuple[bool, List[str]]:
+    """
+    Validate that all required sensor inputs are present.
+    Returns (is_valid, missing_fields_list).
+    """
     missing = []
-    is_valid = True
-    
-    if L is None or not (0 <= L <= 100):
-        missing.append("L")
-        is_valid = False
-    if RF is None or RF < 0:
-        missing.append("RF")
-        is_valid = False
-    if IF is None or IF < 0:
-        missing.append("IF")
-        is_valid = False
-    if DL is None or DL < 0:
-        missing.append("DL")
-        is_valid = False
-        
-    return is_valid, missing
+    if l_t is None:
+        missing.append("water_level")
+    if r_net_t is None:
+        missing.append("r_net")
+    if if_t is None:
+        missing.append("inflow")
+    if dl_t is None:
+        missing.append("downstream_level")
+    return len(missing) == 0, missing
 
 def calculate_rise_rates(L_now: float, L_15: Optional[float], L_60: Optional[float]) -> Tuple[Optional[float], Optional[float]]:
-    rr_short = None
-    rr_long = None
-    
-    if L_15 is not None:
-        rr_short = (L_now - L_15) * 4.0
-    if L_60 is not None:
-        rr_long = L_now - L_60
-        
+    """
+    Calculate short-term (15-min) and long-term (60-min) rise rates in %/hour.
+    """
+    rr_short = (L_now - L_15) * 4.0 if L_15 is not None else None
+    rr_long = (L_now - L_60) * 1.0 if L_60 is not None else None
     return rr_short, rr_long
 
-def calculate_acceleration(rr_long_now: Optional[float], rr_long_60: Optional[float]) -> Optional[float]:
-    if rr_long_now is not None and rr_long_60 is not None:
-        return rr_long_now - rr_long_60
+def calculate_acceleration(rr_long: Optional[float], rr_long_60: Optional[float]) -> Optional[float]:
+    """
+    Calculate water level acceleration (change in long-term rise rate over 60 mins).
+    """
+    if rr_long is not None and rr_long_60 is not None:
+        return rr_long - rr_long_60
     return None
 
-def calculate_rolling_average(rr_long_history: list) -> Optional[float]:
-    if not rr_long_history or len(rr_long_history) == 0:
-        return None
-    return sum(rr_long_history) / len(rr_long_history)
+def calculate_rolling_average(rr_longs: List[float]) -> float:
+    """
+    Calculate the rolling average of long-term rise rates over a list of historical values.
+    """
+    if not rr_longs:
+        return 0.0
+    return sum(rr_longs) / len(rr_longs)
 
-def calculate_deviation(rr_short: Optional[float], ra: Optional[float]) -> Optional[float]:
-    if rr_short is not None and ra is not None:
-        return rr_short - ra
+def calculate_deviation(rr_short: Optional[float], RA: float) -> Optional[float]:
+    """
+    Calculate the deviation of short-term rise rate from the 3-hour rolling average.
+    """
+    if rr_short is not None:
+        return rr_short - RA
     return None
 
-def determine_rr_band(rr_short: Optional[float], rr_long: Optional[float], acc: Optional[float], dev: Optional[float]) -> str:
-    # Safely handle Nones by treating them as conditions not met
-    r_long = rr_long if rr_long is not None else -999.0
+def newton_extrapolate(x_nodes: List[float], y_nodes: List[float], x_target: float) -> float:
+    """
+    Perform Newton divided-difference extrapolation on the given nodes.
+    To avoid high-degree oscillations (Runge's phenomenon), we use a lower-degree fit
+    by selecting the most recent 3 or 4 points if more are provided.
+    
+    x_nodes: List of floats representing timestamps (e.g. in minutes relative to now)
+    y_nodes: List of floats representing corresponding sensor values
+    x_target: Target time to extrapolate to (e.g. h minutes in the future)
+    """
+    n = len(x_nodes)
+    if n == 0:
+        raise InsufficientDataError("No nodes available for extrapolation.")
+    if n == 1:
+        return y_nodes[0]
+    
+    # Select the last 3-4 nodes to keep degree low and avoid Runge's phenomenon
+    if n > 3:
+        x_nodes = x_nodes[-3:]
+        y_nodes = y_nodes[-3:]
+        n = len(x_nodes)
+        
+    # Construct divided difference table
+    coef = list(y_nodes)
+    for j in range(1, n):
+        for i in range(n - 1, j - 1, -1):
+            denom = x_nodes[i] - x_nodes[i - j]
+            if abs(denom) < 1e-9:
+                # Avoid division by zero
+                coef[i] = 0.0
+            else:
+                coef[i] = (coef[i] - coef[i - 1]) / denom
+                
+    # Evaluate at x_target
+    val = coef[n - 1]
+    for i in range(n - 2, -1, -1):
+        val = coef[i] + (x_target - x_nodes[i]) * val
+    return val
+
+def determine_rr_band(rr_pred_or_long: Optional[float], rr_short: Optional[float], acc: Optional[float], dev: Optional[float]) -> str:
+    """
+    Determine the rise-rate severity band.
+    Worst-first logic is applied: first matching condition wins.
+    """
+    r_pred = rr_pred_or_long if rr_pred_or_long is not None else -999.0
     r_short = rr_short if rr_short is not None else -999.0
     a_cc = acc if acc is not None else -999.0
     d_ev = dev if dev is not None else -999.0
 
-    # 8.4 CRITICAL
-    if r_long > 4.0 or r_short > 7.0 or a_cc > 3.0 or d_ev > 5.0:
+    # 1. CRITICAL
+    if r_pred > 4.0 or r_short > 7.0 or a_cc > 3.0 or d_ev > 5.0:
         return "CRITICAL"
     
-    # 8.3 HIGH
-    if (2.5 <= r_long <= 4.0) or (4.0 <= r_short <= 7.0) or (1.5 <= a_cc <= 3.0):
+    # 2. HIGH
+    if (2.5 <= r_pred <= 4.0) or (4.0 <= r_short <= 7.0) or (1.5 <= a_cc <= 3.0):
         return "HIGH"
         
-    # 8.2 ELEVATED
-    if (1.0 <= r_long < 2.5) or (2.0 <= r_short < 4.0) or (0.5 <= a_cc < 1.5):
+    # 3. ELEVATED
+    if (1.0 <= r_pred < 2.5) or (2.0 <= r_short < 4.0) or (0.5 <= a_cc < 1.5):
         return "ELEVATED"
         
-    # 8.1 NORMAL
-    # Note: If history is completely missing, it falls back to NORMAL or UNKNOWN in higher layers
+    # 4. NORMAL
     return "NORMAL"
 
-def calculate_adjustments(rr_band: str, RF: float, IF: float, DL: float) -> Tuple[int, int, int, int]:
-    # 9.1 RR_adj
-    rr_adj_map = {"NORMAL": 0, "ELEVATED": 8, "HIGH": 18, "CRITICAL": 30}
-    rr_adj = rr_adj_map.get(rr_band, 0)
+def calculate_adjustments(rr_band: str, RF: float, IF: float, if_baseline: float, DL: float) -> Tuple[float, float, float, float]:
+    """
+    Calculate threshold adjustments based on live/predicted parameters.
+    """
+    # RR_adj
+    rr_adj_map = {"NORMAL": 0.0, "ELEVATED": 8.0, "HIGH": 18.0, "CRITICAL": 30.0}
+    rr_adj = rr_adj_map.get(rr_band, 0.0)
     
-    # 9.2 RF_adj
-    if RF < 10:
-        rf_adj = 0
-    elif RF <= 25:
-        rf_adj = 3
-    elif RF <= 50:
-        rf_adj = 7
+    # RF_adj
+    if RF < 10.0:
+        rf_adj = 0.0
+    elif RF <= 25.0:
+        rf_adj = 3.0
+    elif RF <= 50.0:
+        rf_adj = 7.0
     else:
-        rf_adj = 12
+        rf_adj = 12.0
         
-    # 9.3 IF_adj
-    ratio = IF / config.IF_baseline
+    # IF_adj
+    if if_baseline <= 0:
+        ratio = 0.0
+    else:
+        ratio = IF / if_baseline
+        
     if ratio < 1.5:
-        if_adj = 0
+        if_adj = 0.0
     elif ratio < 2.5:
-        if_adj = 4
+        if_adj = 4.0
     elif ratio < 4.0:
-        if_adj = 8
+        if_adj = 8.0
     else:
-        if_adj = 13
+        if_adj = 13.0
         
-    # 9.4 DL_adj
-    if DL < 50:
-        dl_adj = 0
-    elif DL <= 70:
-        dl_adj = 3
-    elif DL <= 85:
-        dl_adj = 8
+    # DL_adj
+    if DL < 50.0:
+        dl_adj = 0.0
+    elif DL <= 70.0:
+        dl_adj = 3.0
+    elif DL <= 85.0:
+        dl_adj = 8.0
     else:
-        dl_adj = 15
+        dl_adj = 15.0
         
     return rr_adj, rf_adj, if_adj, dl_adj
 
-def calculate_adaptive_threshold(rr_adj: int, rf_adj: int, if_adj: int, dl_adj: int) -> float:
-    at = config.BASE_THRESHOLD - rr_adj - rf_adj - if_adj - dl_adj
-    at = max(config.MIN_ADAPTIVE_THRESHOLD, min(config.MAX_ADAPTIVE_THRESHOLD, at))
-    return float(at)
-
-def determine_status(L: float, AT: float, rr_band: str, DL: float) -> str:
-    margin_3 = AT + 3.0
-    margin_2 = AT + 10.0
+def calculate_adaptive_threshold(
+    base_threshold: float,
+    threshold_floor: float,
+    rr_adj: float,
+    rf_adj: float,
+    if_adj: float,
+    dl_adj: float
+) -> Tuple[float, bool, bool]:
+    """
+    Calculate clapped adaptive threshold and return (AT, floor_triggered, ceiling_triggered).
+    """
+    raw_at = base_threshold - rr_adj - rf_adj - if_adj - dl_adj
+    floor_triggered = False
+    ceiling_triggered = False
     
-    # 11.1 RED
-    if L > AT or rr_band == "CRITICAL" or (DL > 85 and rr_band in ["HIGH", "CRITICAL"]):
-        return "RED"
+    if raw_at < threshold_floor:
+        at = threshold_floor
+        floor_triggered = True
+    elif raw_at > base_threshold:
+        at = base_threshold
+        ceiling_triggered = True
+    else:
+        at = raw_at
         
-    # 11.2 ORANGE
-    # Note: ACC > 0 is part of the requirement for ORANGE, but the input to determine_status doesn't have it.
-    # Wait, let's fix this in the signature.
-    return "UNKNOWN" # Will fix below
+    return float(at), floor_triggered, ceiling_triggered
 
-def determine_status_full(L: float, AT: float, rr_band: str, DL: float, acc: Optional[float]) -> Tuple[str, str]:
-    margin_1 = AT - 20.0
-    margin_2 = AT - 10.0
-    margin_3 = AT - 3.0
+def determine_gap_trend(gap_current: float, gaps_pred: List[float]) -> str:
+    """
+    Determine the gap trend. Compare consecutive gap points.
+    Returns: "increasing", "decreasing", "stable"
+    """
+    all_gaps = [gap_current] + gaps_pred
+    diffs = [all_gaps[i] - all_gaps[i-1] for i in range(1, len(all_gaps))]
+    
+    neg_diffs = sum(1 for d in diffs if d < -1e-5)
+    pos_diffs = sum(1 for d in diffs if d > 1e-5)
+    
+    if neg_diffs > pos_diffs:
+        return "decreasing"
+    elif pos_diffs > neg_diffs:
+        return "increasing"
+    else:
+        return "stable"
+
+def classify_risk_status(
+    gap_current: float,
+    ttc: Optional[int],
+    rr_band: str,
+    gap_trend: str
+) -> Tuple[str, str]:
+    """
+    Determine official risk status and trigger reason.
+    Evaluates risk rules in order: RED, ORANGE, YELLOW, GREEN.
+    """
+    # RED
+    if gap_current <= 0:
+        return "RED", "Current water level exceeds adaptive threshold."
+    if ttc is not None and ttc <= 15:
+        return "RED", f"Water level predicted to cross threshold in {ttc} minutes (TTC <= 15)."
+    if rr_band == "CRITICAL":
+        return "RED", "Rise-rate severity band is CRITICAL."
+        
+    # ORANGE
+    if ttc is not None and 15 < ttc <= 60:
+        return "ORANGE", f"Water level predicted to cross threshold in {ttc} minutes (15 < TTC <= 60)."
+    if rr_band == "HIGH" and gap_trend == "decreasing":
+        return "ORANGE", "Rise-rate band is HIGH and the gap is decreasing."
+        
+    # YELLOW
+    if ttc is not None and ttc > 60:
+        return "YELLOW", f"Water level predicted to cross threshold in {ttc} minutes (TTC > 60)."
+    if rr_band == "ELEVATED":
+        return "YELLOW", "Rise-rate band is ELEVATED."
+    if ttc is None and gap_trend == "decreasing":
+        return "YELLOW", "No threshold crossing predicted but the gap is decreasing."
+        
+    # GREEN
+    return "GREEN", "System metrics are within normal bounds."
+
+def check_deescalation_conditions(
+    transition: str,
+    rr_band: str,
+    acc: Optional[float],
+    l_now: float,
+    l_prev: Optional[float],
+    r_net_now: float,
+    r_net_prev: Optional[float]
+) -> bool:
+    """
+    Verify if conditions are met for a specific de-escalation transition.
+    """
     a_cc = acc if acc is not None else 0.0
     
-    # 11.1 RED
-    if L > AT or rr_band == "CRITICAL" or (DL > 85 and rr_band in ["HIGH", "CRITICAL"]):
-        return "RED", "Immediate gate operation required"
+    if transition == "RED -> ORANGE":
+        # RR_band below High threshold (i.e. NORMAL or ELEVATED) AND ACC <= 0 AND L(t) stable or dropping
+        is_rr_below_high = rr_band in ["NORMAL", "ELEVATED"]
+        is_acc_neg = a_cc <= 0.0
+        is_l_stable = l_prev is None or l_now <= l_prev
+        return is_rr_below_high and is_acc_neg and is_l_stable
         
-    # 11.2 ORANGE
-    if L > margin_3 or (rr_band == "HIGH" and a_cc > 0):
-        return "ORANGE", "Begin controlled partial release. Alert downstream communities."
+    elif transition == "ORANGE -> YELLOW":
+        # RR_band within Elevated (meaning NORMAL or ELEVATED) AND ACC <= 0 AND (R_net decreasing or rain is zero)
+        is_rr_elevated_or_normal = rr_band in ["NORMAL", "ELEVATED"]
+        is_acc_neg_or_zero = a_cc <= 0.0
+        is_r_decreasing = r_net_prev is None or r_net_now < r_net_prev or r_net_now < 1e-3
+        return is_rr_elevated_or_normal and is_acc_neg_or_zero and is_r_decreasing
         
-    # 11.3 YELLOW
-    if L > margin_2 or rr_band == "ELEVATED":
-        return "YELLOW", "Operators on standby, prepare"
+    elif transition == "YELLOW -> GREEN":
+        # RR_band = NORMAL AND L(t) stable or dropping
+        is_rr_normal = rr_band == "NORMAL"
+        is_l_stable = l_prev is None or l_now <= l_prev
+        return is_rr_normal and is_l_stable
         
-    # 11.4 GREEN
-    return "GREEN", "Continue monitoring"
+    return False
 
-def calculate_release_recommendation(L: float, AT: float, IF: float, DL: float) -> dict:
-    # Step 1: ReleaseRate
-    safe_storage_rate = ((AT - L) / 100.0) * config.ReservoirCapacity / (config.SHORT_WINDOW_MINUTES * 60.0)
-    release_rate = IF - safe_storage_rate
-    if release_rate < 0:
-        release_rate = 0.0
+def calculate_release_recommendation(
+    rr_pred_15: float,
+    max_gate_capacity: float,
+    downstream_capacity: float,
+    dl_now: float,
+    l_now: float,
+    adaptive_threshold_now: float,
+    threshold_floor: float,
+    reservoir_capacity: float,
+    inflow_now: float
+) -> Dict:
+    """
+    Calculate the recommended proportional release.
+    """
+    r = rr_pred_15
     
-    # Step 2: MaxSafeRelease
-    max_safe_release = round(config.DownstreamCapacity * (1.0 - (DL / 100.0)), 2)
-    if max_safe_release < 0:
-        max_safe_release = 0.0
+    # Piecewise linear GateOpening_base%
+    if r <= 1.0:
+        gate_opening_base = 0.0
+    elif 1.0 < r <= 2.5:
+        gate_opening_base = ((r - 1.0) / 1.5) * 30.0
+    elif 2.5 < r <= 4.0:
+        gate_opening_base = 30.0 + ((r - 2.5) / 1.5) * 40.0
+    elif 4.0 < r < 7.0:
+        gate_opening_base = 70.0 + ((r - 4.0) / 3.0) * 30.0
+    else:  # r >= 7.0
+        gate_opening_base = 100.0
         
-    conflict_warning = None
-    if release_rate > max_safe_release:
-        release_rate = max_safe_release
-        conflict_warning = "Full required release exceeds downstream capacity"
-        
-    # Step 3: GateOpeningPercent
-    gate_opening_raw = (release_rate / config.MaxGateCapacity) * 100.0
-    # Round to nearest 5
-    gate_opening_percent = round(gate_opening_raw / 5.0) * 5
-    gate_opening_percent = max(0, min(100, int(gate_opening_percent)))
+    # Round base opening to nearest 5%
+    gate_opening_base_rounded = round(gate_opening_base / 5.0) * 5.0
+    gate_opening_base_rounded = max(0.0, min(100.0, gate_opening_base_rounded))
     
-    # Step 4: EstimatedDuration
-    target_safe_level = AT - config.TARGET_SAFE_BUFFER
-    duration = None
-    if release_rate > IF and L > target_safe_level:
-        duration_raw = ((L - target_safe_level) / (release_rate - IF)) * 60.0
-        duration = int(max(0, duration_raw))
-    elif release_rate <= IF:
-        if conflict_warning:
-            conflict_warning += " | Release rate is not greater than inflow; reservoir level may not decrease."
-        else:
-            conflict_warning = "Release rate is not greater than inflow; reservoir level may not decrease."
-            
+    # Q_desired
+    q_desired = (gate_opening_base_rounded / 100.0) * max_gate_capacity
+    
+    # Q_downstream_available
+    q_downstream_available = downstream_capacity * (1.0 - (dl_now / 100.0))
+    q_downstream_available = max(0.0, q_downstream_available)
+    
+    # Q_release (clamped)
+    q_release = min(q_desired, q_downstream_available, max_gate_capacity)
+    
+    # Applied opening
+    if max_gate_capacity > 0:
+        gate_opening_applied = (q_release / max_gate_capacity) * 100.0
+    else:
+        gate_opening_applied = 0.0
+        
+    conflict_warning = q_desired > q_downstream_available
+    
+    # Target safe level
+    target_safe_level = max(adaptive_threshold_now - 10.0, threshold_floor)
+    
+    # Excess level pct
+    excess_level_pct = max(l_now - target_safe_level, 0.0)
+    
+    # Excess volume
+    excess_volume = (excess_level_pct / 100.0) * reservoir_capacity
+    
+    # Net outflow
+    net_outflow = q_release - inflow_now
+    
+    if net_outflow > 0:
+        estimated_duration_minutes = (excess_volume / net_outflow) / 60.0
+    else:
+        estimated_duration_minutes = None
+        
     return {
-        "active": True,
-        "ReleaseRate": float(release_rate),
-        "MaxSafeRelease": float(max_safe_release),
-        "GateOpeningPercent": gate_opening_percent,
-        "TargetSafeLevel": float(target_safe_level),
-        "EstimatedDurationMinutes": duration,
-        "conflict_warning": conflict_warning
+        "gate_opening_base_pct": gate_opening_base_rounded,
+        "q_desired": q_desired,
+        "q_downstream_available": q_downstream_available,
+        "q_release": q_release,
+        "gate_opening_applied_pct": gate_opening_applied,
+        "conflict_warning": conflict_warning,
+        "target_safe_level": target_safe_level,
+        "estimated_duration_minutes": estimated_duration_minutes
     }

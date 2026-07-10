@@ -1,30 +1,16 @@
 """
-Configuration settings for the Processor Engine.
-All values are constants mapped exactly to the prompt requirements.
+Configuration settings for the FloodGuard Processor Engine.
+Constants are aligned with the project specification.
 """
 
-# Base operating levels
-BASE_THRESHOLD = 75.0            # Default safe operating level in %
-MIN_ADAPTIVE_THRESHOLD = 30.0    # Floor threshold in %
-MAX_ADAPTIVE_THRESHOLD = 75.0    # Ceiling threshold in %
-
-# Time windows
+# Time windows and horizons
 SHORT_WINDOW_MINUTES = 15
 LONG_WINDOW_MINUTES = 60
-ROLLING_AVERAGE_WINDOW_MINUTES = 180
+ROLLING_AVERAGE_WINDOW_MINUTES = 180  # 3 hours for rolling average rise rate RA(t)
 
-# Reassessment intervals
-RELEASE_REASSESS_INTERVAL_MINUTES = 15
-DEESCALATION_CHECK_INTERVAL_MINUTES = 15
-
-# Target safe buffer below threshold
-TARGET_SAFE_BUFFER = 10.0        # TargetSafeLevel = AT(t) - 10%
-
-# Dam-specific physical characteristics (Configurable)
-ReservoirCapacity = 10000000.0   # Example: 10 million cubic meters
-MaxGateCapacity = 5000.0         # Example: 5000 m3/s max discharge
-DownstreamCapacity = 2000.0      # Example: 2000 m3/s max safe downstream release
-IF_baseline = 120.0              # Normal baseline inflow
+# Prediction settings
+PREDICTIONS_HORIZON_MINUTES = [15, 30, 45, 60, 90, 120]
+ROLLING_HISTORY_WINDOW_HOURS = 6      # We use 3-6 hours of history to select extrapolation nodes
 
 # Status severities
 STATUS_SEVERITY = {

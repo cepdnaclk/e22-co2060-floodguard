@@ -23,23 +23,20 @@ The pipeline runs every minute:
 
 ## Completed
 
-- **Database system** — Full PostgreSQL schema with 9 tables:
-  - `dams` (static config), `engineers`, `sensor_readings`
-  - `calculated_metrics`, `threshold_calculations`, `risk_status`
-  - `release_recommendations`, `deescalation_tracking`, `alerts_log`, `simulation_config`
-- **Prediction formula** — A deterministic reference algorithm covering rise rate (short & long term), acceleration, rolling average, deviation score, adaptive threshold calculation, and a 4-level risk classification with gate-release logic
-- **Database–backend connection** — Direct database connection from the backend processor engine (no API layer between them)
-- **Simulation engine** — Configurable scenario generator that writes realistic sensor data into the database, enabling full end-to-end testing without physical hardware; supports scenarios like monsoon spikes, sustained rises, downstream congestion, and recovery
+- **Database system** — Full PostgreSQL schema with descending time-series indexes.
+- **Prediction formula** — Coded, fine-tuned, and fully validated reference algorithm (covering rise rate, acceleration, rolling averages, deviation, and adaptive safety thresholds).
+- **Database–backend connection** — Direct asynchronous connection from the backend processor engine.
+- **Simulation engine** — Completed external desktop weather simulator (Tkinter GUI) featuring 5 Sri Lankan scenarios (Drought, SW Monsoon, NE Monsoon Storm, Inter-Monsoon, Cyclone Surge) that inserts telemetry in real-time.
+- **Frontend dashboard** — Fully realized engineer-facing SCADA dashboard with interactive graphs, predictive trend overlays, station detail cards, and query history tables.
+- **Database-Frontend API** — Complete REST API connection layer linking the local database and backend predictions to the dashboard UI.
 
 ---
 
-## Upcoming
+## Upcoming (To-Do)
 
-- **Frontend dashboard** — Engineer-facing UI for live status, charts, and release recommendations
-- **Formula fine-tuning** — Calibrating rise-rate band thresholds and adjustment weights against realistic data
-- **Simulator fine-tuning** — Improving realism of generated sensor sequences
-- **Manual simulator controls** — Allow engineers to trigger specific scenarios on demand
-- **API layer** — REST endpoints to connect the backend and database to the frontend
+- **Containerization** — Full containerization of frontend, backend, and database services using Docker.
+- **Updated Login Menu** — Design and build a modernized, secure authentication panel for on-site engineers.
+- **Simulator Manual Controls** — Add manual controls and a gate opening switch to the weather simulation center.
 
 ---
 
