@@ -12,6 +12,12 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }) {
+  // --------------------------------------------------------
+  // Root Layout wrapper
+  // 1. Injects global fonts (Inter for sans, Plex Mono for monospace)
+  // 2. Wraps the app in a dark-mode ThemeProvider
+  // 3. Mounts the global Navbar across all routes
+  // --------------------------------------------------------
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${ibmPlexMono.variable}`}>
       <body className={inter.className}>

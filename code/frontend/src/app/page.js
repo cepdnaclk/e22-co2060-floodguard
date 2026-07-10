@@ -1,14 +1,24 @@
 'use client';
 
+// React Core
 import { useEffect, useState, useCallback } from 'react';
+
+// Recharts (Data Visualization)
 import { 
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, ReferenceLine, Legend 
 } from 'recharts';
+
+// Lucide React (Icons)
 import { Waves, AlertTriangle, Shield, CheckCircle, Clock, User, LogOut, Loader2, Calendar } from 'lucide-react';
+
+// Styles
 import styles from './page.module.css';
 
 export default function Dashboard() {
+  // --------------------------------------------------------
+  // 1. Core Data States
+  // --------------------------------------------------------
   const [isMounted, setIsMounted] = useState(false);
   const [dams, setDams] = useState([]);
   const [selectedDamId, setSelectedDamId] = useState('');
@@ -18,8 +28,10 @@ export default function Dashboard() {
   const [stations, setStations] = useState([]);
   const [stationRainfall, setStationRainfall] = useState({});
   const [maxRainfallStation, setMaxRainfallStation] = useState(null);
-  
-  // Chart data states
+
+  // --------------------------------------------------------
+  // 2. Chart Data States
+  // --------------------------------------------------------
   const [charts, setCharts] = useState({
     waterLevel: { live: [], predicted: [] },
     threshold: { live: [], predicted: [] },

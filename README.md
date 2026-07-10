@@ -6,6 +6,22 @@
 
 ---
 
+## Architecture Overview
+
+The system consists of three decoupled layers:
+- **Database**: PostgreSQL storing telemetry, calculations, and risk metrics.
+- **Backend Processor**: A Python engine that fetches raw sensor data, evaluates it against our adaptive threshold algorithm, and updates the database with new risk states.
+- **Frontend SCADA Dashboard**: A Next.js application that provides real-time visualization of sensor data and algorithmic predictions, directly connecting to the database via API routes.
+
+## Local Setup Instructions
+
+1. **Database Setup**: Run the schema provided in `code/database/dam_management_schema.sql` on a local PostgreSQL instance.
+2. **Backend**: Install dependencies (`pip install -r requirements.txt`) and configure your `.env` file. Run the main processing logic.
+3. **Frontend**: Navigate to `code/frontend`, install dependencies (`npm install`), and run the development server (`npm run dev`).
+4. **Simulation**: Execute `code/simulation/db_simulator.py` to launch the telemetry simulation GUI.
+
+---
+
 ## What This System Does
 
 The core idea: a fixed danger threshold is not enough. By the time water crosses a static line, the safe response window has often already closed. FloodGuard uses an **adaptive threshold** that moves dynamically based on four live inputs — rise rate, upstream rainfall, inflow rate, and downstream channel capacity.

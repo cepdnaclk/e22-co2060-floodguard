@@ -13,6 +13,18 @@ This repository hosts the canonical **PostgreSQL database schema**, the **core c
 
 ---
 
+## Table of Contents
+- [1. Project Overview](#1-project-overview)
+- [2. System Architecture](#2-system-architecture)
+- [3. PostgreSQL Database System Schema (3NF)](#3-postgresql-database-system-schema-3nf)
+- [4. Calculation Reference & Predictive Algorithm](#4-calculation-reference--predictive-algorithm)
+- [5. Machine Learning Integration Contract](#5-machine-learning-integration-contract)
+- [6. Simulation & Testing Scenarios](#6-simulation--testing-scenarios)
+- [7. Getting Started](#7-getting-started)
+- [8. Links](#8-links)
+
+---
+
 ## Team
 
 - e22373, L. Sharmilan, e22373@eng.pdn.ac.lk

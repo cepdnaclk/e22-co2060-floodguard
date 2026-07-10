@@ -65,9 +65,17 @@ def newton_extrapolate(x_nodes: List[float], y_nodes: List[float], x_target: flo
     To avoid high-degree oscillations (Runge's phenomenon), we use a lower-degree fit
     by selecting the most recent 3 or 4 points if more are provided.
     
-    x_nodes: List of floats representing timestamps (e.g. in minutes relative to now)
-    y_nodes: List of floats representing corresponding sensor values
-    x_target: Target time to extrapolate to (e.g. h minutes in the future)
+    Args:
+        x_nodes (List[float]): List of floats representing timestamps (e.g., in minutes relative to now).
+                               Expected to be in ascending order.
+        y_nodes (List[float]): List of floats representing corresponding sensor values.
+        x_target (float): Target time to extrapolate to (e.g., h minutes in the future).
+        
+    Returns:
+        float: The extrapolated sensor value at x_target.
+        
+    Raises:
+        InsufficientDataError: If x_nodes is empty.
     """
     n = len(x_nodes)
     if n == 0:
@@ -219,8 +227,19 @@ def classify_risk_status(
     gap_trend: str
 ) -> Tuple[str, str]:
     """
-    Determine official risk status and trigger reason.
-    Evaluates risk rules in order: RED, ORANGE, YELLOW, GREEN.
+    Determine official risk status and trigger reason based on system state.
+    Evaluates risk rules in order of severity: RED, ORANGE, YELLOW, GREEN.
+    
+    Args:
+        gap_current (float): The current distance between the water level and the adaptive threshold.
+                             If <= 0, the threshold is breached.
+        ttc (Optional[int]): Time-to-crossing in minutes. None if crossing is not predicted.
+        rr_band (str): Rise-rate severity band (e.g., "CRITICAL", "HIGH", "ELEVATED", "NORMAL").
+        gap_trend (str): Trend of the gap ("increasing", "decreasing", "stable").
+        
+    Returns:
+        Tuple[str, str]: A tuple containing the risk status (RED/ORANGE/YELLOW/GREEN) 
+                         and a human-readable trigger reason.
     """
     # RED
     if gap_current <= 0:

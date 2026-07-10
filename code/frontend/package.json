@@ -1,6 +1,8 @@
 {
-  "name": "frontend",
+  "name": "floodguard-frontend",
   "version": "0.1.0",
+  "description": "Frontend SCADA Dashboard for the FloodGuard Reservoir Early-Warning System",
+  "author": "E22 Batch",
   "private": true,
   "scripts": {
     "dev": "next dev",
