@@ -7,9 +7,9 @@ title: FloodGuard – Reservoir Flood Early-Warning Decision Support System
 
 # FloodGuard — Dam Management & Early-Warning System
 
-An open-source platform for real-time dam monitoring and predictive flood-risk management. The system ingests live sensor and weather data, calculates a set of hydrological risk indicators, determines a dam's current risk status, and recommends safe water-release actions to on-site engineers — before conditions become dangerous.
+FloodGuard is an advanced, real-time reservoir monitoring and predictive flood-risk decision-support system. Designed for critical infrastructure management, the platform ingests live sensor telemetry, performs high-resolution divided-difference forecasts, computes dynamic safety thresholds, and provides proportional gate-release recommendations for on-site engineers—warning of hazardous states hours before they manifest.
 
-This repository provides the **database schema**, the **calculation logic specification**, and the **integration contract** required to plug in your own machine learning model in place of the reference algorithm.
+This repository hosts the canonical **PostgreSQL database schema**, the **core calculation engine algorithms**, the **Next.js integration APIs**, and a **graphical weather simulation suite**.
 
 ---
 
@@ -26,35 +26,26 @@ This repository provides the **database schema**, the **calculation logic specif
 
 1. [Project Overview](#1-project-overview)
 2. [System Architecture](#2-system-architecture)
-3. [Data Pipeline](#3-data-pipeline)
-4. [Database Schema](#4-database-schema)
-5. [Table Relationships (ERD)](#5-table-relationships-erd)
-6. [Calculation Reference — Formulas](#6-calculation-reference--formulas)
-7. [Risk Status & Alerting Logic](#7-risk-status--alerting-logic)
-8. [Release Recommendation Logic](#8-release-recommendation-logic)
-9. [De-escalation Logic](#9-de-escalation-logic)
-10. [Machine Learning Integration Contract](#10-machine-learning-integration-contract)
-11. [Simulation & Testing](#11-simulation--testing)
-12. [Getting Started](#12-getting-started)
-13. [Contributing](#13-contributing)
-14. [License](#14-license)
-15. [Links](#15-links)
+3. [PostgreSQL Database System Schema (3NF)](#3-postgresql-database-system-schema-3nf)
+4. [Calculation Reference & Predictive Algorithm](#4-calculation-reference--predictive-algorithm)
+5. [Machine Learning Integration Contract](#5-machine-learning-integration-contract)
+6. [Simulation & Testing Scenarios](#6-simulation--testing-scenarios)
+7. [Getting Started](#7-getting-started)
+8. [Links](#8-links)
 
 ---
 
 ## 1. Project Overview
 
-Dams present a unique monitoring challenge: by the time a water level crosses a fixed danger threshold, the window to respond safely has often already closed. This project treats **risk as adaptive rather than fixed** — the danger threshold for a dam moves dynamically based on how fast the water is rising, how hard it's raining upstream, how much water is flowing in, and how full the downstream channel already is.
+Traditional dam safety protocols rely on static water-level thresholds. If a reservoir level crosses a fixed limit (e.g., 85%), gates are opened. However, under extreme storm conditions, the time required for physical gate configuration and downstream channel evacuation can exceed the safe response window. 
 
-The system is built around three cooperating components:
+FloodGuard implements a **predictive, adaptive-threshold model** where risk is assessed dynamically based on:
+- **Rise Rate & Acceleration:** How fast the reservoir level is rising and whether that rate is accelerating.
+- **Weighted Rainfalls:** Lagged, weighted precipitation rates measured across multiple meteorological stations in the catchment area.
+- **Upstream Inflow:** Real-time inflow discharge rates feeding the reservoir.
+- **Downstream Channel Capacity:** The capacity and water level of downstream channels to avoid flooding surrounding valleys.
 
-| Component | Responsibility |
-|---|---|
-| **Sensor / Simulation Layer** | Supplies live (or simulated) water level, rainfall, inflow, and downstream level readings every minute |
-| **Prediction Layer** | Consumes live data and produces calculated risk metrics, an adaptive threshold, a risk status, and release recommendations. This layer is **model-agnostic** — it currently runs a deterministic reference algorithm, and is designed to be replaced by a trained machine learning model without changing the database or front-end |
-| **Database & Front-End Layer** | Persists every stage of the pipeline with timestamps and presents live status, history, and recommendations to dam engineers |
-
-Because the prediction layer's inputs and outputs are fixed by a documented contract (see [Section 10](#10-machine-learning-integration-contract)), **any team can swap in their own ML model** — trained on this repository's schema — without needing to modify a single table or front-end component. This is the core reason the project is open-sourced: the schema and reference algorithm are the shared foundation that any model, from any team, can build against.
+Rather than waiting for a breach, the system extrapolates historical trends forward, identifies if and when the predicted water level will cross the predicted safety threshold (the **Time-To-Crossing** or **TTC**), and triggers alarms in advance.
 
 ---
 
@@ -62,20 +53,23 @@ Because the prediction layer's inputs and outputs are fixed by a documented cont
 
 ```mermaid
 flowchart LR
-    subgraph Field["Field Layer"]
+    subgraph Field["Field Sensor & Simulation Layer"]
         S1[Water Level Sensor]
-        S2[Rainfall Sensor]
-        S3[Inflow Sensor]
+        S2[Meteorological Station Sensors]
+        S3[Upstream Inflow Sensor]
         S4[Downstream Level Sensor]
-        SIM[Simulation Generator]
+        SIM[Tkinter Weather Simulator]
     end
 
-    subgraph Pred["Prediction Layer"]
-        ALGO[Reference Algorithm<br/>or Trained ML Model]
+    subgraph Pred["Prediction & Calculation Layer"]
+        ALGO[Reference Mathematical Engine<br/>or Trained ML Model]
     end
 
-    subgraph DB["PostgreSQL Database"]
-        SR[(sensor_readings)]
+    subgraph DB["PostgreSQL Database (Local)"]
+        WL[(water_level_readings)]
+        RF[(rainfall_readings)]
+        IF[(inflow_readings)]
+        DL[(downstream_level_readings)]
         CM[(calculated_metrics)]
         TC[(threshold_calculations)]
         RS[(risk_status)]
@@ -84,564 +78,442 @@ flowchart LR
         AL[(alerts_log)]
     end
 
-    subgraph FE["Front-End"]
-        DASH[Engineer Dashboard]
+    subgraph FE["Frontend Dashboard"]
+        DASH[SCADA Operator UI]
     end
 
-    S1 & S2 & S3 & S4 --> SR
-    SIM --> SR
-    SR --> ALGO
+    S1 --> WL
+    S2 --> RF
+    S3 --> IF
+    S4 --> DL
+    SIM --> WL & RF & IF & DL
+    
+    WL & RF & IF & DL --> ALGO
     ALGO --> CM --> TC --> RS
     RS --> RR
     RS --> DT
     RS --> AL
-    SR & CM & TC & RS & RR & AL --> DASH
+    
+    WL & CM & TC & RS & RR & AL --> DASH
 ```
 
-**Design principle:** the prediction layer reads from `sensor_readings` and writes to `calculated_metrics`, `threshold_calculations`, `risk_status`, and `release_recommendations`. Nothing upstream or downstream of that layer needs to know whether the numbers came from the reference algorithm or a trained model — this is the "unplug the script, plug in the model" boundary.
+The system operates on an event-driven and polling pipeline:
+1. **Sensor Ingestion:** Telemetry is written to the database.
+2. **Processor Loop:** Evaluates new raw telemetry, computes metrics and thresholds, checks predictive crossing models, and determines risk states.
+3. **Frontend Refresh:** Next.js API layer serves data, refreshing the SCADA panel dynamically on a 15-second polling interval.
 
 ---
 
-## 3. Data Pipeline
+## 3. PostgreSQL Database System Schema (3NF)
 
-The system operates on two clocks:
+The database schema is fully normalized to Third Normal Form (3NF) to support transactional integrity and clean time-series storage.
 
-**Every 1 minute:**
-1. Receive `L(t)`, `RF(t)`, `IF(t)`, `DL(t)` from sensors (or simulator)
-2. Calculate `RR_short`, `RR_long`, `ACC`, `RA`, `DEV`
-3. Determine `RR_band` (Normal / Elevated / High / Critical)
-4. Calculate `RR_adj`, `RF_adj`, `IF_adj`, `DL_adj`
-5. Calculate `AT(t)` = adaptive threshold (floor applied at 30%)
-6. Determine `STATUS` (Green / Yellow / Orange / Red)
-7. If Orange or Red → calculate a release recommendation
-8. Store all values with a timestamp
-9. Update the dashboard
-10. Fire an alert if status has worsened since the last check
+### 3.1 Static Configuration Tables
 
-**Every 15 minutes:**
-11. Run the de-escalation check
-12. Recalculate the release recommendation if one is currently active
+#### `dams`
+Holds physical limits, capacities, and baseline calibration thresholds for each dam.
+- `dam_id` (SERIAL, PRIMARY KEY): Unique identifier.
+- `dam_name` (VARCHAR): Name of the dam.
+- `location` (VARCHAR): GPS location name.
+- `latitude` / `longitude` (DOUBLE PRECISION): GPS coordinates.
+- `elevation_m` (DOUBLE PRECISION): Dam elevation above sea level.
+- `reservoir_capacity` (DOUBLE PRECISION): Maximum reservoir volume ($m^3$).
+- `downstream_capacity` (DOUBLE PRECISION): Maximum safe downstream outflow capacity ($m^3/s$).
+- `max_gate_capacity` (DOUBLE PRECISION): Combined gate discharge capacity ($m^3/s$).
+- `if_baseline` (DOUBLE PRECISION): Normal baseline inflow rate ($m^3/s$).
+- `base_threshold` (DOUBLE PRECISION, DEFAULT 75.0): Baseline safe operating percentage limit ($L_{base}$).
+- `threshold_floor` (DOUBLE PRECISION, DEFAULT 30.0): Absolute floor clamp for adjustments ($L_{floor}$).
 
----
+#### `engineers`
+System user profiles for dam operator logs and alert acknowledgements.
+- `engineer_id` (SERIAL, PRIMARY KEY): Unique identifier.
+- `name` (VARCHAR): Operator username.
+- `role` (VARCHAR): Job role.
+- `contact` (VARCHAR): Contact info.
+- `assigned_dam_id` (INT, REFERENCES dams): Currently assigned dam.
+- `password_hash` (VARCHAR): Bcrypt hash for login credentials.
 
-## 4. Database Schema
-
-All tables are designed for PostgreSQL. Full `CREATE TABLE` statements are provided in [`dam_management_schema.sql`](./dam_management_schema.sql).
-
-### 4.1 `dams` — Static Configuration
-
-One row per physical dam. Holds the constants every calculation depends on.
-
-| Column | Type | Description |
-|---|---|---|
-| dam_id (PK) | SERIAL | Unique dam identifier |
-| dam_name | VARCHAR | Name of the dam |
-| location | VARCHAR | General location/region |
-| latitude, longitude | DOUBLE PRECISION | GPS coordinates |
-| reservoir_capacity | DOUBLE PRECISION | Total reservoir capacity (m³) |
-| downstream_capacity | DOUBLE PRECISION | Downstream channel capacity (m³/s) |
-| max_gate_capacity | DOUBLE PRECISION | Maximum gate release capacity |
-| if_baseline | DOUBLE PRECISION | Normal baseline inflow rate (m³/s) |
-| base_threshold | DOUBLE PRECISION | Default safe operating level, default 75% |
-| threshold_floor | DOUBLE PRECISION | Minimum allowed threshold, default 30% |
-| created_at, updated_at | TIMESTAMPTZ | Record timestamps |
-
-### 4.2 `engineers` — Front-End Users
-
-| Column | Type | Description |
-|---|---|---|
-| engineer_id (PK) | SERIAL | Unique engineer identifier |
-| name | VARCHAR | Full name |
-| role | VARCHAR | Job title |
-| contact | VARCHAR | Phone/email |
-| assigned_dam_id (FK → dams) | INT | Dam this engineer monitors |
-| created_at | TIMESTAMPTZ | Record timestamp |
-
-### 4.3 `sensor_readings` — Raw Input Data
-
-Written every minute, by real sensors in production or by the simulation generator during testing.
-
-| Column | Type | Description |
-|---|---|---|
-| reading_id (PK) | BIGSERIAL | Unique reading identifier |
-| dam_id (FK → dams) | INT | Dam this reading belongs to |
-| reading_time | TIMESTAMPTZ | Timestamp `t` |
-| water_level_pct | DOUBLE PRECISION | `L(t)` — reservoir water level (%) |
-| rainfall_mm_hr | DOUBLE PRECISION | `RF(t)` — upstream rainfall intensity (mm/hour) |
-| inflow_rate_m3s | DOUBLE PRECISION | `IF(t)` — upstream river inflow rate (m³/s) |
-| downstream_level_pct | DOUBLE PRECISION | `DL(t)` — downstream river level (% of safe capacity) |
-
-### 4.4 `calculated_metrics` — Rise Rate & Deviation
-
-Output of the prediction layer's first stage.
-
-| Column | Type | Description |
-|---|---|---|
-| metric_id (PK) | BIGSERIAL | Unique record identifier |
-| dam_id (FK → dams) | INT | Dam this metric belongs to |
-| calc_time | TIMESTAMPTZ | Timestamp of calculation |
-| rr_short | DOUBLE PRECISION | Short-term rise rate (% per hour, 15-min window) |
-| rr_long | DOUBLE PRECISION | Long-term rise rate (% per hour, 60-min window) |
-| acc | DOUBLE PRECISION | Acceleration of rise rate |
-| rolling_avg | DOUBLE PRECISION | 3-hour rolling average of `RR_long` |
-| deviation_score | DOUBLE PRECISION | Deviation of current behaviour from recent average |
-| rr_band | ENUM | Normal / Elevated / High / Critical |
-
-### 4.5 `threshold_calculations` — Adaptive Threshold
-
-| Column | Type | Description |
-|---|---|---|
-| calc_id (PK) | BIGSERIAL | Unique record identifier |
-| dam_id (FK → dams) | INT | Dam this calculation belongs to |
-| calc_time | TIMESTAMPTZ | Timestamp of calculation |
-| rr_adj, rf_adj, if_adj, dl_adj | DOUBLE PRECISION | Individual factor adjustments (%) |
-| adaptive_threshold | DOUBLE PRECISION | `AT(t)` — final adaptive threshold (%) |
-| floor_triggered | BOOLEAN | True if the 30% floor rule was applied |
-| ceiling_triggered | BOOLEAN | True if threshold was capped at BASE (75%) |
-
-### 4.6 `risk_status` — Current Risk Zone
-
-| Column | Type | Description |
-|---|---|---|
-| status_id (PK) | BIGSERIAL | Unique record identifier |
-| dam_id (FK → dams) | INT | Dam this status belongs to |
-| status_time | TIMESTAMPTZ | Timestamp of status evaluation |
-| status | ENUM | Green / Yellow / Orange / Red |
-| margin_1, margin_2, margin_3 | DOUBLE PRECISION | Warning margins above the adaptive threshold |
-| trigger_reason | TEXT | Condition that caused this status |
-| previous_status | ENUM | Prior status, used to detect status changes |
-
-### 4.7 `release_recommendations` — Gate Release Plan
-
-Populated only when `risk_status` is Orange or Red.
-
-| Column | Type | Description |
-|---|---|---|
-| release_id (PK) | BIGSERIAL | Unique record identifier |
-| dam_id (FK → dams) | INT | Dam this recommendation belongs to |
-| calc_time | TIMESTAMPTZ | Timestamp of calculation |
-| release_rate | DOUBLE PRECISION | Required release rate (m³/s) |
-| safe_storage_rate | DOUBLE PRECISION | Rate the reservoir can safely absorb |
-| max_safe_release | DOUBLE PRECISION | Maximum release the downstream channel can accept |
-| conflict_warning | BOOLEAN | True if required release exceeds downstream capacity |
-| gate_opening_pct | DOUBLE PRECISION | Recommended gate opening, rounded to nearest 5% |
-| estimated_duration_min | DOUBLE PRECISION | Estimated time to reach a safe level |
-| target_safe_level | DOUBLE PRECISION | Target water level: `AT(t) − 10%` |
-
-### 4.8 `deescalation_tracking` — Sustained Improvement Tracking
-
-De-escalation requires *sustained* improvement, not a single good reading — this table tracks that state over time.
-
-| Column | Type | Description |
-|---|---|---|
-| tracking_id (PK) | BIGSERIAL | Unique record identifier |
-| dam_id (FK → dams) | INT | Dam being tracked |
-| condition_met_since | TIMESTAMPTZ | When the improving condition first appeared |
-| consecutive_minutes | INT | Minutes the condition has held continuously |
-| required_minutes | INT | Minutes required for this transition (15 / 30 / 60) |
-| transition_from, transition_to | ENUM | The status transition being evaluated |
-| eligible_flag | BOOLEAN | Whether de-escalation can now occur |
-
-### 4.9 `alerts_log` — Alert History
-
-| Column | Type | Description |
-|---|---|---|
-| alert_id (PK) | BIGSERIAL | Unique alert identifier |
-| dam_id (FK → dams) | INT | Dam this alert concerns |
-| alert_time | TIMESTAMPTZ | Time the alert was fired |
-| previous_status, new_status | ENUM | Status change that triggered the alert |
-| message | TEXT | Human-readable alert description |
-| acknowledged_by (FK → engineers) | INT | Engineer who acknowledged the alert |
-| acknowledged_at | TIMESTAMPTZ | Acknowledgement timestamp |
-
-### 4.10 `simulation_config` — Test Data Generator Settings
-
-| Column | Type | Description |
-|---|---|---|
-| config_id (PK) | SERIAL | Unique configuration identifier |
-| dam_id (FK → dams) | INT | Dam this scenario simulates |
-| scenario_name | VARCHAR | Name of the simulated scenario (e.g. "Heavy Monsoon Spike") |
-| start_time, end_time | TIMESTAMPTZ | Simulation time window |
-| description | TEXT | Notes on scenario purpose |
+#### `rainfall_locations`
+Catchment meteorological stations associated with the dam.
+- `location_id` (SERIAL, PRIMARY KEY): Unique identifier.
+- `location_name` (VARCHAR): Station name.
+- `latitude` / `longitude` (DOUBLE PRECISION): GPS coordinates.
+- `weight` (DOUBLE PRECISION): Calibration coefficient of this station ($w_i$, $\sum w_i = 1.0$).
+- `delay_minutes` (DOUBLE PRECISION): Physical lag time for rainfall runoff to reach reservoir ($\tau_i$).
+- `station_code` (VARCHAR, UNIQUE): Station sensor identifier.
+- `is_active` (BOOLEAN): Status of station connection.
 
 ---
 
-## 5. Table Relationships (ERD)
+### 3.2 Live Time-Series Sensor Tables (3NF)
 
-```mermaid
-erDiagram
-    dams ||--o{ engineers : "assigned to"
-    dams ||--o{ sensor_readings : "generates"
-    dams ||--o{ calculated_metrics : "generates"
-    dams ||--o{ threshold_calculations : "generates"
-    dams ||--o{ risk_status : "generates"
-    dams ||--o{ release_recommendations : "generates"
-    dams ||--o{ deescalation_tracking : "tracked in"
-    dams ||--o{ alerts_log : "generates"
-    dams ||--o{ simulation_config : "simulated for"
-    engineers ||--o{ alerts_log : "acknowledges"
+#### `water_level_readings`
+- `reading_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `reading_time` (TIMESTAMPTZ): Telemetry timestamp ($t$).
+- `water_level_pct` (DOUBLE PRECISION): Current water level percentage ($L(t)$).
+- *Constraint:* UNIQUE (`dam_id`, `reading_time`)
 
-    dams {
-        int dam_id PK
-        varchar dam_name
-        float reservoir_capacity
-        float downstream_capacity
-        float base_threshold
-    }
-    sensor_readings {
-        bigint reading_id PK
-        int dam_id FK
-        timestamptz reading_time
-        float water_level_pct
-        float rainfall_mm_hr
-        float inflow_rate_m3s
-        float downstream_level_pct
-    }
-    calculated_metrics {
-        bigint metric_id PK
-        int dam_id FK
-        float rr_short
-        float rr_long
-        float acc
-        enum rr_band
-    }
-    threshold_calculations {
-        bigint calc_id PK
-        int dam_id FK
-        float adaptive_threshold
-    }
-    risk_status {
-        bigint status_id PK
-        int dam_id FK
-        enum status
-    }
-    release_recommendations {
-        bigint release_id PK
-        int dam_id FK
-        float release_rate
-        float gate_opening_pct
-    }
-    alerts_log {
-        bigint alert_id PK
-        int dam_id FK
-        int acknowledged_by FK
-    }
-```
+#### `inflow_readings`
+- `reading_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `reading_time` (TIMESTAMPTZ): Inflow measurement time.
+- `inflow_rate_m3s` (DOUBLE PRECISION): Upstream discharge rate ($IF(t)$, $m^3/s$).
+- *Constraint:* UNIQUE (`dam_id`, `reading_time`)
 
-`dam_id` is the anchor of the entire schema — every time-series table carries it directly (rather than only through joins) so the front-end can query "give me the latest full picture for Dam X" without needing multi-hop joins.
+#### `downstream_level_readings`
+- `reading_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `reading_time` (TIMESTAMPTZ): Downstream channel level measurement time.
+- `downstream_level_pct` (DOUBLE PRECISION): Downstream channel level ($DL(t)$, %).
+- *Constraint:* UNIQUE (`dam_id`, `reading_time`)
+
+#### `rainfall_readings`
+- `reading_id` (BIGSERIAL, PRIMARY KEY)
+- `location_id` (INT, REFERENCES rainfall_locations)
+- `reading_time` (TIMESTAMPTZ): Precipitation measurement time.
+- `rainfall_mm_hr` (DOUBLE PRECISION): Rainfall rate ($R_i(t)$, $mm/h$).
+- *Constraint:* UNIQUE (`location_id`, `reading_time`)
 
 ---
 
-## 6. Calculation Reference — Formulas
+### 3.3 Backend Prediction & Calculation Tables
 
-This section documents every formula in the reference algorithm, in the order they are computed each minute.
+#### `prediction_runs`
+Records metadata for each divided-difference forecast run.
+- `run_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `run_time` (TIMESTAMPTZ): Timestamp when prediction ran.
+- `input_window_start` / `input_window_end` (TIMESTAMPTZ): Bounds of data window.
+- `method` (VARCHAR): Prediction model type (e.g. `"newton_divided_difference"`).
+- `status` (VARCHAR): Result status (`success` / `insufficient_data` / `error`).
 
-### 6.1 Inputs (collected every 1 minute)
+#### `predicted_values`
+Contains extrapolated future states across forecast horizons ($t+15$ to $t+120$ mins).
+- `value_id` (BIGSERIAL, PRIMARY KEY)
+- `run_id` (BIGINT, REFERENCES prediction_runs)
+- `horizon_minutes` (INT): Forecast horizon in minutes ($h$, e.g., 15, 30, 45, 60, 90, 120).
+- `predicted_water_level_pct` (DOUBLE PRECISION): Extrapolated reservoir level ($L_{pred}(t+h)$).
+- `predicted_r_net` (DOUBLE PRECISION): Projected net rainfall runoff ($R_{net\_pred}(t+h)$).
+- `predicted_inflow` (DOUBLE PRECISION): Extrapolated river inflow ($IF_{pred}(t+h)$).
+- `predicted_downstream_level` (DOUBLE PRECISION): Extrapolated downstream level ($DL_{pred}(t+h)$).
+- `predicted_rise_rate` (DOUBLE PRECISION): Projected rise rate ($RR_{pred}(t+h)$).
+- `predicted_acc` (DOUBLE PRECISION): Projected acceleration ($ACC_{pred}(t+h)$).
+- `predicted_adaptive_threshold` (DOUBLE PRECISION): Calculated threshold ($AT_{pred}(t+h)$).
+- `gap` (DOUBLE PRECISION): Difference margin ($AT_{pred}(t+h) - L_{pred}(t+h)$).
 
-| Symbol | Meaning | Unit |
-|---|---|---|
-| `L(t)` | Current reservoir water level | % |
-| `RF(t)` | Upstream rainfall intensity | mm/hour |
-| `IF(t)` | Upstream river inflow rate | m³/second |
-| `DL(t)` | Downstream river level, % of normal safe capacity | % |
-| `t` | Current timestamp | — |
+#### `graph_crossing_results`
+Stores summary predictions on threshold crossings.
+- `result_id` (BIGSERIAL, PRIMARY KEY)
+- `run_id` (BIGINT, REFERENCES prediction_runs)
+- `crossing_time_minutes` (INT): Estimated Time-To-Crossing (TTC, minutes). Null if no crossing is predicted.
+- `minimum_gap` (DOUBLE PRECISION): Minimum gap predicted across horizons.
+- `gap_trend` (VARCHAR): Direction of the gap (`increasing` / `decreasing` / `stable`).
+- `final_status` (risk_status_type): Predicted risk status.
 
-### 6.2 Rise Rate
+#### `calculated_metrics`
+Intermediate calculations performed per sensor scan.
+- `metric_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `calc_time` (TIMESTAMPTZ)
+- `rr_short` (DOUBLE PRECISION): Short-term Rise Rate (%/h, 15-min window).
+- `rr_long` (DOUBLE PRECISION): Long-term Rise Rate (%/h, 60-min window).
+- `acc` (DOUBLE PRECISION): Water level rise acceleration ($ACC(t)$).
+- `rolling_avg` (DOUBLE PRECISION): 3-hour rolling average of rise rates ($RA(t)$).
+- `deviation_score` (DOUBLE PRECISION): Short-term rise deviation ($DEV(t)$).
+- `rr_band` (rr_band_type): Evaluated rise rate band (`NORMAL` / `ELEVATED` / `HIGH` / `CRITICAL`).
 
-**Short-term (last 15 minutes):**
+#### `threshold_calculations`
+- `calc_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `calc_time` (TIMESTAMPTZ)
+- `rr_adj` / `rf_adj` / `if_adj` / `dl_adj` (DOUBLE PRECISION): Factors pulling threshold down.
+- `adaptive_threshold` (DOUBLE PRECISION): Computed live safety threshold ($AT(t)$).
+- `floor_triggered` (BOOLEAN): True if clamped at $L_{floor}$ (30%).
+- `ceiling_triggered` (BOOLEAN): True if clamped at $L_{base}$ (75%).
 
-```
-RR_short(t) = (L(t) − L(t−15)) × 4
-```
+#### `risk_status`
+Official alert state of the dam.
+- `status_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `status_time` (TIMESTAMPTZ)
+- `status` (risk_status_type): `GREEN`, `YELLOW`, `ORANGE`, `RED`.
+- `ttc_minutes` (INT): Active warning Time-To-Crossing.
+- `trigger_reason` (TEXT): Text description of rule triggered.
+- `previous_status` (risk_status_type)
 
-Multiplying by 4 converts a 15-minute change into a "% per hour" figure (15 × 4 = 60 minutes), so both rise rates share the same unit.
+#### `release_recommendations`
+Proportional gate release plans calculated for ORANGE or RED status.
+- `release_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `run_id` (BIGINT, REFERENCES prediction_runs)
+- `calc_time` (TIMESTAMPTZ)
+- `strategy` (VARCHAR): Formula type (`"proportional_rise_rate"`).
+- `rise_rate_used` (DOUBLE PRECISION): $RR_{pred}(t+15)$ used for rate estimation.
+- `gate_opening_base_pct` (DOUBLE PRECISION): Base gate percentage before downstream capacity overrides.
+- `q_desired` (DOUBLE PRECISION): Volumetrically required release ($m^3/s$).
+- `q_downstream_available` (DOUBLE PRECISION): Maximum safe downstream capacity window ($m^3/s$).
+- `q_release` (DOUBLE PRECISION): Final recommended discharge rate ($m^3/s$).
+- `gate_opening_applied_pct` (DOUBLE PRECISION): Final gate opening recommendation, rounded to 5%.
+- `conflict_warning` (BOOLEAN): True if desired release exceeds downstream safety limits.
+- `estimated_duration_minutes` (DOUBLE PRECISION): Time required to return to safe storage level.
 
-**Long-term (last 60 minutes):**
+#### `deescalation_tracking`
+Maintains cumulative timers for de-escalation dampening.
+- `tracking_id` (BIGSERIAL, PRIMARY KEY)
+- `dam_id` (INT, REFERENCES dams)
+- `condition_met_since` (TIMESTAMPTZ): Start timestamp of sustained improvement.
+- `consecutive_minutes` (INT): Tracked elapsed minutes.
+- `required_minutes` (INT): Required wait duration for downgrade (15 / 30 / 60 mins).
+- `transition_from` / `transition_to` (risk_status_type)
+- `eligible_flag` (BOOLEAN)
 
-```
-RR_long(t) = L(t) − L(t−60)
-```
+---
 
-Already expressed in % per hour — no conversion needed.
+## 4. Calculation Reference & Predictive Algorithm
 
-`RR_short` catches sudden spikes; `RR_long` catches sustained dangerous trends. Both are monitored simultaneously.
+The reference engine processes mathematical updates on every ingestion cycle (1-minute intervals during real-time telemetry, or 15-second intervals under simulator conditions).
 
-**Worked example:** `L(t)=48.0%`, `L(t−15)=46.5%`, `L(t−60)=44.0%`  
-`RR_short = (48.0 − 46.5) × 4 = 6.0%/hour` (spike detected)  
-`RR_long = 48.0 − 44.0 = 4.0%/hour` (sustained rise)
+### 4.1 Inflow, Level, & Runoff Inputs
 
-### 6.3 Acceleration
+The engine ingests:
+- $L(t)$ : Reservoir water level (% of maximum height).
+- $IF(t)$ : Upstream river inflow rate ($m^3/s$).
+- $DL(t)$ : Downstream river level (% of safe capacity).
+- $R_i(t)$ : Local rainfall rate ($mm/h$) at station $i$.
 
-```
-ACC(t) = RR_long(t) − RR_long(t−60)
-```
+#### Weighted Net Catchment Rainfall ($R_{net}$)
+To account for geographic delays, rainfall runoff is modeled by looking back at station delay offsets ($\tau_i$). If a station has missing telemetry, weights are scaled dynamically:
 
-Current 1-hour rise rate minus the rise rate from one hour ago.
+$$R_{net}(t) = \frac{\sum w_i R_i(t - \tau_i)}{\sum w_{active}}$$
 
-| Result | Meaning |
-|---|---|
-| `ACC > 0` | Rise rate is accelerating (getting worse) |
-| `ACC = 0` | Rise rate is stable |
-| `ACC < 0` | Rise rate is decelerating (improving) |
+---
 
-**Worked example:** `RR_long now = 4.0`, `RR_long 1hr ago = 2.0` → `ACC = +2.0` → accelerating, situation worsening.
+### 4.2 Rise Rate & Acceleration
 
-### 6.4 Rolling Average & Deviation Score
+#### Short-term Rise Rate ($RR_{short}$)
+Measures water level rate of change over the last 15 minutes, scaled to an hourly rate:
 
-**Rolling average (last 3 hours):**
+$$RR_{short}(t) = [L(t) - L(t - 15)] \times 4 \quad (\%/hour)$$
 
-```
-RA(t) = average of RR_long over the last 180 readings
-      = ( Σ RR_long(t) … RR_long(t−180) ) / 180
-```
+#### Long-term Rise Rate ($RR_{long}$)
+Measures change over the last 60 minutes:
 
-**Deviation score:**
+$$RR_{long}(t) = [L(t) - L(t - 60)] \times 1 \quad (\%/hour)$$
 
-```
-DEV(t) = RR_short(t) − RA(t)
-```
+#### Rise Rate Acceleration ($ACC$)
+Measures the change in long-term rise rate over the preceding hour:
 
-| DEV range | Interpretation |
-|---|---|
-| `< 1.0` | Normal — current rise matches recent behaviour |
-| `1.0 – 2.5` | Elevated — rising faster than recent average |
-| `2.5 – 5.0` | High — significantly abnormal behaviour |
-| `> 5.0` | Critical — extreme deviation from normal pattern |
+$$ACC(t) = RR_{long}(t) - RR_{long}(t - 60) \quad (\%/hour^2)$$
 
-**Worked example:** `RA=1.0`, `RR_short=6.0` → `DEV = 6.0 − 1.0 = 5.0` → critical deviation.
+#### Rolling Average ($RA$) & Deviation Score ($DEV$)
+Calculates the 3-hour moving average of the long-term rise rate and compares it to the short-term spike rate to identify flash surge anomalies:
 
-### 6.5 Rise Rate Risk Bands
+$$RA(t) = \text{Average}(RR_{long}) \text{ over last 3 hours}$$
 
-These bands are the calibration values referenced throughout the rest of the pipeline. **If any single condition in a band is met, that band is triggered.** When multiple bands are triggered simultaneously, the worst one always wins.
+$$DEV(t) = RR_{short}(t) - RA(t)$$
 
-| Band | RR_long | RR_short | ACC |
+---
+
+### 4.3 Severity Classifications (Bands)
+
+Telemetry states are classified into four rise-rate severity bands. The worst individual parameter match determines the band.
+
+| Severity Band | Long-Term Rise Rate | Short-Term Rise Rate | Acceleration |
 |---|---|---|---|
-| **Normal** | < 1.0%/hr | AND < 2.0%/hr | AND ≤ 0.5 |
-| **Elevated** | 1.0 – 2.5%/hr | OR 2.0 – 4.0%/hr | OR 0.5 – 1.5 |
-| **High** | 2.5 – 4.0%/hr | OR 4.0 – 7.0%/hr | OR 1.5 – 3.0 |
-| **Critical** | > 4.0%/hr | OR > 7.0%/hr | OR > 3.0 (or `DEV > 5.0`) |
+| **NORMAL** | $< 1.0\,\%/h$ | AND $< 2.0\,\%/h$ | AND $\le 0.5\,\%/h^2$ |
+| **ELEVATED** | $1.0\text{--}2.5\,\%/h$ | OR $2.0\text{--}4.0\,\%/h$ | OR $0.5\text{--}1.5\,\%/h^2$ |
+| **HIGH** | $2.5\text{--}4.0\,\%/h$ | OR $4.0\text{--}7.0\,\%/h$ | OR $1.5\text{--}3.0\,\%/h^2$ |
+| **CRITICAL** | $> 4.0\,\%/h$ | OR $> 7.0\,\%/h$ | OR $> 3.0\,\%/h^2$ (or $DEV > 5.0$) |
 
-### 6.6 Individual Factor Adjustments
+---
 
-Each of the four live inputs pulls the safe threshold downward as conditions worsen.
+### 4.4 Adaptive Safety Threshold ($AT$)
 
-**Rise Rate Adjustment** (based on the band from 6.5):
+The safety threshold shifts downwards from `BASE` (75%) depending on hydrological stresses, clamped at a minimum `FLOOR` (30%).
 
-| Band | RR_adj |
+$$AT(t) = \text{Clamp}( L_{base} - rr_{adj} - rf_{adj} - if_{adj} - dl_{adj},\; L_{floor},\; L_{base} )$$
+
+#### Individual Penalties
+
+1. **Rise Rate Adjustment ($rr_{adj}$):**
+   - `NORMAL`: 0% | `ELEVATED`: 8% | `HIGH`: 18% | `CRITICAL`: 30%
+2. **Rainfall Adjustment ($rf_{adj}$):**
+   - $R_{net} < 10$: 0% | $10\text{--}25$: 3% | $25\text{--}50$: 7% | $> 50\,\text{mm/h}$: 12%
+3. **Inflow Adjustment ($if_{adj}$):** (relative to baseline inflow $IF_{base}$)
+   - $IF(t) < 1.5 \times IF_{base}$: 0% | $1.5\text{--}2.5 \times$: 4% | $2.5\text{--}4 \times$: 8% | $> 4 \times IF_{base}$: 13%
+4. **Downstream level Adjustment ($dl_{adj}$):**
+   - $DL < 50\%$: 0% | $50\text{--}70\%$: 3% | $70\text{--}85\%$: 8% | $> 85\%$: 15%
+
+---
+
+### 4.5 Newton Divided-Difference Extrapolation
+
+For prediction cycles, the engine fits a polynomial through recent historical readings to extrapolate water levels ($L_{pred}(t+h)$) and inflow rates ($IF_{pred}(t+h)$) for horizons $h \in \{15, 30, 45, 60, 90, 120\}$ minutes.
+
+To avoid high-degree oscillations (Runge's phenomenon), the engine selects a low-degree fit (linear or quadratic) using the last 3-4 historical data points spaced over a rolling 6-hour window.
+
+#### Divided-Difference Table
+Given nodes $(x_0, y_0), (x_1, y_1), \dots, (x_k, y_k)$, divided differences are defined recursively:
+
+$$f[x_i] = y_i$$
+
+$$f[x_i, x_{i+1}, \dots, x_{i+j}] = \frac{f[x_{i+1}, \dots, x_{i+j}] - f[x_i, \dots, x_{i+j-1}]}{x_{i+j} - x_i}$$
+
+The interpolating polynomial is:
+
+$$P(x) = f[x_0] + \sum_{i=1}^k f[x_0, \dots, x_i] \prod_{j=0}^{i-1} (x - x_j)$$
+
+---
+
+### 4.6 Graph Crossing Analysis & Time-To-Crossing ($TTC$)
+
+A crossing is predicted if the gap margin at any horizon $h$ falls to or below zero:
+
+$$Gap(t+h) = AT_{pred}(t+h) - L_{pred}(t+h) \le 0$$
+
+- **$TTC$ (Time-To-Crossing):** The smallest horizon $h$ where $Gap(t+h) \le 0$.
+- **Gap Trend:** Evaluated as `increasing`, `decreasing`, or `stable` by analyzing the derivative differentials of the margins:
+
+$$\Delta Gap = Gap(t+h) - Gap(t+h-15)$$
+
+---
+
+### 4.7 Risk Status Classification Rules
+
+Risk statuses are evaluated in order of severity. First match wins.
+
+| Risk Status | Trigger Conditions |
 |---|---|
-| Normal | 0% |
-| Elevated | 8% |
-| High | 18% |
-| Critical | 30% |
-
-**Upstream Rainfall Adjustment:**
-
-| RF(t) | RF_adj | Description |
-|---|---|---|
-| < 10 mm/hr | 0% | Light rain |
-| 10 – 25 mm/hr | 3% | Moderate rain |
-| 25 – 50 mm/hr | 7% | Heavy rain |
-| > 50 mm/hr | 12% | Extreme rain |
-
-**Upstream Inflow Adjustment** (relative to each dam's `IF_baseline`):
-
-| IF(t) | IF_adj |
-|---|---|
-| < 1.5 × baseline | 0% |
-| 1.5 – 2.5 × baseline | 4% |
-| 2.5 – 4 × baseline | 8% |
-| > 4 × baseline | 13% |
-
-**Downstream Level Adjustment:**
-
-| DL(t) | DL_adj | Description |
-|---|---|---|
-| < 50% | 0% | Downstream safe |
-| 50 – 70% | 3% | Downstream filling |
-| 70 – 85% | 8% | Downstream high |
-| > 85% | 15% | Downstream critical |
-
-### 6.7 Final Adaptive Threshold
-
-```
-AT(t) = BASE − RR_adj − RF_adj − IF_adj − DL_adj
-```
-
-Where `BASE = 75%` (default safe operating level, configurable per dam).
-
-**Floor rule:** `AT(t)` must never go below 30% — this prevents the system from demanding a gate opening at unreasonably low levels.
-
-```
-IF AT(t) < 30% THEN AT(t) = 30%
-```
-
-**Ceiling rule:** `AT(t)` must never exceed `BASE` — the threshold never moves *up* beyond the baseline safe level.
-
-**Worked example:**
-
-```
-BASE = 75%, RR_adj = 18% (High band), RF_adj = 7% (heavy rain),
-IF_adj = 8% (2.5× normal inflow), DL_adj = 3% (downstream 60%)
-
-AT(t) = 75 − 18 − 7 − 8 − 3 = 39%
-```
-
-Meaning: under today's conditions, action is required once the reservoir hits 39% — not the default 75% — because rainfall, inflow, and downstream conditions have all made a lower level dangerous.
+| 🔴 **Red** | $L(t) \ge AT(t)$ (Current level exceeds safety threshold)<br/>OR $TTC \le 15$ minutes (Crossing imminent)<br/>OR $RR_{band} = \text{CRITICAL}$ |
+| 🟠 **Orange** | $L(t) \ge AT(t) + 3\%$ (Within 3% of threshold)<br/>OR ($TTC \le 60$ minutes)<br/>OR ($RR_{band} = \text{HIGH}$ AND Gap Trend = `decreasing`) |
+| 🟡 **Yellow** | $L(t) \ge AT(t) + 10\%$ (Within 10% of threshold)<br/>OR ($TTC > 60$ minutes)<br/>OR ($RR_{band} = \text{ELEVATED}$)<br/>OR ($TTC = \text{Null}$ AND Gap Trend = `decreasing`) |
+| 🟢 **Green** | All other conditions |
 
 ---
 
-## 7. Risk Status & Alerting Logic
+### 4.8 Proportional Release Recommendations
 
-Given the current level `L(t)` and adaptive threshold `AT(t)`, three warning margins are defined above the threshold:
+Calculated when risk status reaches ORANGE or RED.
 
-```
-MARGIN_1 = AT(t) + 20%   (first warning zone starts here)
-MARGIN_2 = AT(t) + 10%   (second warning zone)
-MARGIN_3 = AT(t) + 3%    (near threshold)
-THRESHOLD = AT(t)         (action required)
-```
+1. **Calculate Volumetrically Desired Discharge ($Q_{desired}$):**
+   Calculates the release rate required to bring the reservoir down to the threshold level over the next hour:
+   
+   $$Q_{desired}(t) = IF(t) - \frac{(AT(t) - L(t)) \times \text{Capacity}_{reservoir}}{3600 \times 100} \quad (m^3/s)$$
 
-Status rules are evaluated **in order**, and the **first match wins**:
+2. **Downstream Safety Limit ($Q_{down\_avail}$):**
+   Calculates the remaining capacity of the downstream channel:
+   
+   $$Q_{down\_avail}(t) = \text{Capacity}_{downstream} \times \left(1 - \frac{DL(t)}{100}\right) \quad (m^3/s)$$
 
-| Status | Condition | Action |
-|---|---|---|
-| 🔴 **Red** | `L(t) ≥ AT(t)` OR `RR_band = Critical` OR (`DL > 85%` AND `RR_band ≥ High`) | Immediate gate operation required |
-| 🟠 **Orange** | `L(t) ≥ MARGIN_3` OR (`RR_band = High` AND `ACC > 0`) | Begin controlled partial release; alert downstream communities |
-| 🟡 **Yellow** | `L(t) ≥ MARGIN_2` OR `RR_band = Elevated` | Operators on standby, prepare |
-| 🟢 **Green** | All other conditions | Continue monitoring |
+3. **Apply Safety Overrides:**
+   
+   $$Q_{release}(t) = \text{Min}\left(Q_{desired}(t),\; Q_{down\_avail}(t),\; \text{Capacity}_{max\_gate}\right)$$
+   
+   If $Q_{desired} > Q_{down\_avail}$, a `CONFLICT WARNING` is flagged to inform operators that the downstream channel is constrained.
 
-An alert is fired to `alerts_log` whenever the status **worsens** compared to the previous check.
+4. **Proportional Gate Opening:**
+   
+   $$\text{GateOpening}\% = \left(\frac{Q_{release}(t)}{\text{Capacity}_{max\_gate}}\right) \times 100$$
+   
+   Rounded to the nearest 5% for operator configuration.
 
----
-
-## 8. Release Recommendation Logic
-
-Calculated only when status reaches Orange or Red, and reassessed every 15 minutes while active.
-
-**Step 1 — Required release rate:**
-
-```
-SafeStorageRate = (AT(t) − L(t)) × ReservoirCapacity / 60
-ReleaseRate = IF(t) − SafeStorageRate
-```
-
-**Step 2 — Downstream constraint:**
-
-```
-MaxSafeRelease = DownstreamCapacity × (1 − DL(t)/100)
-
-IF ReleaseRate > MaxSafeRelease:
-    ReleaseRate = MaxSafeRelease
-    → Trigger CONFLICT WARNING:
-      "Full required release exceeds downstream capacity"
-```
-
-**Step 3 — Gate opening percentage:**
-
-```
-GateOpening% = (ReleaseRate / MaxGateCapacity) × 100
-```
-
-Rounded to the nearest 5% for practical operator use.
-
-**Step 4 — Estimated duration:**
-
-```
-TargetSafeLevel = AT(t) − 10%   (safety buffer below threshold)
-
-Duration = (L(t) − TargetSafeLevel) / (ReleaseRate − IF(t)) × 60 minutes
-```
-
-**Step 5 — Reassessment:** every 15 minutes, all of the above is recalculated and the gate recommendation adjusted as conditions change.
+5. **Estimated Discharge Duration ($t_{duration}$):**
+   Calculates the duration (minutes) needed to lower the level to a target buffer level ($AT(t) - 10\%$):
+   
+   $$t_{duration} = \frac{L(t) - (AT(t) - 10.0)}{\left(\frac{Q_{release} - IF(t)}{\text{Capacity}_{reservoir}}\right) \times 100 \times 60} \quad \text{minutes}$$
 
 ---
 
-## 9. De-escalation Logic
+### 4.9 Sustained De-escalation Timers
 
-Status must be downgraded when conditions genuinely improve — but a single good reading is not sufficient. **Improvement must be sustained**, which is why `deescalation_tracking` exists as its own stateful table.
+Status downgrades are delayed to prevent rapid toggling due to noise. The system must meet de-escalation rules continuously:
 
-| Transition | Condition | Sustained For |
-|---|---|---|
-| **Red → Orange** | `RR_long` < High-band threshold AND `ACC < 0` AND `L(t)` dropping or stable | 15 consecutive minutes |
-| **Orange → Yellow** | `RR_long` in Elevated band AND `ACC ≤ 0` AND `RF(t)` decreasing | 30 consecutive minutes |
-| **Yellow → Green** | All inputs back to Normal band AND `L(t)` stable or dropping | 60 consecutive minutes |
-
-This graduated sustain-time (15 → 30 → 60 minutes) prevents the system from flickering rapidly between states as conditions fluctuate near a boundary.
+- **RED $\rightarrow$ ORANGE (15 Mins):** $RR_{band} \in \{\text{NORMAL}, \text{ELEVATED}\}$ AND $ACC \le 0.0$ AND $L(t)$ stable or dropping.
+- **ORANGE $\rightarrow$ YELLOW (30 Mins):** $RR_{band} \in \{\text{NORMAL}, \text{ELEVATED}\}$ AND $ACC \le 0.0$ AND ($R_{net}$ decreasing OR $R_{net} < 0.001\,\text{mm/h}$).
+- **YELLOW $\rightarrow$ GREEN (60 Mins):** $RR_{band} = \text{NORMAL}$ AND $L(t)$ stable or dropping.
 
 ---
 
-## 10. Machine Learning Integration Contract
+## 5. Machine Learning Integration Contract
 
-This project currently uses a **deterministic reference algorithm** (documented in full above) standing in for a trained machine learning model. This is intentional: it lets the database and front-end be built, tested, and demonstrated while a model is developed in parallel — and lets **any team's model be substituted later without touching the schema.**
+The prediction layer is model-agnostic. The deterministic reference algorithm can be swapped for a trained ML model by satisfying this integration contract.
 
-**To integrate your own model, it must:**
+```
++------------------+       Reads telemetry       +------------------+
+|   PostgreSQL     | --------------------------> |  Trained Model   |
+|   Database       | <-------------------------- |  (Python Script) |
++------------------+    Writes predictions &     +------------------+
+                            risk status
+```
 
-1. **Read** from `sensor_readings` (the same four inputs: `water_level_pct`, `rainfall_mm_hr`, `inflow_rate_m3s`, `downstream_level_pct`, plus historical rows for time-window calculations).
-2. **Write** its outputs into the same four tables, using the same column names, on the same cadence (every 1 minute; every 15 minutes for de-escalation/release reassessment):
-   - `calculated_metrics`
-   - `threshold_calculations`
-   - `risk_status`
-   - `release_recommendations`
-3. **Respect the enums** — `rr_band_type` (`NORMAL/ELEVATED/HIGH/CRITICAL`) and `risk_status_type` (`GREEN/YELLOW/ORANGE/RED`) — so the front-end's existing status displays and alert logic continue to work unmodified.
+### 5.1 Inputs
+The model must query live and historical time-series data directly from:
+- `water_level_readings`
+- `rainfall_readings` (resolving weights and delays from `rainfall_locations`)
+- `inflow_readings`
+- `downstream_level_readings`
 
-As long as those conditions hold, the front-end, alerting, and historical reporting require **zero changes** — this is the "unplug the reference algorithm, plug in the trained model" boundary the project is built around.
-
----
-
-## 11. Simulation & Testing
-
-The `simulation_config` table drives a fake-data generator that writes synthetic rows into `sensor_readings`, allowing the full pipeline — calculations, thresholding, alerting, and release recommendations — to be exercised end-to-end without real hardware.
-
-Typical simulated scenarios include:
-- Steady-state normal operation
-- Sudden rainfall spike (tests `RR_short` / spike detection)
-- Sustained monsoon-style rise (tests `RR_long` / sustained trend detection)
-- Downstream congestion (tests the release-conflict warning path)
-- Recovery scenario (tests de-escalation sustain timers)
+### 5.2 Outputs
+The model must write its calculated predictions into the database tables:
+1. **`calculated_metrics`:** Populate rise rates, acceleration, rolling average, deviation, and rise rate band.
+2. **`threshold_calculations`:** Populate the calculated dynamic safety threshold and adjustments.
+3. **`risk_status`:** Set the calculated risk status.
+4. **`release_recommendations`:** Generate proportional gate openings and safe release rates.
 
 ---
 
-## 12. Getting Started
+## 6. Simulation & Testing Scenarios
+
+The Tkinter weather simulator generates real-time telemetry to test system responses.
+
+- **Drought / Dry Season:** Net rainfall is $0.0\,mm/h$, inflows decline ($80 \rightarrow 20\,m^3/s$), water level drops. Status remains `GREEN`.
+- **South-West Monsoon:** Moderate rain ($5\text{--}16\,mm/h$), inflow increases ($120 \rightarrow 450\,m^3/s$), level rises. Status triggers `YELLOW` and `ORANGE`.
+- **North-East Monsoon Storm:** Spikes rain ($70\,mm/h$), inflow rises ($1800\,m^3/s$). Level exceeds threshold, status triggers `RED` and release recommendations activate.
+- **Inter-Monsoon Thunderstorm:** Short convective rain burst ($90\,mm/h$), rapid rise rate triggers an immediate `RED` status.
+- **Tropical Cyclone Surge:** Torrential rain ($50\,mm/h$), high downstream level ($DL > 85\%$). Triggers `RED` with active downstream constraints and conflict warnings.
+
+---
+
+## 7. Getting Started
+
+### 7.1 Database Initialization
+Create your local PostgreSQL database and load the schema:
 
 ```bash
-# 1. Create the database
+# Create local database
 createdb dam_management
 
-# 2. Apply the schema
-psql -U <youruser> -d dam_management -f ./database/dam_management_schema.sql
-
-# 3. Seed a dam and an engineer (example)
-psql -U <youruser> -d dam_management -c "
-  INSERT INTO dams (dam_name, reservoir_capacity, downstream_capacity, max_gate_capacity, if_baseline)
-  VALUES ('Example Dam', 5000000, 300, 150, 40);
-"
-
-# 4. Run the simulation generator (see /simulation) to begin populating sensor_readings
+# Apply schema migrations
+psql -U postgres -d dam_management -f ./code/database/dam_management_schema.sql
 ```
 
+### 7.2 Service Execution
+1. Copy `.env.example` to `.env` and fill in your PostgreSQL credentials:
+   ```bash
+   cp .env.example .env
+   ```
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Launch backend services (launches the Tkinter GUI and calculation loops):
+   ```bash
+   python code/main.py
+   ```
+4. Start the frontend Next.js server:
+   ```bash
+   cd code/frontend
+   npm install
+   npm run dev
+   ```
+   Open `http://localhost:3000` to view the SCADA control panel.
+
 ---
 
-## 13. Contributing
+## 8. Links
 
-Contributions are welcome, particularly:
-- Trained ML models conforming to the [integration contract](#10-machine-learning-integration-contract)
-- Additional simulation scenarios
-- Front-end dashboard improvements
-- Schema extensions (e.g. multi-gate dams, additional sensor types)
-
-Please open an issue describing your proposed change before submitting a pull request, so schema-breaking changes can be discussed against the integration contract above.
-
----
-
-## 14. License
-
-This project is released under an open-source license so that other teams can freely import the schema, build against the same data contract, and connect their own predictive models.
-
----
-
-## 15. Links
-
-- Project Repository: <https://github.com/cepdnaclk/e22-co2060-floodguard>
-- Project Page: <https://cepdnaclk.github.io/e22-co2060-floodguard>
-- Department of Computer Engineering: <http://www.ce.pdn.ac.lk/>
-- University of Peradeniya: <https://eng.pdn.ac.lk/>
+- **Repository:** <https://github.com/cepdnaclk/e22-co2060-floodguard>
+- **Project Site:** <https://cepdnaclk.github.io/e22-co2060-floodguard>
+- **Department of Computer Engineering:** <http://www.ce.pdn.ac.lk/>
+- **University of Peradeniya:** <https://eng.pdn.ac.lk/>
