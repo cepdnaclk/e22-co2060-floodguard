@@ -1,3 +1,9 @@
+/* ==========================================================================
+   FloodGuard Dashboard Main Stylesheet
+   - Uses CSS Modules for scoped styling
+   - Component classes align with logical SCADA UI sections (e.g. Header, Grid, Cards)
+   ========================================================================== */
+
 .dashboard {
   display: flex;
   flex-direction: column;
