@@ -1,5 +1,14 @@
 -- ============================================================
 -- Dam Management System — PostgreSQL Canonical Schema
+--
+-- RELATIONSHIP OVERVIEW:
+-- [dams] 1:N [engineers]
+--   |
+--   +-- 1:N -- [water_level_readings, inflow_readings, downstream_level_readings]
+--   +-- 1:N -- [calculated_metrics, threshold_calculations, risk_status]
+--   +-- 1:N -- [release_recommendations, alerts_log]
+--
+-- [rainfall_locations] 1:N [rainfall_readings]
 -- Covers: sensor ingestion, weighted/time-lagged rainfall,
 -- prediction runs, predicted values, crossing results,
 -- algorithm-derived metrics, adaptive threshold, risk status,
