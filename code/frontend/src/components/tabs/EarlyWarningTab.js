@@ -87,7 +87,7 @@ export default function EarlyWarningTab({ data }) {
                 <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', display: 'inline-block', border: `1px solid ${config.border}` }}>
                     <div className={styles.metricLabel} style={{ color: 'var(--text-muted)' }}>Official Advisory Message</div>
                     <p style={{ fontSize: '1.5rem', fontWeight: '600', color: 'var(--text-main)' }}>
-                        "{data.action_message || config.desc}"
+                        &ldquo;{data.action_message || config.desc}&rdquo;
                     </p>
                 </div>
             </div>
