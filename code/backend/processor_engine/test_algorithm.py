@@ -9,7 +9,7 @@ class TestAlgorithm(unittest.TestCase):
         config.IF_baseline = 120.0
         config.ReservoirCapacity = 10000000.0
         config.MaxGateCapacity = 5000.0
-        config.DownstreamCapacity = 2000.0
+        config.DownstreamCapacity = 2001.5
 
     def test_21_1_normal_case(self):
         rr_band = determine_rr_band(rr_short=1.5, rr_long=0.5, acc=0.2, dev=0.5)
@@ -54,6 +54,7 @@ class TestAlgorithm(unittest.TestCase):
         status, _ = determine_status_full(L=38.0, AT=39.0, rr_band="NORMAL", DL=50.0, acc=0.0)
         self.assertEqual(status, "ORANGE")
 
+    
     def test_21_7_downstream_conflict(self):
         # AT=39, L=70 -> safe_storage_rate = (39 - 70) * 10M / 60 = -31 * 166666 = -5,166,666
         # release_rate = IF (2000) - (-5,166,666) = 5,168,666
