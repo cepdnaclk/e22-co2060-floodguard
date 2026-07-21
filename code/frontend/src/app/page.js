@@ -62,6 +62,7 @@ export default function Dashboard() {
   }));
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [dateError, setDateError] = useState('');
   const [referenceTime, setReferenceTime] = useState(null);
 
   // Helper to compute from timestamp
@@ -258,6 +259,16 @@ export default function Dashboard() {
   // Perform history search
   const handleQueryHistory = async () => {
     if (!selectedDamId) return;
+    setDateError('');
+    
+    const fromTime = new Date(historyRange.from).getTime();
+    const toTime = new Date(historyRange.to).getTime();
+    
+    if (fromTime > toTime) {
+      setDateError('Error: "From" date cannot be after "To" date.');
+      return;
+    }
+    
     setHistoryLoading(true);
     try {
       const fromISO = new Date(historyRange.from).toISOString();
@@ -589,7 +600,7 @@ export default function Dashboard() {
             {/* Warning / Release Panel */}
             <div className={`${styles.colSpan4} ${styles.card} ${styles['status' + activeStatus]}`}>
               <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>RELEASE STRATEGY</span>
+                <span className={styles.cardTitle} title="Calculated gate opening and release rate recommended by the decision support system based on current reservoir level and adaptive thresholds">RELEASE STRATEGY</span>
                 <span className={`${styles.badge} ${styles['badge' + activeStatus]}`}>{activeStatus}</span>
               </div>
               {damStatus.release ? (
@@ -826,6 +837,11 @@ export default function Dashboard() {
                   {historyLoading ? 'QUERYING...' : 'RUN QUERY'}
                 </button>
               </div>
+              {dateError && (
+                <div style={{ color: 'var(--status-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)', marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+                  {dateError}
+                </div>
+              )}
 
               {/* Data result table */}
               {historyLoading ? (
