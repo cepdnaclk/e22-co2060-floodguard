@@ -56,12 +56,13 @@ export default function Dashboard() {
 
   // History Tab States
   const [historyCategory, setHistoryCategory] = useState('water-level');
-  const [historyRange, setHistoryRange] = useState({
+  const [historyRange, setHistoryRange] = useState(() => ({
     from: new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 16), // last 24h
     to: new Date().toISOString().slice(0, 16)
-  });
+  }));
   const [historyData, setHistoryData] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [referenceTime, setReferenceTime] = useState(null);
 
   // Helper to compute from timestamp
   const getFromTime = useCallback((tf) => {
@@ -205,6 +206,7 @@ export default function Dashboard() {
   // Load list of dams on mount
   useEffect(() => {
     setIsMounted(true);
+    setReferenceTime(Date.now());
     checkAuth();
 
     const fetchDamsList = async () => {
@@ -237,6 +239,7 @@ export default function Dashboard() {
     const interval = setInterval(() => {
       fetchData();
       fetchAlerts(selectedDamId);
+      setReferenceTime(Date.now());
     }, 15000); // 15-second update loop
     
     return () => clearInterval(interval);
@@ -633,7 +636,9 @@ export default function Dashboard() {
                       {/* Predicted threshold */}
                       <Line name="Threshold (Predicted)" type="stepAfter" dataKey="pred_threshold" stroke="var(--status-red)" strokeDasharray="3 3" strokeWidth={1.8} dot={false} connectNulls />
                       
-                      <ReferenceLine x={Date.now()} stroke="var(--text-muted)" strokeDasharray="3 3" label={{ value: 'NOW', fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
+                      {referenceTime && (
+                        <ReferenceLine x={referenceTime} stroke="var(--text-muted)" strokeDasharray="3 3" label={{ value: 'NOW', fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
+                      )}
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
