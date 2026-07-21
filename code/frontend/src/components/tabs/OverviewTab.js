@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
 
 export default function OverviewTab({ data, history }) {
+  // Graph Time Range (declared at top level to satisfy Rules of Hooks)
+  const [timeRangeHours, setTimeRangeHours] = useState(3);
+
   if (!data) return null;
 
   const isRed = data.status === 'RED';
@@ -42,8 +45,6 @@ export default function OverviewTab({ data, history }) {
     recMessage = 'Prepare controlled release. Downstream level is within safe capacity.';
   }
 
-  // Graph Time Range
-  const [timeRangeHours, setTimeRangeHours] = useState(3);
   const graphData = history ? history.slice(-timeRangeHours * 60) : []; // Assuming 1 row = 1 minute
 
   return (
