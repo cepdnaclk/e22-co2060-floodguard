@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env
+README.md
+docs/
+code/simulation/
+venv/
+env/
+__pycache__/
+*.pyc

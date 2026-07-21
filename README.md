@@ -15,10 +15,10 @@ The system consists of three decoupled layers:
 
 ## Local Setup Instructions
 
-1. **Database Setup**: Run the schema provided in `code/database/dam_management_schema.sql` on a local PostgreSQL instance.
-2. **Backend**: Install dependencies (`pip install -r requirements.txt`) and configure your `.env` file. Run the main processing logic.
-3. **Frontend**: Navigate to `code/frontend`, install dependencies (`npm install`), and run the development server (`npm run dev`).
-4. **Simulation**: Execute `code/simulation/db_simulator.py` to launch the telemetry simulation GUI.
+We use Docker to orchestrate the core services. Make sure Docker is installed and you have copied `.env.example` to `.env`.
+
+1. **Start Core Services**: Run `docker compose up -d --build`. This will automatically seed the PostgreSQL database, start the Python backend, and serve the Next.js frontend at `http://localhost:3000`.
+2. **Simulation**: Since the database container exposes port `5432`, you can run the simulator natively. Install dependencies with `pip install -r requirements.txt`, then run `python code/simulation/db_simulator.py` to launch the telemetry simulation GUI.
 
 ---
 

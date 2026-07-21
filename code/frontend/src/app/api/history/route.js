@@ -5,13 +5,19 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const totalRes = await pool.query(`SELECT COUNT(*) as count FROM processed_results`);
-        const emergencyRes = await pool.query(`SELECT COUNT(*) as count FROM processed_results WHERE status = 'EMERGENCY' OR status = 'RED'`);
-        const maxLevelRes = await pool.query(`SELECT MAX(l_t) as max_level FROM processed_results`);
+        const totalRes = await pool.query(`SELECT COUNT(*) as count FROM risk_status`);
+        const emergencyRes = await pool.query(`SELECT COUNT(*) as count FROM risk_status WHERE status = 'RED'`);
+        const maxLevelRes = await pool.query(`SELECT MAX(water_level_pct) as max_level FROM water_level_readings`);
+        
         const recentEventsRes = await pool.query(`
-        SELECT id, timestamp, l_t, status 
-        FROM processed_results 
-        ORDER BY timestamp DESC 
+        SELECT 
+            r.status_id as id, 
+            r.status_time as timestamp, 
+            w.water_level_pct as l_t, 
+            r.status 
+        FROM risk_status r
+        LEFT JOIN water_level_readings w ON r.dam_id = w.dam_id AND r.status_time = w.reading_time
+        ORDER BY r.status_time DESC 
         LIMIT 5
     `);
 

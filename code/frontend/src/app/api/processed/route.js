@@ -11,15 +11,33 @@ export async function GET(request) {
     if (limitParam) {
       const limit = parseInt(limitParam) || 60;
       const { rows } = await pool.query(`
-        SELECT * FROM processed_results 
-        ORDER BY timestamp DESC 
+        SELECT 
+          c.calc_time as timestamp,
+          c.rr_short,
+          c.rr_long,
+          c.acc,
+          c.rolling_avg,
+          c.deviation_score,
+          r.status
+        FROM calculated_metrics c
+        LEFT JOIN risk_status r ON c.dam_id = r.dam_id AND c.calc_time = r.status_time
+        ORDER BY c.calc_time DESC 
         LIMIT $1
       `, [limit]);
       return NextResponse.json(rows.reverse());
     } else {
       const { rows } = await pool.query(`
-        SELECT * FROM processed_results 
-        ORDER BY timestamp DESC 
+        SELECT 
+          c.calc_time as timestamp,
+          c.rr_short,
+          c.rr_long,
+          c.acc,
+          c.rolling_avg,
+          c.deviation_score,
+          r.status
+        FROM calculated_metrics c
+        LEFT JOIN risk_status r ON c.dam_id = r.dam_id AND c.calc_time = r.status_time
+        ORDER BY c.calc_time DESC 
         LIMIT 1
       `);
       

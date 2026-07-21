@@ -230,7 +230,7 @@ class WeatherSimulatorApp:
         """Seed Victoria Dam and meteorology locations if database is empty."""
         with conn.cursor() as cur:
             # 1. Check/Insert Victoria Dam
-            cur.execute("SELECT dam_id FROM dams WHERE dam_name = 'Victoria Dam'")
+            cur.execute("SELECT dam_id FROM dams WHERE dam_name = 'Victoria Dam - SCADA Core'")
             row = cur.fetchone()
             if row:
                 self.dam_id = row[0]
@@ -239,7 +239,7 @@ class WeatherSimulatorApp:
                     INSERT INTO dams (dam_name, location, latitude, longitude, elevation_m, 
                                      reservoir_capacity, downstream_capacity, max_gate_capacity, 
                                      if_baseline, base_threshold, threshold_floor)
-                    VALUES ('Victoria Dam', 'Mahaweli River, Teldeniya', 7.2345, 80.7890, 438.0, 
+                    VALUES ('Victoria Dam - SCADA Core', 'Mahaweli River, Teldeniya', 7.2345, 80.7890, 438.0, 
                             730000000.0, 5800.0, 8000.0, 150.0, 75.0, 30.0)
                     RETURNING dam_id;
                 """)

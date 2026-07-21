@@ -489,37 +489,32 @@ The Tkinter weather simulator generates real-time telemetry to test system respo
 
 ## 7. Getting Started
 
-### 7.1 Database Initialization
-Create your local PostgreSQL database and load the schema:
+We have containerized the core infrastructure (PostgreSQL database, Python backend, and Next.js frontend) using Docker for a seamless setup experience. The simulation GUI runs on your local machine so it can easily display its interface.
 
-```bash
-# Create local database
-createdb dam_management
-
-# Apply schema migrations
-psql -U postgres -d dam_management -f ./code/database/dam_management_schema.sql
-```
-
-### 7.2 Service Execution
-1. Copy `.env.example` to `.env` and fill in your PostgreSQL credentials:
+### 7.1 Start Core Services
+1. Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
-2. Install Python dependencies:
+2. Build and start the infrastructure in the background:
+   ```bash
+   docker compose up -d --build
+   ```
+   *This automatically sets up the PostgreSQL database with schemas and initial data, starts the backend processor, and serves the Next.js frontend on port 3000.*
+
+### 7.2 Access the Dashboard
+Open your browser and navigate to `http://localhost:3000` to view the SCADA control panel.
+
+### 7.3 Run the Weather Simulator
+Since the database container exposes port `5432`, the Tkinter simulation GUI can run directly on your host machine and connect to it natively.
+1. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-3. Launch backend services (launches the Tkinter GUI and calculation loops):
+2. Launch the simulator:
    ```bash
-   python code/main.py
+   python code/simulation/db_simulator.py
    ```
-4. Start the frontend Next.js server:
-   ```bash
-   cd code/frontend
-   npm install
-   npm run dev
-   ```
-   Open `http://localhost:3000` to view the SCADA control panel.
 
 ---
 
