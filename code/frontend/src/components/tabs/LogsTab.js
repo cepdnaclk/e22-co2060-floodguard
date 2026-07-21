@@ -3,10 +3,9 @@
 import React, { useMemo } from 'react';
 
 export default function LogsTab({ history }) {
-  if (!history) return <div className="p-4 font-mono text-muted text-sm">Waiting for data...</div>;
-
-  // Derive status changes and significant events from history
+  // Derive status changes and significant events from history (moved to top level to satisfy Rules of Hooks)
   const events = useMemo(() => {
+    if (!history) return [];
     const changes = [];
     let prevStatus = 'GREEN';
     
@@ -40,6 +39,8 @@ export default function LogsTab({ history }) {
     // Return reverse chronological
     return changes.reverse();
   }, [history]);
+
+  if (!history) return <div className="p-4 font-mono text-muted text-sm">Waiting for data...</div>;
 
   return (
     <div className="scadaGrid">

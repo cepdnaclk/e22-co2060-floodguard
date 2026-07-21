@@ -6,9 +6,9 @@ import { TrendingUp, CloudRain, Droplets, Target } from 'lucide-react';
 import styles from '@/app/page.module.css';
 
 export default function TrendsPredictionTab({ history }) {
-    if (!history || history.length === 0) return <div className="text-muted text-center mt-8">No trend data available. Waiting for updates...</div>;
-
+    // Derive chart data (moved to top level to satisfy Rules of Hooks)
     const chartData = useMemo(() => {
+        if (!history || history.length === 0) return [];
         const safeFloat = (val) => isNaN(parseFloat(val)) ? 0 : parseFloat(val);
         return history.map(row => {
             const ts = new Date(row.timestamp);
@@ -23,10 +23,10 @@ export default function TrendsPredictionTab({ history }) {
         });
     }, [history]);
 
+    // Derive prediction data (moved to top level to satisfy Rules of Hooks)
     const predictionData = useMemo(() => {
+        if (chartData.length === 0) return [];
         const lastPoint = chartData[chartData.length - 1];
-        if (!lastPoint) return [];
-
         const predData = [];
         predData.push({ time: 'Now', waterLevel: lastPoint.waterLevel, forecastLevel: lastPoint.waterLevel, threshold: lastPoint.threshold });
 
@@ -45,6 +45,8 @@ export default function TrendsPredictionTab({ history }) {
 
         return predData;
     }, [chartData]);
+
+    if (!history || history.length === 0) return <div className="text-muted text-center mt-8">No trend data available. Waiting for updates...</div>;
 
 
     return (
