@@ -232,6 +232,7 @@ CREATE INDEX idx_release_reco_dam_time ON release_recommendations (dam_id, calc_
 -- ============================================================
 -- 9. deescalation_tracking — sustained improvement tracking (Block 10)
 -- ============================================================
+
 CREATE TABLE deescalation_tracking (
     tracking_id             BIGSERIAL PRIMARY KEY,
     dam_id                  INT NOT NULL REFERENCES dams(dam_id) ON DELETE CASCADE,

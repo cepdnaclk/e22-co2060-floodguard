@@ -12,12 +12,15 @@ def validate_input(L: float, RF: float, IF: float, DL: float) -> Tuple[bool, lis
     if L is None or not (0 <= L <= 100):
         missing.append("L")
         is_valid = False
+
     if RF is None or RF < 0:
         missing.append("RF")
         is_valid = False
+
     if IF is None or IF < 0:
         missing.append("IF")
         is_valid = False
+
     if DL is None or DL < 0:
         missing.append("DL")
         is_valid = False
