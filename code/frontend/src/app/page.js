@@ -423,7 +423,10 @@ export default function Dashboard() {
             <Waves size={20} />
             <span>FloodGuard</span>
           </div>
+          <label htmlFor="dam-selector" className="sr-only" style={{ display: 'none' }}>Select Reservoir Dam</label>
           <select 
+            id="dam-selector"
+            aria-label="Select Reservoir Dam"
             className={styles.damSelector} 
             value={selectedDamId} 
             onChange={(e) => {
@@ -471,12 +474,12 @@ export default function Dashboard() {
             <div className={styles.userPanel}>
               <User size={14} />
               <span className="font-mono">{user.name} ({user.role})</span>
-              <button className={styles.logoutBtn} onClick={handleLogout}>
+              <button type="button" className={styles.logoutBtn} onClick={handleLogout}>
                 <LogOut size={12} />
               </button>
             </div>
           ) : (
-            <button className={styles.loginBtn} onClick={() => setShowLoginModal(true)}>
+            <button type="button" className={styles.loginBtn} onClick={() => setShowLoginModal(true)}>
               ENGINEER LOGIN
             </button>
           )}
@@ -487,18 +490,21 @@ export default function Dashboard() {
       <div className={styles.tabsContainer}>
         <div className={styles.tabList}>
           <button 
+            type="button"
             className={`${styles.tabButton} ${activeTab === 'HOME' ? styles.tabButtonActive : ''}`}
             onClick={() => setActiveTab('HOME')}
           >
             Home
           </button>
           <button 
+            type="button"
             className={`${styles.tabButton} ${activeTab === 'RAINFALL' ? styles.tabButtonActive : ''}`}
             onClick={() => setActiveTab('RAINFALL')}
           >
             Rainfall Details
           </button>
           <button 
+            type="button"
             className={`${styles.tabButton} ${activeTab === 'HISTORY' ? styles.tabButtonActive : ''}`}
             onClick={() => setActiveTab('HISTORY')}
           >
@@ -506,6 +512,7 @@ export default function Dashboard() {
           </button>
           {user && (
             <button 
+              type="button"
               className={`${styles.tabButton} ${activeTab === 'DASHBOARD' ? styles.tabButtonActive : ''}`}
               onClick={() => setActiveTab('DASHBOARD')}
             >
@@ -519,6 +526,7 @@ export default function Dashboard() {
             {['1H', '6H', '1D', '1W', '1M'].map(tf => (
               <button
                 key={tf}
+                type="button"
                 className={`${styles.timeframeBtn} ${timeframe === tf ? styles.timeframeBtnActive : ''}`}
                 onClick={() => setTimeframe(tf)}
               >
@@ -779,8 +787,9 @@ export default function Dashboard() {
               {/* Date pickers & filters */}
               <div className={styles.filterRow}>
                 <div className={styles.filterItem}>
-                  <label className={styles.filterLabel}>CATEGORY</label>
+                  <label htmlFor="history-category-select" className={styles.filterLabel}>CATEGORY</label>
                   <select 
+                    id="history-category-select"
                     className={styles.damSelector}
                     value={historyCategory}
                     onChange={(e) => setHistoryCategory(e.target.value)}
@@ -794,8 +803,9 @@ export default function Dashboard() {
                   </select>
                 </div>
                 <div className={styles.filterItem}>
-                  <label className={styles.filterLabel}>FROM</label>
+                  <label htmlFor="history-from-date" className={styles.filterLabel}>FROM</label>
                   <input 
+                    id="history-from-date"
                     type="datetime-local" 
                     className={styles.dateInput}
                     value={historyRange.from}
@@ -803,8 +813,9 @@ export default function Dashboard() {
                   />
                 </div>
                 <div className={styles.filterItem}>
-                  <label className={styles.filterLabel}>TO</label>
+                  <label htmlFor="history-to-date" className={styles.filterLabel}>TO</label>
                   <input 
+                    id="history-to-date"
                     type="datetime-local" 
                     className={styles.dateInput}
                     value={historyRange.to}
@@ -978,8 +989,9 @@ export default function Dashboard() {
             
             <form onSubmit={handleLoginSubmit}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>ENGINEER NAME</label>
+                <label htmlFor="login-engineer-name" className={styles.formLabel}>ENGINEER NAME</label>
                 <input 
+                  id="login-engineer-name"
                   type="text" 
                   className={styles.formInput}
                   required
@@ -989,8 +1001,9 @@ export default function Dashboard() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>KEY PHRASE PASSWORD</label>
+                <label htmlFor="login-key-phrase" className={styles.formLabel}>KEY PHRASE PASSWORD</label>
                 <input 
+                  id="login-key-phrase"
                   type="password" 
                   className={styles.formInput}
                   required
