@@ -45,12 +45,12 @@ The pipeline runs every minute:
 - **Simulation engine** — Completed external desktop weather simulator (Tkinter GUI) featuring 5 Sri Lankan scenarios (Drought, SW Monsoon, NE Monsoon Storm, Inter-Monsoon, Cyclone Surge) that inserts telemetry in real-time.
 - **Frontend dashboard** — Fully realized engineer-facing SCADA dashboard with interactive graphs, predictive trend overlays, station detail cards, and query history tables.
 - **Database-Frontend API** — Complete REST API connection layer linking the local database and backend predictions to the dashboard UI.
+- **Containerization** — Full containerization of frontend, backend, and database services using Docker.
 
 ---
 
 ## Upcoming (To-Do)
 
-- **Containerization** — Full containerization of frontend, backend, and database services using Docker.
 - **Updated Login Menu** — Design and build a modernized, secure authentication panel for on-site engineers.
 - **Simulator Manual Controls** — Add manual controls and a gate opening switch to the weather simulation center.
 
