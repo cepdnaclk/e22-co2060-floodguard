@@ -1,77 +1,225 @@
-# FloodGuard — Dam Management & Early-Warning System
+# FloodGuard
 
-**FloodGuard** is a real-time dam monitoring and predictive flood-risk management platform. It ingests sensor and weather data, computes hydrological risk indicators, determines a dam's current risk status, and recommends safe water-release actions to on-site engineers — before conditions become dangerous.
+### Dam Management & Early-Warning Decision Support System
 
-> 📖 For full technical detail — database schema, formula derivations, ERD, ML integration contract — see **[docs/README.md](./docs/README.md)** or the [project site](https://cepdnaclk.github.io/e22-co2060-floodguard/).
+FloodGuard is a reservoir monitoring and flood-risk decision-support system designed to assist dam operators in observing changing reservoir conditions and responding to potentially hazardous situations.
 
----
+This repository contains the **E22 team's implementation of the PostgreSQL database system and the web-based frontend dashboard** for the FloodGuard project.
 
-## Architecture Overview
+The database provides the persistent data model for reservoir, rainfall, inflow, downstream and system-status information, while the frontend provides the operator-facing interface for monitoring, analysis and visualization.
 
-The system consists of three decoupled layers:
-- **Database**: PostgreSQL storing telemetry, calculations, and risk metrics.
-- **Backend Processor**: A Python engine that fetches raw sensor data, evaluates it against our adaptive threshold algorithm, and updates the database with new risk states.
-- **Frontend SCADA Dashboard**: A Next.js application that provides real-time visualization of sensor data and algorithmic predictions, directly connecting to the database via API routes.
-
-## Local Setup Instructions
-
-We use Docker to orchestrate the core services. Make sure Docker is installed and you have copied `.env.example` to `.env`.
-
-1. **Start Core Services**: Run `docker compose up -d --build`. This will automatically seed the PostgreSQL database, start the Python backend, and serve the Next.js frontend at `http://localhost:3000`.
-2. **Simulation**: Since the database container exposes port `5432`, you can run the simulator natively. Install dependencies with `pip install -r requirements.txt`, then run `python code/simulation/db_simulator.py` to launch the telemetry simulation GUI.
+> **Project scope:** The database and frontend are the primary deliverables of this repository. A separate backend and simulation environment was developed by the team for integration testing and demonstration.
 
 ---
 
-## What This System Does
+## Contents
 
-The core idea: a fixed danger threshold is not enough. By the time water crosses a static line, the safe response window has often already closed. FloodGuard uses an **adaptive threshold** that moves dynamically based on four live inputs — rise rate, upstream rainfall, inflow rate, and downstream channel capacity.
-
-The pipeline runs every minute:
-
-1. Reads sensor data (water level, rainfall, inflow, downstream level)
-2. Computes rise rate, acceleration, deviation score, and a risk-band classification
-3. Calculates an adaptive safety threshold (floor: 30%, ceiling: 75%)
-4. Assigns a risk status — 🟢 Green / 🟡 Yellow / 🟠 Orange / 🔴 Red
-5. At Orange/Red: generates a gate-release recommendation (rate, opening %, estimated duration)
-6. De-escalates only after sustained improvement (15 / 30 / 60 minutes, depending on transition)
-
----
-
-## Completed
-
-- **Database system** — Full PostgreSQL schema with descending time-series indexes.
-- **Prediction formula** — Coded, fine-tuned, and fully validated reference algorithm (covering rise rate, acceleration, rolling averages, deviation, and adaptive safety thresholds).
-- **Database–backend connection** — Direct asynchronous connection from the backend processor engine.
-- **Simulation engine** — Completed external desktop weather simulator (Tkinter GUI) featuring 5 Sri Lankan scenarios (Drought, SW Monsoon, NE Monsoon Storm, Inter-Monsoon, Cyclone Surge) that inserts telemetry in real-time.
-- **Frontend dashboard** — Fully realized engineer-facing SCADA dashboard with interactive graphs, predictive trend overlays, station detail cards, and query history tables.
-- **Database-Frontend API** — Complete REST API connection layer linking the local database and backend predictions to the dashboard UI.
-- **Containerization** — Full containerization of frontend, backend, and database services using Docker.
+```text
+.
+├── code/
+│   ├── database/       PostgreSQL schema, seed data and ERD
+│   └── frontend/       Next.js web application
+│
+├── docs/               Project documentation
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
 
 ---
 
-## Upcoming (To-Do)
+## Architecture
 
-- **Updated Login Menu** — Design and build a modernized, secure authentication panel for on-site engineers.
-- **Simulator Manual Controls** — Add manual controls and a gate opening switch to the weather simulation center.
+```text
+                         FloodGuard
+                             |
+             +---------------+---------------+
+             |                               |
+          Frontend                         Database
+          (Next.js)                      (PostgreSQL)
+             |                               |
+             +---------------+---------------+
+                             |
+                       Application API
+                             |
+                    Development / Testing
+                             |
+             +---------------+---------------+
+             |                               |
+          Backend                        Simulator
+        (separate)                       (separate)
+```
+
+The backend processor and telemetry simulator exist primarily to provide data and processing during development and demonstration. They are not the primary deliverables of this repository.
 
 ---
 
-## The Team (E22 Batch)
-* **L. Sharmilan** - E/22/373 - [e22373@eng.pdn.ac.lk]
-* **F. R. Sujeevan** - E/22/382 - [e22382@eng.pdn.ac.lk]
-* **S. Kishonithan** - E/22/193 - [e22193@eng.pdn.ac.lk]
-* **R. Thilakshan** - E/22/397 - [e22397@eng.pdn.ac.lk]
+## Database
 
-**Supervisors: M.N.A. Fikry** - E/21/138 - [e21138@eng.pdn.ac.lk]
+The database is implemented in PostgreSQL.
+
+It contains the persistent model used by FloodGuard, including:
+
+```text
+Configuration
+    dams
+    engineers
+    rainfall_locations
+
+Telemetry
+    water_level_readings
+    rainfall_readings
+    inflow_readings
+    downstream_level_readings
+
+Processed data
+    calculated_metrics
+    threshold_calculations
+    risk_status
+
+Prediction data
+    prediction_runs
+    predicted_values
+    graph_crossing_results
+
+Operational data
+    release_recommendations
+    deescalation_tracking
+```
+
+The schema uses foreign-key constraints, uniqueness constraints and time-oriented indexes for telemetry queries.
+
+The database design and ER diagram are available under:
+
+```text
+code/database/
+```
+
+---
+
+## Frontend
+
+The frontend is a Next.js application providing the operator interface.
+
+```text
+Dashboard
+|
+├── Overview
+├── Live Monitoring
+├── Early Warning
+├── Analysis
+├── Historical Analysis
+├── Trends & Prediction
+└── Logs
+```
+
+Application API routes are located under:
+
+```text
+code/frontend/src/app/api/
+```
+
+Current API areas include:
+
+```text
+auth
+dams
+alerts
+history
+raw
+processed
+```
+
+---
+
+## Development
+
+### Requirements
+
+```text
+Docker
+Docker Compose
+Git
+```
+
+### Clone
+
+```sh
+git clone https://github.com/cepdnaclk/e22-co2060-floodguard.git
+cd e22-co2060-floodguard
+```
+
+### Configuration
+
+```sh
+cp .env.example .env
+```
+
+Edit `.env` if required.
+
+### Start
+
+```sh
+docker compose up -d --build
+```
+
+The frontend is served on:
+
+```text
+http://localhost:3000
+```
+
+To stop the environment:
+
+```sh
+docker compose down
+```
+
+---
+
+## Testing and Demonstration
+
+The FloodGuard frontend and database require changing telemetry and processed data to demonstrate their operation. During development, the team therefore developed a separate backend processor and telemetry/weather simulation environment.
+
+These supporting components are used to generate test readings and exercise the frontend/database integration under simulated operating conditions.
+
+They are maintained outside this repository.
+
+> Simulated data and demonstration predictions should not be interpreted as live field measurements or as a production dam-control system.
+
+---
+
+## Documentation
+
+**Project Site:**
+https://cepdnaclk.github.io/e22-co2060-floodguard/
+
+The documentation contains the database design, system architecture, implementation details and supporting technical material.
+
+---
+
+## Team
+
+**E22 Batch — Department of Computer Engineering, University of Peradeniya**
+
+* **L. Sharmilan** — E/22/373 — [e22373@eng.pdn.ac.lk](mailto:e22373@eng.pdn.ac.lk)
+* **F. R. Sujeevan** — E/22/382 — [e22382@eng.pdn.ac.lk](mailto:e22382@eng.pdn.ac.lk)
+* **S. Kishonithan** — E/22/193 — [e22193@eng.pdn.ac.lk](mailto:e22193@eng.pdn.ac.lk)
+* **R. Thilakshan** — E/22/397 — [e22397@eng.pdn.ac.lk](mailto:e22397@eng.pdn.ac.lk)
+
+### Supervisor
+
+**M.N.A. Fikry** — E/21/138 — [e21138@eng.pdn.ac.lk](mailto:e21138@eng.pdn.ac.lk)
 
 ---
 
 ## Links
 
-- **Project Site:** <https://cepdnaclk.github.io/e22-co2060-floodguard/>
-- **Full Documentation:** [docs/README.md](./docs/README.md)
-- **Department of Computer Engineering:** <http://www.ce.pdn.ac.lk/>
-- **University of Peradeniya:** <https://eng.pdn.ac.lk/>
+* **Project Site:** https://cepdnaclk.github.io/e22-co2060-floodguard/
+* **Full Documentation:** [docs/README.md](./docs/README.md)
+* **CO2060 Projects Gallery:** https://projects.ce.pdn.ac.lk
+* **Department of Computer Engineering:** http://www.ce.pdn.ac.lk/
+* **University of Peradeniya:** https://eng.pdn.ac.lk/
 
 ---
 
