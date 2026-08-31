@@ -5,14 +5,6 @@ repository-name: e22-co2060-floodguard
 title: FloodGuard – Reservoir Flood Early-Warning Decision Support System
 ---
 
----
-
-layout: home
-permalink: index.html
-repository-name: e22-co2060-floodguard
-title: FloodGuard — Reservoir Monitoring & Early-Warning System
----------------------------------------------------------------
-
 # FloodGuard
 
 ## Reservoir Monitoring & Early-Warning Decision Support System
