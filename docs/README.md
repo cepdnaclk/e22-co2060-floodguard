@@ -5,522 +5,1120 @@ repository-name: e22-co2060-floodguard
 title: FloodGuard – Reservoir Flood Early-Warning Decision Support System
 ---
 
-# FloodGuard — Dam Management & Early-Warning System
+---
 
-FloodGuard is an advanced, real-time reservoir monitoring and predictive flood-risk decision-support system. Designed for critical infrastructure management, the platform ingests live sensor telemetry, performs high-resolution divided-difference forecasts, computes dynamic safety thresholds, and provides proportional gate-release recommendations for on-site engineers—warning of hazardous states hours before they manifest.
+layout: home
+permalink: index.html
+repository-name: e22-co2060-floodguard
+title: FloodGuard — Reservoir Monitoring & Early-Warning System
+---------------------------------------------------------------
 
-This repository hosts the canonical **PostgreSQL database schema**, the **core calculation engine algorithms**, the **Next.js integration APIs**, and a **graphical weather simulation suite**.
+# FloodGuard
+
+## Reservoir Monitoring & Early-Warning Decision Support System
+
+FloodGuard is a software system for monitoring reservoir conditions and supporting dam operators in identifying potentially hazardous situations.
+
+The system combines reservoir telemetry, rainfall observations, inflow measurements, downstream conditions and derived operational metrics into a centralized data platform and operator-facing dashboard.
+
+This repository contains the **E22 team's implementation of the database and frontend layers** of the FloodGuard project.
+
+The backend processing engine and telemetry simulator used during development are supporting components maintained separately. They provide the data and processing environment required to test and demonstrate the database and frontend implementation.
 
 ---
 
-## Table of Contents
-- [1. Project Overview](#1-project-overview)
-- [2. System Architecture](#2-system-architecture)
-- [3. PostgreSQL Database System Schema (3NF)](#3-postgresql-database-system-schema-3nf)
-- [4. Calculation Reference & Predictive Algorithm](#4-calculation-reference--predictive-algorithm)
-- [5. Machine Learning Integration Contract](#5-machine-learning-integration-contract)
-- [6. Simulation & Testing Scenarios](#6-simulation--testing-scenarios)
-- [7. Getting Started](#7-getting-started)
-- [8. Links](#8-links)
+# 1. Project Scope
 
----
+The FloodGuard project is organized around several cooperating software components.
 
-## Team
+For this E22 implementation, the primary deliverables are:
 
-- e22373, L. Sharmilan, e22373@eng.pdn.ac.lk
-- e22382, F. R. Sujeevan, e22382@eng.pdn.ac.lk
-- e22193, S. Kishonithan, e22193@eng.pdn.ac.lk
-- e22397, R. Thilakshan, e22397@eng.pdn.ac.lk
-
----
-
-## Table of Contents
-
-1. [Project Overview](#1-project-overview)
-2. [System Architecture](#2-system-architecture)
-3. [PostgreSQL Database System Schema (3NF)](#3-postgresql-database-system-schema-3nf)
-4. [Calculation Reference & Predictive Algorithm](#4-calculation-reference--predictive-algorithm)
-5. [Machine Learning Integration Contract](#5-machine-learning-integration-contract)
-6. [Simulation & Testing Scenarios](#6-simulation--testing-scenarios)
-7. [Getting Started](#7-getting-started)
-8. [Links](#8-links)
-
----
-
-## 1. Project Overview
-
-Traditional dam safety protocols rely on static water-level thresholds. If a reservoir level crosses a fixed limit (e.g., 85%), gates are opened. However, under extreme storm conditions, the time required for physical gate configuration and downstream channel evacuation can exceed the safe response window. 
-
-FloodGuard implements a **predictive, adaptive-threshold model** where risk is assessed dynamically based on:
-- **Rise Rate & Acceleration:** How fast the reservoir level is rising and whether that rate is accelerating.
-- **Weighted Rainfalls:** Lagged, weighted precipitation rates measured across multiple meteorological stations in the catchment area.
-- **Upstream Inflow:** Real-time inflow discharge rates feeding the reservoir.
-- **Downstream Channel Capacity:** The capacity and water level of downstream channels to avoid flooding surrounding valleys.
-
-Rather than waiting for a breach, the system extrapolates historical trends forward, identifies if and when the predicted water level will cross the predicted safety threshold (the **Time-To-Crossing** or **TTC**), and triggers alarms in advance.
-
----
-
-## 2. System Architecture
-
-```mermaid
-flowchart LR
-    subgraph Field["Field Sensor & Simulation Layer"]
-        S1[Water Level Sensor]
-        S2[Meteorological Station Sensors]
-        S3[Upstream Inflow Sensor]
-        S4[Downstream Level Sensor]
-        SIM[Tkinter Weather Simulator]
-    end
-
-    subgraph Pred["Prediction & Calculation Layer"]
-        ALGO[Reference Mathematical Engine<br/>or Trained ML Model]
-    end
-
-    subgraph DB["PostgreSQL Database (Local)"]
-        WL[(water_level_readings)]
-        RF[(rainfall_readings)]
-        IF[(inflow_readings)]
-        DL[(downstream_level_readings)]
-        CM[(calculated_metrics)]
-        TC[(threshold_calculations)]
-        RS[(risk_status)]
-        RR[(release_recommendations)]
-        DT[(deescalation_tracking)]
-        AL[(alerts_log)]
-    end
-
-    subgraph FE["Frontend Dashboard"]
-        DASH[SCADA Operator UI]
-    end
-
-    S1 --> WL
-    S2 --> RF
-    S3 --> IF
-    S4 --> DL
-    SIM --> WL & RF & IF & DL
-    
-    WL & RF & IF & DL --> ALGO
-    ALGO --> CM --> TC --> RS
-    RS --> RR
-    RS --> DT
-    RS --> AL
-    
-    WL & CM & TC & RS & RR & AL --> DASH
+```text
+┌──────────────────────────────────────────────┐
+│              E22 IMPLEMENTATION              │
+├──────────────────────┬───────────────────────┤
+│                      │                       │
+│      PostgreSQL      │       Next.js         │
+│       Database       │       Frontend        │
+│                      │                       │
+└──────────────────────┴───────────────────────┘
 ```
 
-The system operates on an event-driven and polling pipeline:
-1. **Sensor Ingestion:** Telemetry is written to the database.
-2. **Processor Loop:** Evaluates new raw telemetry, computes metrics and thresholds, checks predictive crossing models, and determines risk states.
-3. **Frontend Refresh:** Next.js API layer serves data, refreshing the SCADA panel dynamically on a 15-second polling interval.
-
----
-
-## 3. PostgreSQL Database System Schema (3NF)
-
-The database schema is fully normalized to Third Normal Form (3NF) to support transactional integrity and clean time-series storage.
-
-### 3.1 Static Configuration Tables
-
-#### `dams`
-Holds physical limits, capacities, and baseline calibration thresholds for each dam.
-- `dam_id` (SERIAL, PRIMARY KEY): Unique identifier.
-- `dam_name` (VARCHAR): Name of the dam.
-- `location` (VARCHAR): GPS location name.
-- `latitude` / `longitude` (DOUBLE PRECISION): GPS coordinates.
-- `elevation_m` (DOUBLE PRECISION): Dam elevation above sea level.
-- `reservoir_capacity` (DOUBLE PRECISION): Maximum reservoir volume ($m^3$).
-- `downstream_capacity` (DOUBLE PRECISION): Maximum safe downstream outflow capacity ($m^3/s$).
-- `max_gate_capacity` (DOUBLE PRECISION): Combined gate discharge capacity ($m^3/s$).
-- `if_baseline` (DOUBLE PRECISION): Normal baseline inflow rate ($m^3/s$).
-- `base_threshold` (DOUBLE PRECISION, DEFAULT 75.0): Baseline safe operating percentage limit ($L_{base}$).
-- `threshold_floor` (DOUBLE PRECISION, DEFAULT 30.0): Absolute floor clamp for adjustments ($L_{floor}$).
-
-#### `engineers`
-System user profiles for dam operator logs and alert acknowledgements.
-- `engineer_id` (SERIAL, PRIMARY KEY): Unique identifier.
-- `name` (VARCHAR): Operator username.
-- `role` (VARCHAR): Job role.
-- `contact` (VARCHAR): Contact info.
-- `assigned_dam_id` (INT, REFERENCES dams): Currently assigned dam.
-- `password_hash` (VARCHAR): Bcrypt hash for login credentials.
-
-#### `rainfall_locations`
-Catchment meteorological stations associated with the dam.
-- `location_id` (SERIAL, PRIMARY KEY): Unique identifier.
-- `location_name` (VARCHAR): Station name.
-- `latitude` / `longitude` (DOUBLE PRECISION): GPS coordinates.
-- `weight` (DOUBLE PRECISION): Calibration coefficient of this station ($w_i$, $\sum w_i = 1.0$).
-- `delay_minutes` (DOUBLE PRECISION): Physical lag time for rainfall runoff to reach reservoir ($\tau_i$).
-- `station_code` (VARCHAR, UNIQUE): Station sensor identifier.
-- `is_active` (BOOLEAN): Status of station connection.
-
----
-
-### 3.2 Live Time-Series Sensor Tables (3NF)
-
-#### `water_level_readings`
-- `reading_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `reading_time` (TIMESTAMPTZ): Telemetry timestamp ($t$).
-- `water_level_pct` (DOUBLE PRECISION): Current water level percentage ($L(t)$).
-- *Constraint:* UNIQUE (`dam_id`, `reading_time`)
-
-#### `inflow_readings`
-- `reading_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `reading_time` (TIMESTAMPTZ): Inflow measurement time.
-- `inflow_rate_m3s` (DOUBLE PRECISION): Upstream discharge rate ($IF(t)$, $m^3/s$).
-- *Constraint:* UNIQUE (`dam_id`, `reading_time`)
-
-#### `downstream_level_readings`
-- `reading_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `reading_time` (TIMESTAMPTZ): Downstream channel level measurement time.
-- `downstream_level_pct` (DOUBLE PRECISION): Downstream channel level ($DL(t)$, %).
-- *Constraint:* UNIQUE (`dam_id`, `reading_time`)
-
-#### `rainfall_readings`
-- `reading_id` (BIGSERIAL, PRIMARY KEY)
-- `location_id` (INT, REFERENCES rainfall_locations)
-- `reading_time` (TIMESTAMPTZ): Precipitation measurement time.
-- `rainfall_mm_hr` (DOUBLE PRECISION): Rainfall rate ($R_i(t)$, $mm/h$).
-- *Constraint:* UNIQUE (`location_id`, `reading_time`)
-
----
-
-### 3.3 Backend Prediction & Calculation Tables
-
-#### `prediction_runs`
-Records metadata for each divided-difference forecast run.
-- `run_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `run_time` (TIMESTAMPTZ): Timestamp when prediction ran.
-- `input_window_start` / `input_window_end` (TIMESTAMPTZ): Bounds of data window.
-- `method` (VARCHAR): Prediction model type (e.g. `"newton_divided_difference"`).
-- `status` (VARCHAR): Result status (`success` / `insufficient_data` / `error`).
-
-#### `predicted_values`
-Contains extrapolated future states across forecast horizons ($t+15$ to $t+120$ mins).
-- `value_id` (BIGSERIAL, PRIMARY KEY)
-- `run_id` (BIGINT, REFERENCES prediction_runs)
-- `horizon_minutes` (INT): Forecast horizon in minutes ($h$, e.g., 15, 30, 45, 60, 90, 120).
-- `predicted_water_level_pct` (DOUBLE PRECISION): Extrapolated reservoir level ($L_{pred}(t+h)$).
-- `predicted_r_net` (DOUBLE PRECISION): Projected net rainfall runoff ($R_{net\_pred}(t+h)$).
-- `predicted_inflow` (DOUBLE PRECISION): Extrapolated river inflow ($IF_{pred}(t+h)$).
-- `predicted_downstream_level` (DOUBLE PRECISION): Extrapolated downstream level ($DL_{pred}(t+h)$).
-- `predicted_rise_rate` (DOUBLE PRECISION): Projected rise rate ($RR_{pred}(t+h)$).
-- `predicted_acc` (DOUBLE PRECISION): Projected acceleration ($ACC_{pred}(t+h)$).
-- `predicted_adaptive_threshold` (DOUBLE PRECISION): Calculated threshold ($AT_{pred}(t+h)$).
-- `gap` (DOUBLE PRECISION): Difference margin ($AT_{pred}(t+h) - L_{pred}(t+h)$).
-
-#### `graph_crossing_results`
-Stores summary predictions on threshold crossings.
-- `result_id` (BIGSERIAL, PRIMARY KEY)
-- `run_id` (BIGINT, REFERENCES prediction_runs)
-- `crossing_time_minutes` (INT): Estimated Time-To-Crossing (TTC, minutes). Null if no crossing is predicted.
-- `minimum_gap` (DOUBLE PRECISION): Minimum gap predicted across horizons.
-- `gap_trend` (VARCHAR): Direction of the gap (`increasing` / `decreasing` / `stable`).
-- `final_status` (risk_status_type): Predicted risk status.
-
-#### `calculated_metrics`
-Intermediate calculations performed per sensor scan.
-- `metric_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `calc_time` (TIMESTAMPTZ)
-- `rr_short` (DOUBLE PRECISION): Short-term Rise Rate (%/h, 15-min window).
-- `rr_long` (DOUBLE PRECISION): Long-term Rise Rate (%/h, 60-min window).
-- `acc` (DOUBLE PRECISION): Water level rise acceleration ($ACC(t)$).
-- `rolling_avg` (DOUBLE PRECISION): 3-hour rolling average of rise rates ($RA(t)$).
-- `deviation_score` (DOUBLE PRECISION): Short-term rise deviation ($DEV(t)$).
-- `rr_band` (rr_band_type): Evaluated rise rate band (`NORMAL` / `ELEVATED` / `HIGH` / `CRITICAL`).
-
-#### `threshold_calculations`
-- `calc_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `calc_time` (TIMESTAMPTZ)
-- `rr_adj` / `rf_adj` / `if_adj` / `dl_adj` (DOUBLE PRECISION): Factors pulling threshold down.
-- `adaptive_threshold` (DOUBLE PRECISION): Computed live safety threshold ($AT(t)$).
-- `floor_triggered` (BOOLEAN): True if clamped at $L_{floor}$ (30%).
-- `ceiling_triggered` (BOOLEAN): True if clamped at $L_{base}$ (75%).
-
-#### `risk_status`
-Official alert state of the dam.
-- `status_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `status_time` (TIMESTAMPTZ)
-- `status` (risk_status_type): `GREEN`, `YELLOW`, `ORANGE`, `RED`.
-- `ttc_minutes` (INT): Active warning Time-To-Crossing.
-- `trigger_reason` (TEXT): Text description of rule triggered.
-- `previous_status` (risk_status_type)
-
-#### `release_recommendations`
-Proportional gate release plans calculated for ORANGE or RED status.
-- `release_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `run_id` (BIGINT, REFERENCES prediction_runs)
-- `calc_time` (TIMESTAMPTZ)
-- `strategy` (VARCHAR): Formula type (`"proportional_rise_rate"`).
-- `rise_rate_used` (DOUBLE PRECISION): $RR_{pred}(t+15)$ used for rate estimation.
-- `gate_opening_base_pct` (DOUBLE PRECISION): Base gate percentage before downstream capacity overrides.
-- `q_desired` (DOUBLE PRECISION): Volumetrically required release ($m^3/s$).
-- `q_downstream_available` (DOUBLE PRECISION): Maximum safe downstream capacity window ($m^3/s$).
-- `q_release` (DOUBLE PRECISION): Final recommended discharge rate ($m^3/s$).
-- `gate_opening_applied_pct` (DOUBLE PRECISION): Final gate opening recommendation, rounded to 5%.
-- `conflict_warning` (BOOLEAN): True if desired release exceeds downstream safety limits.
-- `estimated_duration_minutes` (DOUBLE PRECISION): Time required to return to safe storage level.
-
-#### `deescalation_tracking`
-Maintains cumulative timers for de-escalation dampening.
-- `tracking_id` (BIGSERIAL, PRIMARY KEY)
-- `dam_id` (INT, REFERENCES dams)
-- `condition_met_since` (TIMESTAMPTZ): Start timestamp of sustained improvement.
-- `consecutive_minutes` (INT): Tracked elapsed minutes.
-- `required_minutes` (INT): Required wait duration for downgrade (15 / 30 / 60 mins).
-- `transition_from` / `transition_to` (risk_status_type)
-- `eligible_flag` (BOOLEAN)
-
----
-
-## 4. Calculation Reference & Predictive Algorithm
-
-The reference engine processes mathematical updates on every ingestion cycle (1-minute intervals during real-time telemetry, or 15-second intervals under simulator conditions).
-
-### 4.1 Inflow, Level, & Runoff Inputs
-
-The engine ingests:
-- $L(t)$ : Reservoir water level (% of maximum height).
-- $IF(t)$ : Upstream river inflow rate ($m^3/s$).
-- $DL(t)$ : Downstream river level (% of safe capacity).
-- $R_i(t)$ : Local rainfall rate ($mm/h$) at station $i$.
-
-#### Weighted Net Catchment Rainfall ($R_{net}$)
-To account for geographic delays, rainfall runoff is modeled by looking back at station delay offsets ($\tau_i$). If a station has missing telemetry, weights are scaled dynamically:
-
-$$R_{net}(t) = \frac{\sum w_i R_i(t - \tau_i)}{\sum w_{active}}$$
-
----
-
-### 4.2 Rise Rate & Acceleration
-
-#### Short-term Rise Rate ($RR_{short}$)
-Measures water level rate of change over the last 15 minutes, scaled to an hourly rate:
-
-$$RR_{short}(t) = [L(t) - L(t - 15)] \times 4 \quad (\%/hour)$$
-
-#### Long-term Rise Rate ($RR_{long}$)
-Measures change over the last 60 minutes:
-
-$$RR_{long}(t) = [L(t) - L(t - 60)] \times 1 \quad (\%/hour)$$
-
-#### Rise Rate Acceleration ($ACC$)
-Measures the change in long-term rise rate over the preceding hour:
-
-$$ACC(t) = RR_{long}(t) - RR_{long}(t - 60) \quad (\%/hour^2)$$
-
-#### Rolling Average ($RA$) & Deviation Score ($DEV$)
-Calculates the 3-hour moving average of the long-term rise rate and compares it to the short-term spike rate to identify flash surge anomalies:
-
-$$RA(t) = \text{Average}(RR_{long}) \text{ over last 3 hours}$$
-
-$$DEV(t) = RR_{short}(t) - RA(t)$$
-
----
-
-### 4.3 Severity Classifications (Bands)
-
-Telemetry states are classified into four rise-rate severity bands. The worst individual parameter match determines the band.
-
-| Severity Band | Long-Term Rise Rate | Short-Term Rise Rate | Acceleration |
-|---|---|---|---|
-| **NORMAL** | $< 1.0\,\%/h$ | AND $< 2.0\,\%/h$ | AND $\le 0.5\,\%/h^2$ |
-| **ELEVATED** | $1.0\text{--}2.5\,\%/h$ | OR $2.0\text{--}4.0\,\%/h$ | OR $0.5\text{--}1.5\,\%/h^2$ |
-| **HIGH** | $2.5\text{--}4.0\,\%/h$ | OR $4.0\text{--}7.0\,\%/h$ | OR $1.5\text{--}3.0\,\%/h^2$ |
-| **CRITICAL** | $> 4.0\,\%/h$ | OR $> 7.0\,\%/h$ | OR $> 3.0\,\%/h^2$ (or $DEV > 5.0$) |
-
----
-
-### 4.4 Adaptive Safety Threshold ($AT$)
-
-The safety threshold shifts downwards from `BASE` (75%) depending on hydrological stresses, clamped at a minimum `FLOOR` (30%).
-
-$$AT(t) = \text{Clamp}( L_{base} - rr_{adj} - rf_{adj} - if_{adj} - dl_{adj},\; L_{floor},\; L_{base} )$$
-
-#### Individual Penalties
-
-1. **Rise Rate Adjustment ($rr_{adj}$):**
-   - `NORMAL`: 0% | `ELEVATED`: 8% | `HIGH`: 18% | `CRITICAL`: 30%
-2. **Rainfall Adjustment ($rf_{adj}$):**
-   - $R_{net} < 10$: 0% | $10\text{--}25$: 3% | $25\text{--}50$: 7% | $> 50\,\text{mm/h}$: 12%
-3. **Inflow Adjustment ($if_{adj}$):** (relative to baseline inflow $IF_{base}$)
-   - $IF(t) < 1.5 \times IF_{base}$: 0% | $1.5\text{--}2.5 \times$: 4% | $2.5\text{--}4 \times$: 8% | $> 4 \times IF_{base}$: 13%
-4. **Downstream level Adjustment ($dl_{adj}$):**
-   - $DL < 50\%$: 0% | $50\text{--}70\%$: 3% | $70\text{--}85\%$: 8% | $> 85\%$: 15%
-
----
-
-### 4.5 Newton Divided-Difference Extrapolation
-
-For prediction cycles, the engine fits a polynomial through recent historical readings to extrapolate water levels ($L_{pred}(t+h)$) and inflow rates ($IF_{pred}(t+h)$) for horizons $h \in \{15, 30, 45, 60, 90, 120\}$ minutes.
-
-To avoid high-degree oscillations (Runge's phenomenon), the engine selects a low-degree fit (linear or quadratic) using the last 3-4 historical data points spaced over a rolling 6-hour window.
-
-#### Divided-Difference Table
-Given nodes $(x_0, y_0), (x_1, y_1), \dots, (x_k, y_k)$, divided differences are defined recursively:
-
-$$f[x_i] = y_i$$
-
-$$f[x_i, x_{i+1}, \dots, x_{i+j}] = \frac{f[x_{i+1}, \dots, x_{i+j}] - f[x_i, \dots, x_{i+j-1}]}{x_{i+j} - x_i}$$
-
-The interpolating polynomial is:
-
-$$P(x) = f[x_0] + \sum_{i=1}^k f[x_0, \dots, x_i] \prod_{j=0}^{i-1} (x - x_j)$$
-
----
-
-### 4.6 Graph Crossing Analysis & Time-To-Crossing ($TTC$)
-
-A crossing is predicted if the gap margin at any horizon $h$ falls to or below zero:
-
-$$Gap(t+h) = AT_{pred}(t+h) - L_{pred}(t+h) \le 0$$
-
-- **$TTC$ (Time-To-Crossing):** The smallest horizon $h$ where $Gap(t+h) \le 0$.
-- **Gap Trend:** Evaluated as `increasing`, `decreasing`, or `stable` by analyzing the derivative differentials of the margins:
-
-$$\Delta Gap = Gap(t+h) - Gap(t+h-15)$$
-
----
-
-### 4.7 Risk Status Classification Rules
-
-Risk statuses are evaluated in order of severity. First match wins.
-
-| Risk Status | Trigger Conditions |
-|---|---|
-| 🔴 **Red** | $L(t) \ge AT(t)$ (Current level exceeds safety threshold)<br/>OR $TTC \le 15$ minutes (Crossing imminent)<br/>OR $RR_{band} = \text{CRITICAL}$ |
-| 🟠 **Orange** | $L(t) \ge AT(t) + 3\%$ (Within 3% of threshold)<br/>OR ($TTC \le 60$ minutes)<br/>OR ($RR_{band} = \text{HIGH}$ AND Gap Trend = `decreasing`) |
-| 🟡 **Yellow** | $L(t) \ge AT(t) + 10\%$ (Within 10% of threshold)<br/>OR ($TTC > 60$ minutes)<br/>OR ($RR_{band} = \text{ELEVATED}$)<br/>OR ($TTC = \text{Null}$ AND Gap Trend = `decreasing`) |
-| 🟢 **Green** | All other conditions |
-
----
-
-### 4.8 Proportional Release Recommendations
-
-Calculated when risk status reaches ORANGE or RED.
-
-1. **Calculate Volumetrically Desired Discharge ($Q_{desired}$):**
-   Calculates the release rate required to bring the reservoir down to the threshold level over the next hour:
-   
-   $$Q_{desired}(t) = IF(t) - \frac{(AT(t) - L(t)) \times \text{Capacity}_{reservoir}}{3600 \times 100} \quad (m^3/s)$$
-
-2. **Downstream Safety Limit ($Q_{down\_avail}$):**
-   Calculates the remaining capacity of the downstream channel:
-   
-   $$Q_{down\_avail}(t) = \text{Capacity}_{downstream} \times \left(1 - \frac{DL(t)}{100}\right) \quad (m^3/s)$$
-
-3. **Apply Safety Overrides:**
-   
-   $$Q_{release}(t) = \text{Min}\left(Q_{desired}(t),\; Q_{down\_avail}(t),\; \text{Capacity}_{max\_gate}\right)$$
-   
-   If $Q_{desired} > Q_{down\_avail}$, a `CONFLICT WARNING` is flagged to inform operators that the downstream channel is constrained.
-
-4. **Proportional Gate Opening:**
-   
-   $$\text{GateOpening}\% = \left(\frac{Q_{release}(t)}{\text{Capacity}_{max\_gate}}\right) \times 100$$
-   
-   Rounded to the nearest 5% for operator configuration.
-
-5. **Estimated Discharge Duration ($t_{duration}$):**
-   Calculates the duration (minutes) needed to lower the level to a target buffer level ($AT(t) - 10\%$):
-   
-   $$t_{duration} = \frac{L(t) - (AT(t) - 10.0)}{\left(\frac{Q_{release} - IF(t)}{\text{Capacity}_{reservoir}}\right) \times 100 \times 60} \quad \text{minutes}$$
-
----
-
-### 4.9 Sustained De-escalation Timers
-
-Status downgrades are delayed to prevent rapid toggling due to noise. The system must meet de-escalation rules continuously:
-
-- **RED $\rightarrow$ ORANGE (15 Mins):** $RR_{band} \in \{\text{NORMAL}, \text{ELEVATED}\}$ AND $ACC \le 0.0$ AND $L(t)$ stable or dropping.
-- **ORANGE $\rightarrow$ YELLOW (30 Mins):** $RR_{band} \in \{\text{NORMAL}, \text{ELEVATED}\}$ AND $ACC \le 0.0$ AND ($R_{net}$ decreasing OR $R_{net} < 0.001\,\text{mm/h}$).
-- **YELLOW $\rightarrow$ GREEN (60 Mins):** $RR_{band} = \text{NORMAL}$ AND $L(t)$ stable or dropping.
-
----
-
-## 5. Machine Learning Integration Contract
-
-The prediction layer is model-agnostic. The deterministic reference algorithm can be swapped for a trained ML model by satisfying this integration contract.
-
-```
-+------------------+       Reads telemetry       +------------------+
-|   PostgreSQL     | --------------------------> |  Trained Model   |
-|   Database       | <-------------------------- |  (Python Script) |
-+------------------+    Writes predictions &     +------------------+
-                            risk status
+The database provides persistent storage for configuration, telemetry, processed information, predictions and operational records.
+
+The frontend provides the operator-facing interface for viewing system state, telemetry, warnings, historical data, trends and other operational information.
+
+During development, additional components were implemented to exercise these two deliverables:
+
+```text
+┌────────────────────── Development ──────────────────────┐
+│                                                         │
+│   Backend Processor              Telemetry Simulator    │
+│          │                               │              │
+│          └───────────────┬───────────────┘              │
+│                          │                              │
+│                          ▼                              │
+│                    PostgreSQL                           │
+│                          │                              │
+│                          ▼                              │
+│                    Next.js UI                           │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### 5.1 Inputs
-The model must query live and historical time-series data directly from:
-- `water_level_readings`
-- `rainfall_readings` (resolving weights and delays from `rainfall_locations`)
-- `inflow_readings`
-- `downstream_level_readings`
-
-### 5.2 Outputs
-The model must write its calculated predictions into the database tables:
-1. **`calculated_metrics`:** Populate rise rates, acceleration, rolling average, deviation, and rise rate band.
-2. **`threshold_calculations`:** Populate the calculated dynamic safety threshold and adjustments.
-3. **`risk_status`:** Set the calculated risk status.
-4. **`release_recommendations`:** Generate proportional gate openings and safe release rates.
+These supporting components are intended for **integration testing and demonstration** and should not be confused with the primary frontend and database deliverables.
 
 ---
 
-## 6. Simulation & Testing Scenarios
+# 2. System Architecture
 
-The Tkinter weather simulator generates real-time telemetry to test system responses.
+At a high level, FloodGuard follows a data-oriented architecture:
 
-- **Drought / Dry Season:** Net rainfall is $0.0\,mm/h$, inflows decline ($80 \rightarrow 20\,m^3/s$), water level drops. Status remains `GREEN`.
-- **South-West Monsoon:** Moderate rain ($5\text{--}16\,mm/h$), inflow increases ($120 \rightarrow 450\,m^3/s$), level rises. Status triggers `YELLOW` and `ORANGE`.
-- **North-East Monsoon Storm:** Spikes rain ($70\,mm/h$), inflow rises ($1800\,m^3/s$). Level exceeds threshold, status triggers `RED` and release recommendations activate.
-- **Inter-Monsoon Thunderstorm:** Short convective rain burst ($90\,mm/h$), rapid rise rate triggers an immediate `RED` status.
-- **Tropical Cyclone Surge:** Torrential rain ($50\,mm/h$), high downstream level ($DL > 85\%$). Triggers `RED` with active downstream constraints and conflict warnings.
+```text
+                       DATA SOURCES
+                            │
+              ┌─────────────┴─────────────┐
+              │                           │
+         Field Sensors              Development
+              │                    Simulation Tools
+              │                           │
+              └─────────────┬─────────────┘
+                            │
+                            ▼
+                    PostgreSQL Database
+                            │
+                 ┌──────────┴──────────┐
+                 │                     │
+             Raw Data             Derived Data
+                 │                     │
+                 └──────────┬──────────┘
+                            │
+                            ▼
+                     Application API
+                            │
+                            ▼
+                     Next.js Frontend
+                            │
+                            ▼
+                    Operator Dashboard
+```
 
----
+The database is the central persistence layer.
 
-## 7. Getting Started
+The frontend does not represent an independent copy of system data. It obtains application data through its API layer and presents that information through the dashboard.
 
-We have containerized the core infrastructure (PostgreSQL database, Python backend, and Next.js frontend) using Docker for a seamless setup experience. The simulation GUI runs on your local machine so it can easily display its interface.
-
-### 7.1 Start Core Services
-1. Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-2. Build and start the infrastructure in the background:
-   ```bash
-   docker compose up -d --build
-   ```
-   *This automatically sets up the PostgreSQL database with schemas and initial data, starts the backend processor, and serves the Next.js frontend on port 3000.*
-
-### 7.2 Access the Dashboard
-Open your browser and navigate to `http://localhost:3000` to view the SCADA control panel.
-
-### 7.3 Run the Weather Simulator
-Since the database container exposes port `5432`, the Tkinter simulation GUI can run directly on your host machine and connect to it natively.
-1. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Launch the simulator:
-   ```bash
-   python code/simulation/db_simulator.py
-   ```
+The development backend and simulator can populate and process the database so that the frontend can be exercised without requiring a live field deployment.
 
 ---
 
-## 8. Links
+# 3. Repository Layout
 
-- **Repository:** <https://github.com/cepdnaclk/e22-co2060-floodguard>
-- **Project Site:** <https://cepdnaclk.github.io/e22-co2060-floodguard>
-- **Department of Computer Engineering:** <http://www.ce.pdn.ac.lk/>
-- **University of Peradeniya:** <https://eng.pdn.ac.lk/>
+The repository is organized around the two primary implementation areas:
+
+```text
+.
+├── code/
+│   ├── database/
+│   │   ├── dam_management_schema.sql
+│   │   ├── sample_dam_and_rainfall_data.sql
+│   │   ├── sample_readings_seed.sql
+│   │   ├── ER-Diagram.pgerd
+│   │   ├── ER-Diagram.pgerd.png
+│   │   └── Dockerfile
+│   │
+│   └── frontend/
+│       ├── src/
+│       │   ├── app/
+│       │   ├── components/
+│       │   └── lib/
+│       ├── public/
+│       ├── package.json
+│       ├── package-lock.json
+│       └── Dockerfile
+│
+├── docs/
+│   ├── README.md
+│   ├── images/
+│   └── ...
+│
+├── docker-compose.yml
+├── .env.example
+├── requirements.txt
+└── README.md
+```
+
+The `docs/` directory contains the documentation used to generate this project site.
+
+The root `README.md` provides the repository-level overview and development entry point.
+
+---
+
+# 4. Database
+
+## 4.1 Overview
+
+The database is implemented using PostgreSQL.
+
+It acts as the persistent data store for FloodGuard and is designed to separate relatively static configuration from continuously changing telemetry and derived system information.
+
+The schema can be broadly divided into five groups:
+
+```text
+Configuration
+    │
+    ├── dams
+    ├── engineers
+    └── rainfall_locations
+
+Telemetry
+    │
+    ├── water_level_readings
+    ├── rainfall_readings
+    ├── inflow_readings
+    └── downstream_level_readings
+
+Calculated Data
+    │
+    ├── calculated_metrics
+    └── threshold_calculations
+
+Prediction Data
+    │
+    ├── prediction_runs
+    ├── predicted_values
+    └── graph_crossing_results
+
+Operational Data
+    │
+    ├── risk_status
+    ├── release_recommendations
+    └── deescalation_tracking
+```
+
+---
+
+## 4.2 Entity Relationship Model
+
+The database design is represented by the ER diagram stored in:
+
+```text
+code/database/ER-Diagram.pgerd
+code/database/ER-Diagram.pgerd.png
+```
+
+The model establishes relationships between dams, rainfall stations, telemetry readings and derived operational information.
+
+The general relationship is:
+
+```text
+                         dams
+                          │
+          ┌───────────────┼────────────────┐
+          │               │                │
+          ▼               ▼                ▼
+ water_level_readings  inflow_readings  downstream_level_readings
+          │
+          │
+          └──────────────────────┐
+                                 │
+rainfall_locations               │
+          │                      │
+          ▼                      ▼
+rainfall_readings        calculated_metrics
+                                 │
+                                 ▼
+                      threshold_calculations
+                                 │
+                                 ▼
+                           risk_status
+                                 │
+                    ┌────────────┴────────────┐
+                    ▼                         ▼
+          release_recommendations     deescalation_tracking
+```
+
+Prediction-related tables provide a separate path for forecast runs and their results.
+
+---
+
+## 4.3 Configuration Tables
+
+### `dams`
+
+Stores dam-level configuration and physical operating limits.
+
+Important attributes include:
+
+* dam identity and location
+* geographic coordinates
+* reservoir capacity
+* downstream capacity
+* gate capacity
+* baseline inflow
+* base safety threshold
+* threshold floor
+
+### `engineers`
+
+Stores application users and operator-related information.
+
+The table includes:
+
+* engineer identity
+* name
+* role
+* contact information
+* assigned dam
+* password hash
+
+### `rainfall_locations`
+
+Represents rainfall measurement stations associated with the catchment.
+
+Station configuration includes:
+
+* station identity
+* location
+* coordinates
+* weighting coefficient
+* rainfall delay
+* station code
+* active/inactive state
+
+---
+
+# 5. Telemetry Model
+
+FloodGuard stores sensor measurements as timestamped records.
+
+## `water_level_readings`
+
+Stores reservoir water-level observations.
+
+```text
+reading_id
+dam_id
+reading_time
+water_level_pct
+```
+
+The combination of dam and timestamp is unique.
+
+---
+
+## `rainfall_readings`
+
+Stores rainfall observations associated with meteorological stations.
+
+```text
+reading_id
+location_id
+reading_time
+rainfall_mm_hr
+```
+
+The combination of station and timestamp is unique.
+
+---
+
+## `inflow_readings`
+
+Stores upstream inflow measurements.
+
+```text
+reading_id
+dam_id
+reading_time
+inflow_rate_m3s
+```
+
+---
+
+## `downstream_level_readings`
+
+Stores downstream channel-level measurements.
+
+```text
+reading_id
+dam_id
+reading_time
+downstream_level_pct
+```
+
+---
+
+# 6. Derived and Prediction Data
+
+The database also contains relations for information calculated from telemetry.
+
+## `calculated_metrics`
+
+Stores intermediate hydrological metrics such as:
+
+* short-term rise rate
+* long-term rise rate
+* acceleration
+* rolling average
+* deviation score
+* rise-rate severity band
+
+---
+
+## `threshold_calculations`
+
+Stores the adaptive safety threshold and the individual adjustment factors contributing to it.
+
+```text
+rr_adj
+rf_adj
+if_adj
+dl_adj
+adaptive_threshold
+floor_triggered
+ceiling_triggered
+```
+
+---
+
+## `prediction_runs`
+
+Represents an individual prediction/calculation execution.
+
+A run records:
+
+* dam
+* execution time
+* input data window
+* prediction method
+* execution status
+
+---
+
+## `predicted_values`
+
+Stores forecast values associated with a prediction run.
+
+The stored information can include:
+
+* predicted water level
+* predicted rainfall/runoff
+* predicted inflow
+* predicted downstream level
+* predicted rise rate
+* predicted acceleration
+* predicted adaptive threshold
+* prediction gap
+
+---
+
+## `graph_crossing_results`
+
+Stores the summarized result of predicted threshold-crossing analysis.
+
+Important fields include:
+
+* estimated Time-To-Crossing
+* minimum predicted gap
+* gap trend
+* resulting risk status
+
+---
+
+# 7. Operational State
+
+## `risk_status`
+
+Represents the evaluated operational state of a dam.
+
+FloodGuard uses four status levels:
+
+```text
+GREEN
+YELLOW
+ORANGE
+RED
+```
+
+A status record can contain:
+
+* current state
+* timestamp
+* Time-To-Crossing
+* trigger reason
+* previous state
+
+The frontend uses this information to present the current operational condition to the operator.
+
+---
+
+## `release_recommendations`
+
+Stores release recommendations generated for elevated-risk situations.
+
+The stored information includes:
+
+* release strategy
+* rise rate used
+* desired discharge
+* downstream available capacity
+* final release rate
+* gate opening recommendation
+* conflict warning
+* estimated duration
+
+These values are presented as recommendations for operator decision support.
+
+---
+
+## `deescalation_tracking`
+
+Stores information required to prevent rapid oscillation between risk states.
+
+The table tracks:
+
+* when an improving condition began
+* elapsed improvement time
+* required duration
+* transition state
+* eligibility for downgrade
+
+---
+
+# 8. Database Integrity
+
+The database uses standard relational integrity mechanisms to maintain consistent data.
+
+These include:
+
+```text
+Primary Keys
+Foreign Keys
+Unique Constraints
+Enumerated / Domain Types
+Indexes
+```
+
+Foreign keys maintain relationships between configuration, telemetry and derived data.
+
+Timestamp-based uniqueness constraints prevent duplicate telemetry observations for the same source and time.
+
+Indexes are provided for common chronological telemetry access patterns.
+
+The complete schema is available at:
+
+```text
+code/database/dam_management_schema.sql
+```
+
+---
+
+# 9. Frontend
+
+## 9.1 Overview
+
+The frontend is implemented using **Next.js**.
+
+It provides the operator-facing web interface for interacting with FloodGuard data.
+
+The application is organized around several operational views:
+
+```text
+Dashboard
+│
+├── Overview
+├── Live Monitoring
+├── Early Warning
+├── Analysis
+├── Historical Analysis
+├── Trends & Prediction
+└── Logs
+```
+
+The frontend is designed to expose the information stored in the database without requiring operators to interact directly with database structures.
+
+---
+
+# 10. Frontend Architecture
+
+The frontend follows the application structure provided by Next.js.
+
+At a simplified level:
+
+```text
+                         Browser
+                            │
+                            ▼
+                     Next.js Application
+                            │
+             ┌──────────────┴──────────────┐
+             │                             │
+        UI Components                  API Routes
+             │                             │
+             │                             ▼
+             │                         Database
+             │
+             └──────────────┬──────────────┘
+                            │
+                            ▼
+                     Dashboard Views
+```
+
+Reusable interface components are maintained under:
+
+```text
+code/frontend/src/components/
+```
+
+Application pages and API routes are maintained under:
+
+```text
+code/frontend/src/app/
+```
+
+---
+
+# 11. Dashboard Views
+
+## Overview
+
+Provides a high-level view of the current FloodGuard system state.
+
+It is intended to give the operator an immediate understanding of the current condition without requiring navigation through individual datasets.
+
+---
+
+## Live Monitoring
+
+Provides current telemetry and operational measurements.
+
+The view is intended for observing changing conditions such as:
+
+* reservoir level
+* rainfall
+* inflow
+* downstream level
+* current risk state
+
+---
+
+## Early Warning
+
+Provides warning-oriented information derived from the system state.
+
+The interface exposes risk conditions and relevant supporting information so that operators can identify situations requiring attention.
+
+---
+
+## Analysis
+
+Provides access to calculated and derived system information.
+
+This allows operational data to be examined beyond the immediate dashboard state.
+
+---
+
+## Historical Analysis
+
+Provides access to historical telemetry and system records.
+
+Historical information is useful for examining previous reservoir behaviour and comparing changing conditions over time.
+
+---
+
+## Trends & Prediction
+
+Provides visualization of trend and prediction-related data stored in the database.
+
+The page can display predicted values and related indicators produced by the processing layer.
+
+---
+
+## Logs
+
+Provides access to operational and system records useful for reviewing system activity and historical events.
+
+---
+
+# 12. Application API
+
+The frontend contains application API routes under:
+
+```text
+code/frontend/src/app/api/
+```
+
+The current API structure includes areas such as:
+
+```text
+api/
+├── auth/
+├── dams/
+├── alerts/
+├── history/
+├── raw/
+└── processed/
+```
+
+The API layer provides the boundary between the frontend interface and application data.
+
+Conceptually:
+
+```text
+Frontend Component
+        │
+        ▼
+    API Route
+        │
+        ▼
+    Data Access
+        │
+        ▼
+   PostgreSQL
+```
+
+This separation allows the frontend interface to remain independent from the underlying database queries and storage implementation.
+
+---
+
+# 13. Data Flow
+
+A typical development/demo data path is:
+
+```text
+                    Simulator
+                        │
+                        ▼
+                Raw Telemetry
+                        │
+                        ▼
+                   PostgreSQL
+                        │
+                        ▼
+              Backend Processor
+                        │
+                        ▼
+              Derived / Prediction
+                     Data
+                        │
+                        ▼
+                   PostgreSQL
+                        │
+                        ▼
+                  Next.js API
+                        │
+                        ▼
+                Frontend Dashboard
+```
+
+In an actual deployment, the simulator would be replaced by appropriate field telemetry sources and the development processor would be replaced or complemented by the production processing infrastructure defined by the overall FloodGuard system.
+
+---
+
+# 14. Prediction and Risk Calculation Reference
+
+The FloodGuard concept uses a predictive model rather than relying exclusively on a fixed reservoir-level threshold.
+
+The reference processing model considers:
+
+```text
+Reservoir water level
+Rainfall
+Upstream inflow
+Downstream level
+Rise rate
+Rise-rate acceleration
+Historical trends
+```
+
+These inputs can be used to derive:
+
+```text
+Rise-rate severity
+Adaptive safety threshold
+Predicted reservoir level
+Threshold crossing
+Time-To-Crossing
+Risk status
+Release recommendation
+```
+
+The database is designed to store the outputs of this processing independently from the frontend.
+
+This separation is important because the frontend consumes **results**, rather than implementing the hydrological processing itself.
+
+---
+
+# 15. Adaptive Threshold Model
+
+The reference calculation uses an adaptive threshold rather than a single immutable operating value.
+
+Conceptually:
+
+```text
+                    Base Threshold
+                           │
+             ┌─────────────┼─────────────┐
+             │             │             │
+         Rise Rate       Rainfall       Inflow
+             │             │             │
+             └─────────────┼─────────────┘
+                           │
+                    Downstream Level
+                           │
+                           ▼
+                  Adaptive Threshold
+                           │
+                     [Floor, Base]
+```
+
+The threshold is adjusted according to the prevailing conditions and constrained within configured limits.
+
+The resulting threshold is stored in:
+
+```text
+threshold_calculations
+```
+
+---
+
+# 16. Prediction
+
+The reference implementation includes a divided-difference based extrapolation method.
+
+Historical observations are used to estimate future values over predefined forecast horizons.
+
+The prediction subsystem records:
+
+```text
+Prediction Run
+      │
+      ├── Input window
+      ├── Method
+      ├── Execution status
+      │
+      └── Predicted values
+              │
+              ├── +15 min
+              ├── +30 min
+              ├── +45 min
+              ├── +60 min
+              ├── +90 min
+              └── +120 min
+```
+
+The resulting values are stored in the prediction-related database tables and can subsequently be consumed by the frontend.
+
+---
+
+# 17. Threshold Crossing
+
+A predicted crossing is determined by comparing the predicted reservoir level with the predicted adaptive threshold.
+
+Conceptually:
+
+```text
+Gap = Predicted Threshold - Predicted Level
+```
+
+A non-positive gap indicates that the predicted level has reached or exceeded the predicted threshold.
+
+The earliest forecast horizon satisfying this condition provides the estimated:
+
+```text
+Time-To-Crossing (TTC)
+```
+
+The crossing result is stored separately so that the frontend can access a concise representation of the prediction outcome.
+
+---
+
+# 18. Risk Status
+
+The reference system classifies conditions into four operational states:
+
+| State    | Meaning                                           |
+| -------- | ------------------------------------------------- |
+| `GREEN`  | Normal operating condition                        |
+| `YELLOW` | Increased attention required                      |
+| `ORANGE` | Significant risk; operator action may be required |
+| `RED`    | Critical condition requiring immediate attention  |
+
+Risk status is derived from current and predicted conditions rather than solely from the instantaneous reservoir level.
+
+The evaluated state is stored in:
+
+```text
+risk_status
+```
+
+and exposed to the frontend through the application API.
+
+---
+
+# 19. Release Recommendation
+
+For elevated-risk conditions, the reference processing layer can calculate a recommended release rate.
+
+The calculation considers:
+
+```text
+Current inflow
+Reservoir condition
+Adaptive threshold
+Reservoir capacity
+Downstream available capacity
+Maximum gate capacity
+```
+
+The resulting recommendation is stored in:
+
+```text
+release_recommendations
+```
+
+The frontend presents these values as **decision-support information**.
+
+The system does not represent an autonomous physical gate-control mechanism.
+
+---
+
+# 20. Testing and Simulation
+
+The frontend and database require changing data to demonstrate their behaviour.
+
+A development simulation environment was therefore implemented to provide controlled telemetry.
+
+The simulator can reproduce several representative environmental scenarios:
+
+```text
+Drought / Dry Season
+South-West Monsoon
+North-East Monsoon Storm
+Inter-Monsoon Thunderstorm
+Tropical Cyclone Surge
+```
+
+These scenarios are intended to exercise different parts of the data and risk pipeline.
+
+For example:
+
+```text
+Normal conditions
+      │
+      ▼
+Increasing rainfall
+      │
+      ▼
+Increasing inflow
+      │
+      ▼
+Increasing reservoir level
+      │
+      ▼
+Higher calculated risk
+      │
+      ▼
+Warning / recommendation
+```
+
+The simulator is a **development and testing utility**.
+
+It does not represent a real sensor network and should not be interpreted as a production telemetry source.
+
+---
+
+# 21. Development Environment
+
+The project uses Docker to simplify local development.
+
+The primary repository components are:
+
+```text
+PostgreSQL
+Next.js Frontend
+```
+
+The backend processor and simulator are maintained separately.
+
+A complete demonstration environment therefore consists of two repositories:
+
+```text
+e22-co2060-floodguard
+│
+├── database
+└── frontend
+
+backend / simulation repository
+│
+├── backend
+└── simulation
+```
+
+The repositories remain independently version-controlled while communicating through the application/database interfaces.
+
+---
+
+# 22. Local Development
+
+Clone the project:
+
+```bash
+git clone https://github.com/cepdnaclk/e22-co2060-floodguard.git
+cd e22-co2060-floodguard
+```
+
+Create the local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Start the database and frontend environment:
+
+```bash
+docker compose up -d --build
+```
+
+The frontend is available at:
+
+```text
+http://localhost:3000
+```
+
+Stop the environment with:
+
+```bash
+docker compose down
+```
+
+Detailed service-specific configuration should be taken from the corresponding project files rather than duplicated here.
+
+---
+
+# 23. Development and Demonstration Boundary
+
+The distinction between implementation and demonstration is important when evaluating this repository.
+
+```text
+PRIMARY E22 IMPLEMENTATION
+───────────────────────────
+
+PostgreSQL Database
+    └── Schema
+    └── Data model
+    └── Constraints
+    └── Indexes
+    └── Seed data
+
+Next.js Frontend
+    └── Dashboard
+    └── Monitoring
+    └── Warnings
+    └── Analysis
+    └── Historical data
+    └── Prediction views
+    └── Logs
+    └── Application API
+
+
+SUPPORTING DEVELOPMENT ENVIRONMENT
+──────────────────────────────────
+
+Backend Processor
+    └── Test/development processing
+
+Telemetry Simulator
+    └── Controlled test data
+    └── Scenario generation
+```
+
+The supporting components exist so that the primary implementation can be developed, exercised and demonstrated without requiring a deployed field infrastructure.
+
+---
+
+# 24. Limitations
+
+This repository represents an academic software project and development environment.
+
+In particular:
+
+* simulated telemetry is not live field data;
+* prediction results produced by the reference processing environment are not operational forecasts;
+* release recommendations are decision-support outputs, not autonomous control commands;
+* production deployment would require validated sensor infrastructure, processing models, operational procedures and appropriate safety validation.
+
+The system should therefore be treated as a software engineering and decision-support prototype rather than a certified dam-control system.
+
+---
+
+# 25. Further Development
+
+Possible future development areas include:
+
+```text
+Authentication improvements
+Manual simulator controls
+Additional telemetry sources
+Production sensor integration
+Model validation
+Improved historical analytics
+Deployment infrastructure
+Operational audit facilities
+```
+
+The separation between frontend, database and processing layers allows these components to evolve independently.
+
+---
+
+# 26. Project Resources
+
+### Repository
+
+https://github.com/cepdnaclk/e22-co2060-floodguard
+
+### Project Site
+
+https://cepdnaclk.github.io/e22-co2060-floodguard/
+
+### CO2060 Projects Gallery
+
+https://projects.ce.pdn.ac.lk
+
+### Department of Computer Engineering
+
+http://www.ce.pdn.ac.lk/
+
+### University of Peradeniya
+
+https://eng.pdn.ac.lk/
+
+---
+
+# 27. Team
+
+**E22 Batch — Department of Computer Engineering**
+
+| Name           | Registration | Email                                               |
+| -------------- | ------------ | --------------------------------------------------- |
+| L. Sharmilan   | E/22/373     | [e22373@eng.pdn.ac.lk](mailto:e22373@eng.pdn.ac.lk) |
+| F. R. Sujeevan | E/22/382     | [e22382@eng.pdn.ac.lk](mailto:e22382@eng.pdn.ac.lk) |
+| S. Kishonithan | E/22/193     | [e22193@eng.pdn.ac.lk](mailto:e22193@eng.pdn.ac.lk) |
+| R. Thilakshan  | E/22/397     | [e22397@eng.pdn.ac.lk](mailto:e22397@eng.pdn.ac.lk) |
+
+### Supervisor
+
+**M.N.A. Fikry** — E/21/138 — [e21138@eng.pdn.ac.lk](mailto:e21138@eng.pdn.ac.lk)
+
+---
+
+# 28. Project Context
+
+FloodGuard is developed as part of the **CO2060 Software Systems Design Project** at the Department of Computer Engineering, Faculty of Engineering, University of Peradeniya.
+
+Project metadata is maintained in:
+
+```text
+docs/index.json
+```
+
+The project is automatically listed in the CO2060 project collection.
