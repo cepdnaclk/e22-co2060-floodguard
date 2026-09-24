@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
 
 const dbHost = process.env.DB_HOST || 'localhost';
 const dbPort = parseInt(process.env.DB_PORT || '5432', 10);
-const dbName = process.env.DB_NAME || 'mydb';
+const dbName = process.env.DB_NAME || 'floodguard';
 const dbUser = process.env.DB_USER || 'postgres';
 const dbPassword = process.env.DB_PASSWORD || '';
 

@@ -28,7 +28,7 @@ try:
     DB_PORT = int(os.getenv("DB_PORT", "5432"))
 except ValueError:
     DB_PORT = 5432
-DB_NAME = os.getenv("DB_NAME", "mydb")
+DB_NAME = os.getenv("DB_NAME", "floodguard")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 

@@ -7,14 +7,14 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: ${DB_NAME:-mydb}
+      POSTGRES_DB: ${DB_NAME:-floodguard}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-mydb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-floodguard}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,7 +28,7 @@ services:
       # Override DB_HOST to point to the db service instead of localhost
       DB_HOST: db
       DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-mydb}
+      DB_NAME: ${DB_NAME:-floodguard}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-password}
       DB_SSL: ${DB_SSL:-false}
@@ -48,7 +48,7 @@ services:
       # Database connection for Next.js API routes
       DB_HOST: db
       DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-mydb}
+      DB_NAME: ${DB_NAME:-floodguard}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-password}
       DB_SSL: ${DB_SSL:-false}

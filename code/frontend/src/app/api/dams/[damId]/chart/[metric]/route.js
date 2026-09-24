@@ -162,7 +162,38 @@ export async function GET(request, { params }) {
     }
 
     const liveRes = await pool.query(query, queryParams);
-    const liveData = liveRes.rows;
+    let liveData = liveRes.rows;
+
+    // If no rows were found in the requested window, anchor to the latest telemetry window in the database
+    if (liveData.length === 0) {
+      try {
+        let maxTimeQuery = '';
+        if (metric === 'net-rainfall') {
+          maxTimeQuery = `
+            SELECT MAX(r.reading_time) AS max_t
+            FROM rainfall_readings r
+            JOIN rainfall_locations l ON r.location_id = l.location_id
+            WHERE l.nearest_dam_id = $1
+          `;
+        } else {
+          maxTimeQuery = `SELECT MAX(${timeCol}) AS max_t FROM ${table} WHERE dam_id = $1`;
+        }
+        const maxRes = await pool.query(maxTimeQuery, [damId]);
+        const maxTime = maxRes.rows[0]?.max_t;
+        if (maxTime) {
+          const maxDate = new Date(maxTime);
+          const reqFrom = new Date(fromParam);
+          const reqTo = new Date(toParam);
+          const diffMs = Math.max(reqTo.getTime() - reqFrom.getTime(), 6 * 3600 * 1000);
+          const fallbackFrom = new Date(maxDate.getTime() - diffMs).toISOString();
+          const fallbackTo = maxDate.toISOString();
+          const fallbackRes = await pool.query(query, [damId, fallbackFrom, fallbackTo]);
+          liveData = fallbackRes.rows;
+        }
+      } catch (err) {
+        console.warn('Fallback chart window query failed:', err);
+      }
+    }
 
     // Fetch predicted segment (if metric has one and query spans current time)
     const predictedData = [];

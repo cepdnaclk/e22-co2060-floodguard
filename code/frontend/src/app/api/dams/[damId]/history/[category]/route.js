@@ -67,7 +67,15 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: `Unknown history category: ${category}` }, { status: 400 });
     }
 
-    const { rows } = await pool.query(query, queryParams);
+    let { rows } = await pool.query(query, queryParams);
+
+    // If no records in range, fallback to latest 100 records for immediate review
+    if (rows.length === 0) {
+      const fallbackQuery = query.replace('BETWEEN $2 AND $3', 'IS NOT NULL') + ' LIMIT 100';
+      const fallbackRes = await pool.query(fallbackQuery, [damId]);
+      rows = fallbackRes.rows;
+    }
+
     return NextResponse.json(rows);
 
   } catch (error) {

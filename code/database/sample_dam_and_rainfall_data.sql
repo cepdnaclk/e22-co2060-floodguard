@@ -21,6 +21,7 @@ INSERT INTO dams (
     location,
     latitude,                 -- [SOURCED] 07°14'29"N
     longitude,                -- [SOURCED] 80°47'05"E
+    elevation_m,              -- [SOURCED] dam crest elevation, meters above sea level
     reservoir_capacity,       -- [SOURCED] gross storage capacity, 722,000,000 m^3
     downstream_capacity,      -- [ESTIMATE] safe downstream channel capacity — not publicly documented;
                               --            replace with real hydrological/engineering data when available
@@ -33,6 +34,7 @@ INSERT INTO dams (
     'Teldeniya, Kandy District, Central Province, Sri Lanka',
     7.2414,
     80.7847,
+    438,                      -- [SOURCED] dam crest elevation, meters above sea level
     722000000,
     600,
     8200,

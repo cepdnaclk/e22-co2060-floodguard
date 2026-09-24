@@ -61,6 +61,26 @@ export async function GET(request, { params }) {
       LIMIT 1
     `;
 
+    // Fetch latest calculated metrics (rate of rise, acceleration, etc.)
+    const metricsQuery = `
+      SELECT rr_short, rr_long, acc, rolling_avg, deviation_score, rr_band, calc_time
+      FROM calculated_metrics
+      WHERE dam_id = $1
+      ORDER BY calc_time DESC
+      LIMIT 1
+    `;
+
+    // Fetch latest weighted catchment rainfall (r_net)
+    const rNetQuery = `
+      SELECT SUM(l.weight * r.rainfall_mm_hr) AS r_net, MAX(r.reading_time) AS reading_time
+      FROM rainfall_readings r
+      JOIN rainfall_locations l ON r.location_id = l.location_id
+      WHERE l.nearest_dam_id = $1
+      GROUP BY r.reading_time
+      ORDER BY r.reading_time DESC
+      LIMIT 1
+    `;
+
     // Execute queries in parallel
     const [
       statusRes,
@@ -68,14 +88,18 @@ export async function GET(request, { params }) {
       inflowRes,
       downstreamRes,
       thresholdRes,
-      releaseRes
+      releaseRes,
+      metricsRes,
+      rNetRes
     ] = await Promise.all([
       pool.query(statusQuery, [damId]),
       pool.query(waterLevelQuery, [damId]),
       pool.query(inflowQuery, [damId]),
       pool.query(downstreamQuery, [damId]),
       pool.query(thresholdQuery, [damId]),
-      pool.query(releaseQuery, [damId])
+      pool.query(releaseQuery, [damId]),
+      pool.query(metricsQuery, [damId]),
+      pool.query(rNetQuery, [damId])
     ]);
 
     const statusRow = statusRes.rows[0] || null;
@@ -84,20 +108,24 @@ export async function GET(request, { params }) {
     const downstreamRow = downstreamRes.rows[0] || null;
     const thresholdRow = thresholdRes.rows[0] || null;
     const releaseRow = releaseRes.rows[0] || null;
+    const metricsRow = metricsRes.rows[0] || null;
+    const rNetRow = rNetRes.rows[0] || null;
 
     if (releaseRow) {
       const at = thresholdRow ? thresholdRow.adaptive_threshold : 75.0;
       releaseRow.target_safe_level = Math.max(at - 10.0, 30.0);
     }
 
-    // Return whatever status records are found (null if empty)
+    // Return status records
     return NextResponse.json({
       risk_status: statusRow,
       water_level: waterLevelRow,
       inflow: inflowRow,
       downstream_level: downstreamRow,
       threshold: thresholdRow,
-      release: releaseRow
+      release: releaseRow,
+      metrics: metricsRow,
+      r_net: rNetRow
     });
 
   } catch (error) {

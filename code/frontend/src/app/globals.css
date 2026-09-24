@@ -1,145 +1,114 @@
+/* ==========================================================================
+   FloodGuard Engineering SCADA Design System
+   High-precision, high-contrast Linear aesthetic for dam & reservoir management
+   ========================================================================== */
+
 :root {
-  /* ========================================================
-     1. SCADA Industrial Palette - Base Backgrounds & Borders
-     ======================================================== */
-  --bg-primary: #0B0F12;
-  --bg-secondary: #141B20;
-  --bg-tertiary: #192227;
-  --border-color: #2A363C;
-  --border-light: rgba(143, 163, 173, 0.1);
-  
-  /* ========================================================
-     2. Typography Colors
-     ======================================================== */
-  --text-primary: #E8F1F2;
-  --text-secondary: #B6C7CD;
-  --text-muted: #8FA3AD;
-  
-  /* ========================================================
-     3. Semantic Data Colors (Sensors & Charts)
-     ======================================================== */
-  --data-cyan: #3BD6E8;
-  --water-blue: #2F8CFF;
-  --rain-indigo: #7A8CFF;
-  --inflow-teal: #24D2A4;
-  --downstream-amber: #55B7C8;
-  
-  /* ========================================================
-     4. Alert & Risk Status Colors
-     ======================================================== */
-  --status-green: #36D399;
-  --status-yellow: #FFD166;
-  --status-orange: #FF9F1C;
-  --status-red: #FF3B3B;
-  --status-disabled: #46545A;
-  
-  /* ========================================================
-     5. Font Families
-     ======================================================== */
-  --font-mono: var(--font-mono), monospace;
-  --font-inter: var(--font-inter), sans-serif;
+  /* Backgrounds - Deep Slate Palette */
+  --bg-page: #0a0e17;
+  --bg-card: #0f1523;
+  --bg-card-subtle: #131b2e;
+  --bg-sidebar: #070a12;
+  --bg-header: #0b101c;
+  --bg-input: #111726;
+  --bg-hover: #172033;
+
+  /* Borders - Precision 1px grid */
+  --border: #1e293b;
+  --border-subtle: #162032;
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-strong: #334155;
+
+  /* Text - High Legibility */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #070a12;
+
+  /* Technical Accent - Subdued Engineering Slate-Blue */
+  --accent: #38bdf8;
+  --accent-hover: #0284c7;
+  --accent-light: rgba(56, 189, 248, 0.08);
+  --accent-border: rgba(56, 189, 248, 0.25);
+
+  /* SCADA Operational Status Indicators */
+  --status-green: #10b981;
+  --status-green-bg: rgba(16, 185, 129, 0.08);
+  --status-green-border: rgba(16, 185, 129, 0.25);
+
+  --status-yellow: #f59e0b;
+  --status-yellow-bg: rgba(245, 158, 11, 0.08);
+  --status-yellow-border: rgba(245, 158, 11, 0.25);
+
+  --status-orange: #f97316;
+  --status-orange-bg: rgba(249, 115, 22, 0.08);
+  --status-orange-border: rgba(249, 115, 22, 0.25);
+
+  --status-red: #ef4444;
+  --status-red-bg: rgba(239, 68, 68, 0.1);
+  --status-red-border: rgba(239, 68, 68, 0.3);
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Consolas', 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Sizing */
+  --sidebar-width: 250px;
+  --header-height: 52px;
+
+  /* Radius */
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-lg: 8px;
 }
 
-* {
+/* Reset */
+*, *::before, *::after {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 body {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-page);
   color: var(--text-primary);
-  font-family: var(--font-inter);
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  background-image: 
-    linear-gradient(var(--border-light) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
-  background-size: 80px 80px; /* Subtle grid */
-  background-attachment: fixed;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: inherit;
+  color: var(--accent);
   text-decoration: none;
 }
 
-.container {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 0 1rem;
+a:hover {
+  text-decoration: underline;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
-  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: var(--text-primary);
 }
 
-.font-mono {
-  font-family: var(--font-mono);
-}
-
-.text-cyan { color: var(--data-cyan); }
-.text-green { color: var(--status-green); }
-.text-yellow { color: var(--status-yellow); }
-.text-orange { color: var(--status-orange); }
-.text-red { color: var(--status-red); }
-.text-muted { color: var(--text-muted); }
-.text-primary { color: var(--text-primary); }
-
-.bg-panel {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-}
-
-.card {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  padding: 1rem;
-}
-
-/* Minimal glow/pulse for critical states only */
-.status-pulse-red {
-  animation: pulse-red 2s infinite;
-}
-
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.2); }
-  70% { box-shadow: 0 0 0 6px rgba(255, 59, 59, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 59, 59, 0); }
-}
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.1rem; }
 
 button {
   cursor: pointer;
   border: none;
   background: none;
   font-family: inherit;
+  font-size: inherit;
 }
 
-.btn-primary {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  transition: all 150ms ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--border-color);
-  color: #fff;
-}
-
-.btn-emergency {
-  background-color: rgba(255, 59, 59, 0.1);
-  color: var(--status-red);
-  border: 1px solid var(--status-red);
-  font-weight: 600;
-}
-
-.btn-emergency:hover {
-  background-color: var(--status-red);
-  color: #000;
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
 }
 
 /* Scrollbar */
@@ -147,12 +116,16 @@ button {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: var(--bg-page);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: var(--border);
+  border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }

@@ -1,1099 +1,791 @@
 'use client';
 
-// React Core
-import { useEffect, useState, useCallback } from 'react';
-
-// Recharts (Data Visualization)
-import { 
-  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, ReferenceLine, Legend 
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import Link from 'next/link';
+import { useApp } from '@/context/AppContext';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import { formatDateTime } from '@/lib/dateUtils';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ReferenceLine,
 } from 'recharts';
+import {
+  Waves,
+  Activity,
+  CloudRain,
+  Clock,
+  Shield,
+  RefreshCw,
+  ArrowUpRight,
+  Droplets,
+  Gauge,
+  Sliders,
+  AlertTriangle,
+  CheckCircle,
+  MapPin,
+  TrendingUp,
+  Compass,
+  Radio,
+  Layers,
+  ChevronRight,
+} from 'lucide-react';
+import styles from './overview.module.css';
 
-// Lucide React (Icons)
-import { Waves, AlertTriangle, Shield, CheckCircle, Clock, User, LogOut, Loader2, Calendar } from 'lucide-react';
+export default function OverviewPage() {
+  const { dams, selectedDamId, setSelectedDamId, selectedDam } = useApp();
 
-// Styles
-import styles from './page.module.css';
-
-export default function Dashboard() {
-  // --------------------------------------------------------
-  // 1. Core Data States
-  // --------------------------------------------------------
-  const [isMounted, setIsMounted] = useState(false);
-  const [dams, setDams] = useState([]);
-  const [selectedDamId, setSelectedDamId] = useState('');
-  const [damInfo, setDamInfo] = useState(null);
-  const [damStatus, setDamStatus] = useState(null);
-  const [crossingResult, setCrossingResult] = useState(null);
+  const [statusData, setStatusData] = useState(null);
+  const [alerts, setAlerts] = useState([]);
   const [stations, setStations] = useState([]);
-  const [stationRainfall, setStationRainfall] = useState({});
-  const [maxRainfallStation, setMaxRainfallStation] = useState(null);
-
-  // --------------------------------------------------------
-  // 2. Chart Data States
-  // --------------------------------------------------------
-  const [charts, setCharts] = useState({
-    waterLevel: { live: [], predicted: [] },
-    threshold: { live: [], predicted: [] },
-    netRainfall: { live: [], predicted: [] },
-    inflow: { live: [], predicted: [] },
-    release: { live: [], predicted: [] },
-    riseRate: { live: [], predicted: [] }
+  const [chartData, setChartData] = useState({
+    waterLevel: [],
+    threshold: [],
+    inflow: [],
+    release: [],
   });
-
-  // Navigation & Control States
-  const [activeTab, setActiveTab] = useState('HOME');
-  const [timeframe, setTimeframe] = useState('6H');
-  const [staleConnection, setStaleConnection] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Authentication & Alert Management States
-  const [user, setUser] = useState(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginFields, setLoginFields] = useState({ name: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const [unackAlerts, setUnackAlerts] = useState([]);
-
-  // History Tab States
-  const [historyCategory, setHistoryCategory] = useState('water-level');
-  const [historyRange, setHistoryRange] = useState(() => ({
-    from: new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 16), // last 24h
-    to: new Date().toISOString().slice(0, 16)
-  }));
-  const [historyData, setHistoryData] = useState([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [dateError, setDateError] = useState('');
-  const [referenceTime, setReferenceTime] = useState(null);
-
-  // Helper to compute from timestamp
-  const getFromTime = useCallback((tf) => {
-    const now = new Date();
-    if (tf === '1H') return new Date(now.getTime() - 60 * 60 * 1000).toISOString();
-    if (tf === '6H') return new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
-    if (tf === '1D') return new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-    if (tf === '1W') return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    if (tf === '1M') return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
-    return new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString();
-  }, []);
-
-  // Check auth session
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.authenticated) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-    } catch (err) {
-      setUser(null);
-    }
-  };
-
-  // Fetch alerts
-  const fetchAlerts = useCallback(async (damId) => {
+  const fetchData = useCallback(async (damId) => {
     if (!damId) return;
     try {
-      const res = await fetch(`/api/dams/${damId}/alerts?acknowledged=false`);
-      if (res.ok) {
-        const data = await res.json();
-        setUnackAlerts(data);
+      const fromTime = new Date(Date.now() - 6 * 3600 * 1000).toISOString();
+
+      const [statusRes, alertsRes, stationsRes, wlRes, thRes, ifRes, relRes] =
+        await Promise.all([
+          fetch(`/api/dams/${damId}/status`),
+          fetch(`/api/dams/${damId}/alerts`),
+          fetch(`/api/dams/${damId}/rainfall-stations`),
+          fetch(`/api/dams/${damId}/chart/water-level?from=${encodeURIComponent(fromTime)}`),
+          fetch(`/api/dams/${damId}/chart/threshold?from=${encodeURIComponent(fromTime)}`),
+          fetch(`/api/dams/${damId}/chart/inflow?from=${encodeURIComponent(fromTime)}`),
+          fetch(`/api/dams/${damId}/chart/release?from=${encodeURIComponent(fromTime)}`),
+        ]);
+
+      if (statusRes.ok) setStatusData(await statusRes.json());
+      if (alertsRes.ok) {
+        const alertsArr = await alertsRes.json();
+        setAlerts(Array.isArray(alertsArr) ? alertsArr.slice(0, 6) : []);
       }
-    } catch (err) {
-      console.error('Failed to fetch alerts:', err);
-    }
-  }, []);
-
-  // Fetch static and dynamic data
-  const fetchData = useCallback(async () => {
-    if (!selectedDamId) return;
-    
-    try {
-      const fromTime = getFromTime(timeframe);
-      const toTime = new Date().toISOString();
-      
-      // Determine resolution hint based on timeframe
-      let resolution = 'raw';
-      if (timeframe === '1D') resolution = '15m';
-      if (timeframe === '1W' || timeframe === '1M') resolution = '1h';
-
-      // 1. Fetch Dam Static Details
-      const infoRes = await fetch(`/api/dams/${selectedDamId}`);
-      if (!infoRes.ok) throw new Error('Dam info failed');
-      const infoData = await infoRes.json();
-      setDamInfo(infoData);
-
-      // 2. Fetch Dam Latest Status
-      const statusRes = await fetch(`/api/dams/${selectedDamId}/status`);
-      if (!statusRes.ok) throw new Error('Dam status failed');
-      const statusData = await statusRes.json();
-      setDamStatus(statusData);
-
-      // 3. Fetch Crossing forecast results
-      const crossingRes = await fetch(`/api/dams/${selectedDamId}/crossing`);
-      if (crossingRes.ok) {
-        const crossingData = await crossingRes.json();
-        setCrossingResult(crossingData);
-      } else {
-        setCrossingResult(null);
-      }
-
-      // 4. Fetch Rainfall Stations List
-      const stationsRes = await fetch(`/api/dams/${selectedDamId}/rainfall-stations`);
       if (stationsRes.ok) {
-        const stationsData = await stationsRes.json();
-        setStations(stationsData);
-        
-        // Fetch latest rainfall reading for each station to find the maximum reporting station
-        let maxStation = null;
-        let maxVal = -1;
-        const stationRainMap = {};
-
-        await Promise.all(stationsData.map(async (st) => {
-          const rfRes = await fetch(`/api/dams/${selectedDamId}/rainfall-stations/${st.location_id}/rainfall?from=${new Date(Date.now() - 30 * 60 * 1000).toISOString()}`); // check last 30m
-          if (rfRes.ok) {
-            const rfData = await rfRes.json();
-            const latest = rfData.live && rfData.live.length > 0 ? rfData.live[rfData.live.length - 1].value : 0.0;
-            stationRainMap[st.location_id] = latest;
-            if (latest > maxVal) {
-              maxVal = latest;
-              maxStation = { name: st.location_name, value: latest };
-            }
-          }
-        }));
-        
-        setStationRainfall(stationRainMap);
-        setMaxRainfallStation(maxStation);
+        const stationsArr = await stationsRes.json();
+        setStations(Array.isArray(stationsArr) ? stationsArr : []);
       }
 
-      // 5. Fetch Chart Metrics
-      const metrics = ['water-level', 'threshold', 'net-rainfall', 'inflow', 'release', 'rise-rate'];
-      const chartResults = {};
+      const wl = wlRes.ok ? await wlRes.json() : { live: [] };
+      const th = thRes.ok ? await thRes.json() : { live: [] };
+      const inf = ifRes.ok ? await ifRes.json() : { live: [] };
+      const rel = relRes.ok ? await relRes.json() : { live: [] };
 
-      await Promise.all(metrics.map(async (m) => {
-        const chartRes = await fetch(`/api/dams/${selectedDamId}/chart/${m}?from=${fromTime}&to=${toTime}&resolution=${resolution}`);
-        if (chartRes.ok) {
-          chartResults[m] = await chartRes.json();
-        } else {
-          chartResults[m] = { live: [], predicted: [] };
-        }
-      }));
-
-      setCharts({
-        waterLevel: chartResults['water-level'] || { live: [], predicted: [] },
-        threshold: chartResults['threshold'] || { live: [], predicted: [] },
-        netRainfall: chartResults['net-rainfall'] || { live: [], predicted: [] },
-        inflow: chartResults['inflow'] || { live: [], predicted: [] },
-        release: chartResults['release'] || { live: [], predicted: [] },
-        riseRate: chartResults['rise-rate'] || { live: [], predicted: [] }
+      setChartData({
+        waterLevel: wl.live || [],
+        threshold: th.live || [],
+        inflow: inf.live || [],
+        release: rel.live || [],
       });
-
-      // Clear stale connection flag on success
-      setStaleConnection(false);
-      setLoading(false);
-
     } catch (err) {
-      console.error('API Fetch Error:', err);
-      setStaleConnection(true);
+      console.error('Failed to fetch SCADA overview data:', err);
+    } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }, [selectedDamId, timeframe, getFromTime]);
-
-  // Load list of dams on mount
-  useEffect(() => {
-    // Defer mount updates to satisfy React purity rules and avoid cascading renders
-    const timer = setTimeout(() => {
-      setIsMounted(true);
-      setReferenceTime(Date.now());
-      checkAuth();
-    }, 0);
-
-    const fetchDamsList = async () => {
-      try {
-        const res = await fetch('/api/dams');
-        if (res.ok) {
-          const data = await res.json();
-          setDams(data);
-          if (data.length > 0) {
-            setSelectedDamId(data[0].dam_id.toString());
-          }
-        } else {
-          setStaleConnection(true);
-        }
-      } catch (err) {
-        setStaleConnection(true);
-      }
-    };
-    
-    fetchDamsList();
-    return () => clearTimeout(timer);
   }, []);
 
-  // Poll for updates
   useEffect(() => {
-    if (!selectedDamId) return;
-    
-    // Defer initial telemetry fetch to satisfy compiler rules and prevent cascading renders
-    const timer = setTimeout(() => {
-      fetchData();
-      fetchAlerts(selectedDamId);
-    }, 0);
-    
-    const interval = setInterval(() => {
-      fetchData();
-      fetchAlerts(selectedDamId);
-      setReferenceTime(Date.now());
-    }, 15000); // 15-second update loop
-    
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [selectedDamId, timeframe, fetchData, fetchAlerts]);
+    if (selectedDamId) {
+      setLoading(true);
+      fetchData(selectedDamId);
+      const interval = setInterval(() => fetchData(selectedDamId), 15000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedDamId, fetchData]);
 
-  // Perform history search
-  const handleQueryHistory = async () => {
-    if (!selectedDamId) return;
-    setDateError('');
-    
-    const fromTime = new Date(historyRange.from).getTime();
-    const toTime = new Date(historyRange.to).getTime();
-    
-    if (fromTime > toTime) {
-      setDateError('Error: "From" date cannot be after "To" date.');
-      return;
-    }
-    
-    setHistoryLoading(true);
-    try {
-      const fromISO = new Date(historyRange.from).toISOString();
-      const toISO = new Date(historyRange.to).toISOString();
-      const res = await fetch(`/api/dams/${selectedDamId}/history/${historyCategory}?from=${fromISO}&to=${toISO}`);
-      if (res.ok) {
-        const data = await res.json();
-        setHistoryData(data);
-      } else {
-        setHistoryData([]);
-      }
-    } catch (err) {
-      console.error('History API error:', err);
-      setHistoryData([]);
-    } finally {
-      setHistoryLoading(false);
-    }
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchData(selectedDamId);
   };
 
-  // Perform login
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setLoginError('');
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginFields)
+  // Operational status determination
+  const riskStatus = statusData?.risk_status?.status || 'GREEN';
+  const riskVariant =
+    riskStatus === 'RED' || riskStatus === 'CRITICAL'
+      ? 'critical'
+      : riskStatus === 'ORANGE' || riskStatus === 'WARNING'
+      ? 'warning'
+      : riskStatus === 'YELLOW' || riskStatus === 'WATCH'
+      ? 'watch'
+      : 'normal';
+
+  // Numerical parameters
+  const waterLevelNum =
+    statusData?.water_level?.water_level_pct != null
+      ? Number(statusData.water_level.water_level_pct)
+      : null;
+
+  const adaptiveThresholdNum =
+    statusData?.threshold?.adaptive_threshold != null
+      ? Number(statusData.threshold.adaptive_threshold)
+      : 75.0;
+
+  const inflowRateNum =
+    statusData?.inflow?.inflow_rate_m3s != null
+      ? Number(statusData.inflow.inflow_rate_m3s)
+      : null;
+
+  const downstreamLevelNum =
+    statusData?.downstream_level?.downstream_level_pct != null
+      ? Number(statusData.downstream_level.downstream_level_pct)
+      : null;
+
+  const qReleaseNum =
+    statusData?.release?.q_release != null
+      ? Number(statusData.release.q_release)
+      : null;
+
+  const gateOpeningPct =
+    statusData?.release?.gate_opening_applied_pct != null
+      ? Number(statusData.release.gate_opening_applied_pct).toFixed(1)
+      : '0.0';
+
+  const rrShortNum =
+    statusData?.metrics?.rr_short != null
+      ? Number(statusData.metrics.rr_short)
+      : null;
+
+  const rNetNum =
+    statusData?.r_net?.r_net != null
+      ? Number(statusData.r_net.r_net).toFixed(1)
+      : '0.0';
+
+  // Derived engineering dimensions
+  const crestElev = selectedDam?.elevation_m || 438.0;
+  const currentStageM =
+    waterLevelNum != null ? (crestElev * (waterLevelNum / 100)).toFixed(2) : '—';
+  const freeboardM =
+    waterLevelNum != null
+      ? Math.max(0, (crestElev * (1 - waterLevelNum / 100))).toFixed(2)
+      : '—';
+
+  const latestTelemetryTime =
+    statusData?.water_level?.reading_time ||
+    statusData?.risk_status?.status_time ||
+    statusData?.threshold?.calc_time;
+
+  // Build Unified Hydrograph Data (Water Level vs Threshold)
+  const hydrographSeries = useMemo(() => {
+    const map = new Map();
+
+    (chartData.waterLevel || []).forEach((d) => {
+      const timeStr = new Date(d.time).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
       });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-        setShowLoginModal(false);
-        setLoginFields({ name: '', password: '' });
-        if (selectedDamId) fetchAlerts(selectedDamId);
-      } else {
-        const data = await res.json();
-        setLoginError(data.error || 'Login failed');
-      }
-    } catch (err) {
-      setLoginError('Server unreachable');
-    }
-  };
-
-  // Perform logout
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      setUnackAlerts([]);
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  };
-
-  // Acknowledge alert
-  const handleAcknowledgeAlert = async (alertId) => {
-    try {
-      const res = await fetch(`/api/alerts/${alertId}/acknowledge`, { method: 'POST' });
-      if (res.ok) {
-        if (selectedDamId) {
-          fetchAlerts(selectedDamId);
-          fetchData();
-        }
-      } else {
-        const data = await res.json();
-        alert(data.error || 'Acknowledge failed');
-      }
-    } catch (err) {
-      alert('Network error acknowledging alert');
-    }
-  };
-
-  // Merge water-level and threshold data for main chart plotting
-  const mergeMainChartData = () => {
-    const map = {};
-    
-    charts.waterLevel.live?.forEach(p => {
-      const t = new Date(p.time).getTime();
-      if (!map[t]) map[t] = { time: t };
-      map[t].live_level = p.value;
+      map.set(d.time, { time: timeStr, iso: d.time, waterLevel: Number(d.value).toFixed(2) });
     });
-    
-    charts.waterLevel.predicted?.forEach(p => {
-      const t = new Date(p.time).getTime();
-      if (!map[t]) map[t] = { time: t };
-      map[t].pred_level = p.value;
-    });
-    
-    charts.threshold.live?.forEach(p => {
-      const t = new Date(p.time).getTime();
-      if (!map[t]) map[t] = { time: t };
-      map[t].live_threshold = p.value;
-    });
-    
-    charts.threshold.predicted?.forEach(p => {
-      const t = new Date(p.time).getTime();
-      if (!map[t]) map[t] = { time: t };
-      map[t].pred_threshold = p.value;
-    });
-    
-    return Object.values(map).sort((a, b) => a.time - b.time);
-  };
 
-  // Merge supporting single series (live + predicted)
-  const mergeSeriesData = (series) => {
-    const map = {};
-    
-    series.live?.forEach(p => {
-      const t = new Date(p.time).getTime();
-      if (!map[t]) map[t] = { time: t };
-      map[t].live_val = p.value;
+    (chartData.threshold || []).forEach((d) => {
+      const existing = map.get(d.time) || {
+        time: new Date(d.time).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        iso: d.time,
+      };
+      existing.threshold = Number(d.value).toFixed(2);
+      map.set(d.time, existing);
     });
-    
-    series.predicted?.forEach(p => {
-      const t = new Date(p.time).getTime();
-      if (!map[t]) map[t] = { time: t };
-      map[t].pred_val = p.value;
+
+    return Array.from(map.values()).sort((a, b) => new Date(a.iso) - new Date(b.iso));
+  }, [chartData.waterLevel, chartData.threshold]);
+
+  // Build Hydraulic Mass Balance Series (Inflow vs Outflow)
+  const hydraulicBalanceSeries = useMemo(() => {
+    const map = new Map();
+
+    (chartData.inflow || []).forEach((d) => {
+      const timeStr = new Date(d.time).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      map.set(d.time, { time: timeStr, iso: d.time, inflow: Number(d.value).toFixed(1) });
     });
-    
-    return Object.values(map).sort((a, b) => a.time - b.time);
-  };
 
-  // Format timestamp for XAxis
-  const formatXAxisTime = (timeMs) => {
-    return new Date(timeMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+    (chartData.release || []).forEach((d) => {
+      const existing = map.get(d.time) || {
+        time: new Date(d.time).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+        iso: d.time,
+      };
+      existing.release = Number(d.value).toFixed(1);
+      map.set(d.time, existing);
+    });
 
-  // Status badge logic
-  const getStatusColor = (status) => {
-    if (status === 'RED') return 'var(--status-red)';
-    if (status === 'ORANGE') return 'var(--status-orange)';
-    if (status === 'YELLOW') return 'var(--status-yellow)';
-    return 'var(--status-green)';
-  };
-
-  if (loading) {
-    return (
-      <div className={styles.loadingScreen}>
-        <Loader2 className={styles.spinner} size={40} />
-        <div>LOAD SCADA DASHBOARD TELEMETRY...</div>
-      </div>
-    );
-  }
-
-  const activeStatus = damStatus?.risk_status?.status || 'GREEN';
-  const mainChartData = mergeMainChartData();
+    return Array.from(map.values()).sort((a, b) => new Date(a.iso) - new Date(b.iso));
+  }, [chartData.inflow, chartData.release]);
 
   return (
-    <div className={styles.dashboard}>
-      {/* CONNECTION ERROR FLOATING BANNER */}
-      {staleConnection && (
-        <div className={styles.connectionBanner}>
-          <AlertTriangle size={16} />
-          <span>DATABASE SERVICE LINK LOSS — RECONNECTING... BANNERING LAST FREQUENCY PACKET</span>
+    <div className={styles.container}>
+      {/* 1. Formal SCADA System Header & Latency Strip */}
+      <div className={styles.agencyStrip}>
+        <div className={styles.agencyTitle}>
+          <Shield size={14} style={{ color: 'var(--accent)' }} />
+          <span>Department of Irrigation • National Hydro-Meteorological SCADA Network</span>
         </div>
-      )}
 
-      {/* TOP COMMAND BAR */}
-      <header className={styles.commandBar}>
-        <div className={styles.commandLeft}>
-          <div className={styles.logoText}>
-            <Waves size={20} />
-            <span>FloodGuard</span>
+        <div className={styles.agencyMeta}>
+          <div className={`${styles.statusPill} ${styles[riskVariant]}`}>
+            <span className={styles.liveDot} />
+            <span>OP-STATE: {riskStatus}</span>
           </div>
-          <label htmlFor="dam-selector" className="sr-only" style={{ display: 'none' }}>Select Reservoir Dam</label>
-          <select 
-            id="dam-selector"
-            aria-label="Select Reservoir Dam"
-            className={styles.damSelector} 
-            value={selectedDamId} 
-            onChange={(e) => {
-              setSelectedDamId(e.target.value);
-              setLoading(true);
-            }}
-          >
-            {dams.map(dam => (
-              <option key={dam.dam_id} value={dam.dam_id}>{dam.dam_name}</option>
-            ))}
-          </select>
+
+          <div className={styles.telemetryClock}>
+            <span>SCADA Sync: {formatDateTime(latestTelemetryTime)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Top Header & Quick Actions */}
+      <div className={styles.topBar}>
+        <div className={styles.headingGroup}>
+          <h1 className={styles.pageTitle}>Reservoir Operations & Early-Warning Console</h1>
+          <p className={styles.pageSubtitle}>
+            Supervisory Control and Data Acquisition (SCADA) • Automated Hydrological Mass Balance
+          </p>
         </div>
 
-        {damInfo && (
-          <div className={styles.commandCenter}>
-            <div className={styles.bannerItem}>
-              <span className={styles.bannerLabel}>COORDINATES</span>
-              <span className={styles.bannerValue}>{Number(damInfo.latitude).toFixed(4)}°N, {Number(damInfo.longitude).toFixed(4)}°E</span>
-            </div>
-            <div className={styles.bannerItem}>
-              <span className={styles.bannerLabel}>ELEVATION</span>
-              <span className={styles.bannerValue}>{damInfo.elevation_m ? `${damInfo.elevation_m}m ASL` : 'N/A'}</span>
-            </div>
-            <div className={styles.bannerItem}>
-              <span className={styles.bannerLabel}>CAPACITY</span>
-              <span className={styles.bannerValue}>
-                {damStatus?.water_level?.water_level_pct ? `${Number(damStatus.water_level.water_level_pct).toFixed(1)}% / 100%` : 'N/A'}
+        <div className={styles.topActions}>
+          <button onClick={handleRefresh} className={styles.refreshBtn} title="Force Database Sync">
+            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            <span>Sync DB</span>
+          </button>
+
+          <Link href="/monitoring" className={styles.primaryAction}>
+            <span>Full Multi-Curve Telemetry</span>
+            <ArrowUpRight size={13} />
+          </Link>
+        </div>
+      </div>
+
+      {/* 3. Active Hydro-Structure Engineering Banner */}
+      <div className={styles.damBanner}>
+        <div className={styles.damHeaderMain}>
+          <div>
+            <div className={styles.damTitleRow}>
+              <span className={styles.damName}>{selectedDam?.dam_name || 'Victoria Dam'}</span>
+              <span className={styles.damCode}>
+                ID: {selectedDam?.dam_id ? `DAM-0${selectedDam.dam_id}` : 'DAM-01'}
               </span>
+              <Badge variant={riskVariant}>{riskStatus}</Badge>
+            </div>
+            <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              <MapPin size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: '-1px' }} />
+              <span>{selectedDam?.location || 'Mahaweli River Basin, Central Province'}</span>
             </div>
           </div>
-        )}
 
-        <div className={styles.commandRight}>
-          <div className={styles.dataFreshness}>
-            <div 
-              className={styles.pulseDot} 
-              style={{ color: staleConnection ? 'var(--status-orange)' : 'var(--status-green)' }}
-            ></div>
-            <span style={{ color: staleConnection ? 'var(--status-orange)' : 'var(--status-green)' }}>
-              {staleConnection ? 'STALE' : 'ONLINE'}
+          {statusData?.risk_status?.trigger_reason && (
+            <div className={styles.damReason}>
+              <strong>Trigger Evaluation:</strong> {statusData.risk_status.trigger_reason}
+            </div>
+          )}
+        </div>
+
+        {/* Structural Specifications Strip */}
+        <div className={styles.damSpecsStrip}>
+          <div className={styles.specItem}>
+            <span className={styles.specLabel}>Crest Elevation</span>
+            <span className={styles.specVal}>{crestElev.toFixed(1)} m AMSL</span>
+          </div>
+
+          <div className={styles.specItem}>
+            <span className={styles.specLabel}>Current Reservoir Stage</span>
+            <span className={styles.specVal}>{currentStageM} m AMSL</span>
+          </div>
+
+          <div className={styles.specItem}>
+            <span className={styles.specLabel}>Remaining Freeboard</span>
+            <span className={styles.specVal}>{freeboardM} m to Crest</span>
+          </div>
+
+          <div className={styles.specItem}>
+            <span className={styles.specLabel}>Gross Reservoir Storage</span>
+            <span className={styles.specVal}>
+              {selectedDam?.reservoir_capacity ? `${(selectedDam.reservoir_capacity / 1e6).toFixed(0)} MCM` : '722 MCM'}
             </span>
           </div>
 
-          {user ? (
-            <div className={styles.userPanel}>
-              <User size={14} />
-              <span className="font-mono">{user.name} ({user.role})</span>
-              <button type="button" className={styles.logoutBtn} onClick={handleLogout}>
-                <LogOut size={12} />
-              </button>
-            </div>
-          ) : (
-            <button type="button" className={styles.loginBtn} onClick={() => setShowLoginModal(true)}>
-              ENGINEER LOGIN
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* TABS CONTAINER */}
-      <div className={styles.tabsContainer}>
-        <div className={styles.tabList}>
-          <button 
-            type="button"
-            className={`${styles.tabButton} ${activeTab === 'HOME' ? styles.tabButtonActive : ''}`}
-            onClick={() => setActiveTab('HOME')}
-          >
-            Home
-          </button>
-          <button 
-            type="button"
-            className={`${styles.tabButton} ${activeTab === 'RAINFALL' ? styles.tabButtonActive : ''}`}
-            onClick={() => setActiveTab('RAINFALL')}
-          >
-            Rainfall Details
-          </button>
-          <button 
-            type="button"
-            className={`${styles.tabButton} ${activeTab === 'HISTORY' ? styles.tabButtonActive : ''}`}
-            onClick={() => setActiveTab('HISTORY')}
-          >
-            History
-          </button>
-          {user && (
-            <button 
-              type="button"
-              className={`${styles.tabButton} ${activeTab === 'DASHBOARD' ? styles.tabButtonActive : ''}`}
-              onClick={() => setActiveTab('DASHBOARD')}
-            >
-              Control Panel {unackAlerts.length > 0 && <span style={{ color: 'var(--status-red)', fontWeight: 'bold' }}>({unackAlerts.length})</span>}
-            </button>
-          )}
-        </div>
-
-        {activeTab === 'HOME' && (
-          <div className={styles.timeframeSelector}>
-            {['1H', '6H', '1D', '1W', '1M'].map(tf => (
-              <button
-                key={tf}
-                type="button"
-                className={`${styles.timeframeBtn} ${timeframe === tf ? styles.timeframeBtnActive : ''}`}
-                onClick={() => setTimeframe(tf)}
-              >
-                {tf}
-              </button>
-            ))}
+          <div className={styles.specItem}>
+            <span className={styles.specLabel}>Max Spillway Sluice</span>
+            <span className={styles.specVal}>
+              {selectedDam?.max_gate_capacity ? `${selectedDam.max_gate_capacity} m³/s` : '8,200 m³/s'}
+            </span>
           </div>
-        )}
+
+          <div className={styles.specItem}>
+            <span className={styles.specLabel}>Safe Downstream Limit</span>
+            <span className={styles.specVal}>
+              {selectedDam?.downstream_capacity ? `${selectedDam.downstream_capacity} m³/s` : '600 m³/s'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* MAIN CONTENT PORT */}
-      <main className={styles.contentArea}>
-        {/* ============================================================ */}
-        {/* TABS 1: HOME */}
-        {/* ============================================================ */}
-        {activeTab === 'HOME' && damStatus && (
-          <div className={styles.scadaGrid}>
-            {/* Quick Status Cards */}
-            <div className={`${styles.colSpan8} ${styles.statsRow}`}>
-              {/* Card 1: Max Rainfall */}
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>MAX STATION RAINFALL</span>
-                {maxRainfallStation ? (
-                  <div className={styles.statValue}>
-                    {maxRainfallStation.value.toFixed(1)} <span className="text-xs text-muted">mm/h</span>
-                    <div className="text-[10px] text-cyan truncate mt-1">{maxRainfallStation.name}</div>
-                  </div>
-                ) : (
-                  <div className={styles.statValue}>N/A</div>
-                )}
-              </div>
-
-              {/* Card 2: Current Reservoir State */}
-              <div className={styles.statItem} style={{ borderLeft: `3px solid ${getStatusColor(activeStatus)}` }}>
-                <span className={styles.statLabel}>RESERVOIR STATUS</span>
-                <div className={styles.statValue} style={{ color: getStatusColor(activeStatus) }}>
-                  {activeStatus}
-                  <span className="text-xs text-primary font-normal font-mono ml-2">
-                    ({damStatus.water_level?.water_level_pct?.toFixed(1) || '0.0'}% L)
-                  </span>
-                </div>
-              </div>
-
-              {/* Card 3: Future Warnings */}
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>FORECAST STATE (TTC)</span>
-                <div className={styles.statValue}>
-                  {crossingResult && crossingResult.crossing_time_minutes !== null ? (
-                    <span className="text-red">Crossing: {crossingResult.crossing_time_minutes} min</span>
-                  ) : (
-                    <span className="text-green">No Crossing</span>
-                  )}
-                  <div className="text-[10px] text-muted truncate mt-1">
-                    {crossingResult ? `Gap Trend: ${crossingResult.gap_trend}` : 'No trend data'}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Warning / Release Panel */}
-            <div className={`${styles.colSpan4} ${styles.card} ${styles['status' + activeStatus]}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle} title="Calculated gate opening and release rate recommended by the decision support system based on current reservoir level and adaptive thresholds">RELEASE STRATEGY</span>
-                <span className={`${styles.badge} ${styles['badge' + activeStatus]}`}>{activeStatus}</span>
-              </div>
-              {damStatus.release ? (
-                <div>
-                  <div className="font-mono text-sm mb-3">
-                    Piecewise: <span className="text-cyan">{damStatus.release.strategy}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 mb-3 bg-panel p-2 font-mono text-xs">
-                    <div>GATE APPLIED: <span className="text-red font-bold">{damStatus.release.gate_opening_applied_pct}%</span></div>
-                    <div>RELEASE FLOW: <span>{damStatus.release.q_release?.toFixed(0)} m³/s</span></div>
-                    <div>EST. DURATION: <span>{damStatus.release.estimated_duration_minutes ? `${damStatus.release.estimated_duration_minutes.toFixed(0)} min` : 'Continuous'}</span></div>
-                    <div>TARGET SAFE: <span>{damStatus.release.target_safe_level?.toFixed(1)}% L</span></div>
-                  </div>
-                  {damStatus.release.conflict_warning && (
-                    <div className="text-[10px] text-orange bg-[rgba(255,159,28,0.1)] p-2 border border-orange rounded">
-                      WARNING: Release target exceeds safe downstream channel capacity! Recommended rate is clamped.
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className={styles.emptyState} style={{ padding: '1rem' }}>
-                  No release recommendation required. Dam operating safely.
-                </div>
-              )}
-            </div>
-
-            {/* Main Graph (L vs AT) */}
-            <div className={`${styles.colSpan8} ${styles.card}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>Reservoir Level L(t) vs Adaptive Threshold AT(t)</span>
-                <span className="text-[10px] text-muted font-mono">Dashed lines represent predictions</span>
-              </div>
-              <div style={{ width: '100%', height: 350 }}>
-                {isMounted && mainChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={mainChartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
-                      <XAxis 
-                        dataKey="time" 
-                        type="number"
-                        domain={['auto', 'auto']}
-                        tickFormatter={formatXAxisTime} 
-                        stroke="var(--border-color)"
-                        tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
-                      />
-                      <YAxis stroke="var(--border-color)" tick={{ fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)' }} />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', fontFamily: 'var(--font-mono)' }}
-                        labelFormatter={(l) => new Date(l).toLocaleString()}
-                      />
-                      <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 11, fontFamily: 'var(--font-mono)' }} />
-                      
-                      {/* Live level */}
-                      <Line name="Level (Live)" type="monotone" dataKey="live_level" stroke="var(--water-blue)" strokeWidth={2.5} dot={false} connectNulls />
-                      
-                      {/* Predicted level */}
-                      <Line name="Level (Predicted)" type="monotone" dataKey="pred_level" stroke="var(--water-blue)" strokeDasharray="5 5" strokeWidth={2.5} dot={false} connectNulls />
-                      
-                      {/* Live threshold */}
-                      <Line name="Threshold (Live)" type="stepAfter" dataKey="live_threshold" stroke="var(--status-red)" strokeWidth={1.8} dot={false} connectNulls />
-                      
-                      {/* Predicted threshold */}
-                      <Line name="Threshold (Predicted)" type="stepAfter" dataKey="pred_threshold" stroke="var(--status-red)" strokeDasharray="3 3" strokeWidth={1.8} dot={false} connectNulls />
-                      
-                      {referenceTime && (
-                        <ReferenceLine x={referenceTime} stroke="var(--text-muted)" strokeDasharray="3 3" label={{ value: 'NOW', fill: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', position: 'insideTopLeft' }} />
-                      )}
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={styles.emptyState}>No chart readings found for selected timeframe.</div>
-                )}
-              </div>
-            </div>
-
-            {/* Sidebar Graphs */}
-            <div className={`${styles.colSpan4} ${styles.card}`} style={{ maxHeight: 440, overflowY: 'auto' }}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>Supporting Telemetry Sidebar</span>
-              </div>
-              
-              {/* Graph 1: Net Rainfall */}
-              <div className="mb-4">
-                <div className="text-[10px] font-mono text-muted mb-1 text-uppercase">NET RAINFALL R_net(t)</div>
-                <div style={{ height: 100, width: '100%' }}>
-                  {isMounted && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={mergeSeriesData(charts.netRainfall)} margin={{ top: 0, right: 0, left: -30, bottom: 0 }}>
-                        <XAxis dataKey="time" type="number" domain={['auto', 'auto']} hide />
-                        <YAxis hide />
-                        <Tooltip labelFormatter={(l) => new Date(l).toLocaleTimeString()} />
-                        <Area type="monotone" dataKey="live_val" stroke="var(--rain-indigo)" fill="rgba(122, 140, 255, 0.15)" strokeWidth={1.5} dot={false} connectNulls />
-                        <Area type="monotone" dataKey="pred_val" stroke="var(--rain-indigo)" fill="none" strokeDasharray="3 3" strokeWidth={1.5} dot={false} connectNulls />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-              </div>
-
-              {/* Graph 2: Inflow Rate */}
-              <div className="mb-4">
-                <div className="text-[10px] font-mono text-muted mb-1 text-uppercase">INFLOW RATE IF(t)</div>
-                <div style={{ height: 100, width: '100%' }}>
-                  {isMounted && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={mergeSeriesData(charts.inflow)} margin={{ top: 0, right: 0, left: -30, bottom: 0 }}>
-                        <XAxis dataKey="time" type="number" domain={['auto', 'auto']} hide />
-                        <YAxis hide />
-                        <Tooltip labelFormatter={(l) => new Date(l).toLocaleTimeString()} />
-                        <Line type="monotone" dataKey="live_val" stroke="var(--inflow-teal)" strokeWidth={1.5} dot={false} connectNulls />
-                        <Line type="monotone" dataKey="pred_val" stroke="var(--inflow-teal)" strokeDasharray="3 3" strokeWidth={1.5} dot={false} connectNulls />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-              </div>
-
-              {/* Graph 3: Outflow / Release */}
-              <div>
-                <div className="text-[10px] font-mono text-muted mb-1 text-uppercase">RECOMMENDED RELEASE Q_release</div>
-                <div style={{ height: 100, width: '100%' }}>
-                  {isMounted && charts.release.live && charts.release.live.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={charts.release.live} margin={{ top: 0, right: 0, left: -30, bottom: 0 }}>
-                        <XAxis dataKey="time" hide />
-                        <YAxis hide />
-                        <Tooltip labelFormatter={(l) => new Date(l).toLocaleTimeString()} />
-                        <Area type="step" dataKey="value" stroke="var(--status-orange)" fill="rgba(255, 159, 28, 0.1)" strokeWidth={1.5} dot={false} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-full flex items-center justify-center font-mono text-[10px] text-muted border border-dashed var(--border-color)">
-                      Release recommendation inactive
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+      {/* 4. Precision SCADA Engineering Metrics Grid (6 Columns) */}
+      <div className={styles.metricsGrid}>
+        {/* Metric 1: Water Level */}
+        <div className={styles.metricBlock}>
+          <div className={styles.metricTop}>
+            <span className={styles.metricTitle}>Stage Water Level</span>
+            <Waves size={14} className={styles.metricIcon} />
           </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* TABS 2: RAINFALL DETAILS */}
-        {/* ============================================================ */}
-        {activeTab === 'RAINFALL' && (
-          <div className={styles.scadaGrid}>
-            <div className={`${styles.colSpan12} ${styles.card}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>RAINFALL STATIONS DETAILS</span>
-                <span className="text-xs text-muted font-mono">Sensors in the reservoir catchment area</span>
-              </div>
-              {stations.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {stations.map(st => {
-                    return (
-                      <div key={st.location_id} className="border border-[var(--border-color)] bg-[var(--bg-secondary)] p-3 rounded">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-mono text-xs font-bold text-primary">{st.location_name}</span>
-                          <span className="text-[10px] font-mono bg-panel p-1 rounded">w={st.weight.toFixed(2)}</span>
-                        </div>
-                        <div className="text-[10px] text-muted font-mono mb-2">
-                          Delay: {st.delay_minutes} min | District: {st.district || 'N/A'}
-                        </div>
-                        <div style={{ height: 140, width: '100%' }}>
-                          {isMounted && (
-                            <StationRainfallChart 
-                              locationId={st.location_id} 
-                              selectedDamId={selectedDamId}
-                              timeframe={timeframe}
-                              getFromTime={getFromTime}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className={styles.emptyState}>No rainfall stations configured for this dam.</div>
-              )}
-            </div>
+          <div className={styles.metricValRow}>
+            <span className={styles.metricNum}>
+              {waterLevelNum != null ? waterLevelNum.toFixed(1) : '—'}
+            </span>
+            <span className={styles.metricUnit}>%</span>
           </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* TABS 3: HISTORY */}
-        {/* ============================================================ */}
-        {activeTab === 'HISTORY' && (
-          <div className={styles.scadaGrid}>
-            <div className={`${styles.colSpan12} ${styles.card}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>HISTORICAL LOG RETRIEVAL</span>
-              </div>
-              
-              {/* Date pickers & filters */}
-              <div className={styles.filterRow}>
-                <div className={styles.filterItem}>
-                  <label htmlFor="history-category-select" className={styles.filterLabel}>CATEGORY</label>
-                  <select 
-                    id="history-category-select"
-                    className={styles.damSelector}
-                    value={historyCategory}
-                    onChange={(e) => setHistoryCategory(e.target.value)}
-                  >
-                    <option value="water-level">Water Level</option>
-                    <option value="rainfall">Rainfall (Catchment)</option>
-                    <option value="inflow">Inflow</option>
-                    <option value="downstream-level">Downstream Level</option>
-                    <option value="risk-status">Risk Status History</option>
-                    <option value="alerts">Escalation Alerts</option>
-                  </select>
-                </div>
-                <div className={styles.filterItem}>
-                  <label htmlFor="history-from-date" className={styles.filterLabel}>FROM</label>
-                  <input 
-                    id="history-from-date"
-                    type="datetime-local" 
-                    className={styles.dateInput}
-                    value={historyRange.from}
-                    onChange={(e) => setHistoryRange({ ...historyRange, from: e.target.value })}
-                  />
-                </div>
-                <div className={styles.filterItem}>
-                  <label htmlFor="history-to-date" className={styles.filterLabel}>TO</label>
-                  <input 
-                    id="history-to-date"
-                    type="datetime-local" 
-                    className={styles.dateInput}
-                    value={historyRange.to}
-                    onChange={(e) => setHistoryRange({ ...historyRange, to: e.target.value })}
-                  />
-                </div>
-                <button className={styles.queryBtn} onClick={handleQueryHistory}>
-                  {historyLoading ? 'QUERYING...' : 'RUN QUERY'}
-                </button>
-              </div>
-              {dateError && (
-                <div style={{ color: 'var(--status-red)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)', marginTop: '0.5rem', marginBottom: '0.5rem' }}>
-                  {dateError}
-                </div>
-              )}
-
-              {/* Data result table */}
-              {historyLoading ? (
-                <div className={styles.emptyState}>
-                  <Loader2 className={styles.spinner} />
-                  <span>Loading query payload...</span>
-                </div>
-              ) : historyData.length > 0 ? (
-                <div className={styles.historyTableWrapper}>
-                  <table className={styles.historyTable}>
-                    <thead>
-                      {historyCategory === 'water-level' && (
-                        <tr>
-                          <th>TIMESTAMP</th>
-                          <th>WATER LEVEL PERCENT (%)</th>
-                        </tr>
-                      )}
-                      {historyCategory === 'rainfall' && (
-                        <tr>
-                          <th>TIMESTAMP</th>
-                          <th>STATION</th>
-                          <th>MEASURED (mm/h)</th>
-                        </tr>
-                      )}
-                      {historyCategory === 'inflow' && (
-                        <tr>
-                          <th>TIMESTAMP</th>
-                          <th>INFLOW RATE (m³/s)</th>
-                        </tr>
-                      )}
-                      {historyCategory === 'downstream-level' && (
-                        <tr>
-                          <th>TIMESTAMP</th>
-                          <th>DOWNSTREAM LEVEL (%)</th>
-                        </tr>
-                      )}
-                      {historyCategory === 'risk-status' && (
-                        <tr>
-                          <th>TIMESTAMP</th>
-                          <th>STATUS</th>
-                          <th>TTC (MIN)</th>
-                          <th>PREVIOUS STATUS</th>
-                          <th>TRIGGER FACTOR</th>
-                        </tr>
-                      )}
-                      {historyCategory === 'alerts' && (
-                        <tr>
-                          <th>TIMESTAMP</th>
-                          <th>NEW STATUS</th>
-                          <th>ALERT CONTENT MESSAGE</th>
-                          <th>ACKNOWLEDGED BY</th>
-                          <th>ACKNOWLEDGED TIME</th>
-                        </tr>
-                      )}
-                    </thead>
-                    <tbody>
-                      {historyData.map((row, idx) => (
-                        <tr key={idx}>
-                          <td>{new Date(row.time).toLocaleString()}</td>
-                          {historyCategory === 'water-level' && <td>{row.value}%</td>}
-                          {historyCategory === 'rainfall' && (
-                            <>
-                              <td>{row.station || 'Station'}</td>
-                              <td>{row.value} mm/h</td>
-                            </>
-                          )}
-                          {historyCategory === 'inflow' && <td>{row.value} m³/s</td>}
-                          {historyCategory === 'downstream-level' && <td>{row.value}%</td>}
-                          {historyCategory === 'risk-status' && (
-                            <>
-                              <td style={{ color: getStatusColor(row.status), fontWeight: 'bold' }}>{row.status}</td>
-                              <td>{row.ttc_minutes !== null ? `${row.ttc_minutes} min` : 'N/A'}</td>
-                              <td>{row.previous_status || 'N/A'}</td>
-                              <td>{row.trigger_reason}</td>
-                            </>
-                          )}
-                          {historyCategory === 'alerts' && (
-                            <>
-                              <td style={{ color: getStatusColor(row.new_status), fontWeight: 'bold' }}>{row.new_status}</td>
-                              <td>{row.message}</td>
-                              <td>{row.acknowledged_by || <span className="text-red font-bold">UNACKED</span>}</td>
-                              <td>{row.acknowledged_at ? new Date(row.acknowledged_at).toLocaleString() : 'N/A'}</td>
-                            </>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className={styles.emptyState}>No records found matching query parameters.</div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/* TABS 4: CONTROL PANEL */}
-        {/* ============================================================ */}
-        {activeTab === 'DASHBOARD' && user && (
-          <div className={styles.scadaGrid}>
-            <div className={`${styles.colSpan12} ${styles.card}`}>
-              <div className={styles.cardHeader}>
-                <span className={styles.cardTitle}>ENGINEER COMMAND CONSOLE</span>
-              </div>
-              <div className="mb-4 bg-panel p-4 rounded border border-[var(--border-color)]">
-                <h3 className="font-mono text-sm font-bold text-cyan mb-2">USER METADATA</h3>
-                <div className="grid grid-cols-2 gap-4 font-mono text-xs">
-                  <div>NAME: {user.name}</div>
-                  <div>ROLE: {user.role}</div>
-                  <div>ASSIGNED DAM ID: {user.assigned_dam_id || 'Global Operator'}</div>
-                  <div>ENGINEER RECORD ID: {user.engineer_id}</div>
-                </div>
-              </div>
-
-              <div className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <span className={styles.cardTitle}>UNACKNOWLEDGED ALERTS</span>
-                </div>
-                {unackAlerts.length > 0 ? (
-                  <div className={styles.alertList}>
-                    {unackAlerts.map(alert => (
-                      <div key={alert.alert_id} className={styles.alertItem}>
-                        <div className={styles.alertBody}>
-                          <span className={styles.alertTime}>{new Date(alert.alert_time).toLocaleString()}</span>
-                          <span className={styles.alertMsg}>
-                            <span style={{ color: getStatusColor(alert.new_status), fontWeight: 'bold', marginRight: '0.5rem' }}>
-                              [{alert.new_status}]
-                            </span>
-                            {alert.message}
-                          </span>
-                        </div>
-                        <button 
-                          className={styles.ackBtn}
-                          onClick={() => handleAcknowledgeAlert(alert.alert_id)}
-                        >
-                          ACKNOWLEDGE
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className={styles.emptyState}>No unacknowledged alerts found. Operating cleanly.</div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* LOGIN MODAL */}
-      {showLoginModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.loginCard}>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-md font-bold font-mono text-cyan">SCADA GATEWAY AUTHENTICATION</h3>
-              <button className="text-muted hover:text-primary font-mono text-sm" onClick={() => setShowLoginModal(false)}>ESC</button>
-            </div>
-            
-            {loginError && <div className="text-xs text-red bg-[rgba(255,59,59,0.15)] border border-red p-2.5 rounded mb-4 font-mono">{loginError}</div>}
-            
-            <form onSubmit={handleLoginSubmit}>
-              <div className={styles.formGroup}>
-                <label htmlFor="login-engineer-name" className={styles.formLabel}>ENGINEER NAME</label>
-                <input 
-                  id="login-engineer-name"
-                  type="text" 
-                  className={styles.formInput}
-                  required
-                  placeholder="e.g. sujee"
-                  value={loginFields.name}
-                  onChange={(e) => setLoginFields({ ...loginFields, name: e.target.value })}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="login-key-phrase" className={styles.formLabel}>KEY PHRASE PASSWORD</label>
-                <input 
-                  id="login-key-phrase"
-                  type="password" 
-                  className={styles.formInput}
-                  required
-                  placeholder="••••••••"
-                  value={loginFields.password}
-                  onChange={(e) => setLoginFields({ ...loginFields, password: e.target.value })}
-                />
-              </div>
-              <button type="submit" className={styles.submitBtn}>
-                AUTHENTICATE
-              </button>
-            </form>
+          <div className={styles.metricFooter}>
+            <span>AMSL: {currentStageM}m</span>
+            <span className={styles.metricMeta}>Freeboard: {freeboardM}m</span>
           </div>
         </div>
-      )}
+
+        {/* Metric 2: Rate of Rise (dL/dt) */}
+        <div className={styles.metricBlock}>
+          <div className={styles.metricTop}>
+            <span className={styles.metricTitle}>Rate of Rise (dL/dt)</span>
+            <TrendingUp size={14} className={styles.metricIcon} />
+          </div>
+          <div className={styles.metricValRow}>
+            <span className={styles.metricNum}>
+              {rrShortNum != null ? (rrShortNum > 0 ? `+${rrShortNum.toFixed(2)}` : rrShortNum.toFixed(2)) : '0.00'}
+            </span>
+            <span className={styles.metricUnit}>%/hr</span>
+          </div>
+          <div className={styles.metricFooter}>
+            <span>Band: {statusData?.metrics?.rr_band || 'NORMAL'}</span>
+            <span className={styles.metricMeta}>
+              Acc: {statusData?.metrics?.acc != null ? Number(statusData.metrics.acc).toFixed(2) : '0.00'}
+            </span>
+          </div>
+        </div>
+
+        {/* Metric 3: Catchment Inflow */}
+        <div className={styles.metricBlock}>
+          <div className={styles.metricTop}>
+            <span className={styles.metricTitle}>Catchment Inflow</span>
+            <Droplets size={14} className={styles.metricIcon} />
+          </div>
+          <div className={styles.metricValRow}>
+            <span className={styles.metricNum}>
+              {inflowRateNum != null ? inflowRateNum.toFixed(1) : '—'}
+            </span>
+            <span className={styles.metricUnit}>m³/s</span>
+          </div>
+          <div className={styles.metricFooter}>
+            <span>Baseline: {selectedDam?.if_baseline || 50} m³/s</span>
+            <span className={styles.metricMeta}>
+              {inflowRateNum && selectedDam?.if_baseline
+                ? `${(inflowRateNum / selectedDam.if_baseline).toFixed(1)}x`
+                : '1.0x'}
+            </span>
+          </div>
+        </div>
+
+        {/* Metric 4: Downstream River Stage */}
+        <div className={styles.metricBlock}>
+          <div className={styles.metricTop}>
+            <span className={styles.metricTitle}>Downstream Riverbed</span>
+            <Gauge size={14} className={styles.metricIcon} />
+          </div>
+          <div className={styles.metricValRow}>
+            <span className={styles.metricNum}>
+              {downstreamLevelNum != null ? downstreamLevelNum.toFixed(1) : '—'}
+            </span>
+            <span className={styles.metricUnit}>%</span>
+          </div>
+          <div className={styles.metricFooter}>
+            <span>Safe Channel: {selectedDam?.downstream_capacity || 600} m³/s</span>
+            <span className={styles.metricMeta}>
+              {downstreamLevelNum != null ? `${(100 - downstreamLevelNum).toFixed(0)}% Headroom` : '—'}
+            </span>
+          </div>
+        </div>
+
+        {/* Metric 5: Adaptive Safety Threshold */}
+        <div className={styles.metricBlock}>
+          <div className={styles.metricTop}>
+            <span className={styles.metricTitle}>Adaptive Threshold</span>
+            <Sliders size={14} className={styles.metricIcon} />
+          </div>
+          <div className={styles.metricValRow}>
+            <span className={styles.metricNum}>
+              {adaptiveThresholdNum.toFixed(1)}
+            </span>
+            <span className={styles.metricUnit}>%</span>
+          </div>
+          <div className={styles.metricFooter}>
+            <span>
+              {statusData?.threshold?.floor_triggered ? 'Floor Active (30%)' : 'Dynamic Buffer'}
+            </span>
+            <span className={styles.metricMeta}>
+              {waterLevelNum != null
+                ? `Gap: ${(adaptiveThresholdNum - waterLevelNum).toFixed(1)}%`
+                : '—'}
+            </span>
+          </div>
+        </div>
+
+        {/* Metric 6: Spillway Discharge Recommendation */}
+        <div className={styles.metricBlock}>
+          <div className={styles.metricTop}>
+            <span className={styles.metricTitle}>Spillway Sluice Target</span>
+            <Activity size={14} className={styles.metricIcon} />
+          </div>
+          <div className={styles.metricValRow}>
+            <span className={styles.metricNum}>
+              {qReleaseNum != null ? qReleaseNum.toFixed(1) : '0.0'}
+            </span>
+            <span className={styles.metricUnit}>m³/s</span>
+          </div>
+          <div className={styles.metricFooter}>
+            <span>Gate Opening: {gateOpeningPct}%</span>
+            <span className={styles.metricMeta}>
+              {statusData?.release?.conflict_warning ? '⚠️ Constrained' : 'Optimal'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Direct SCADA Dual Hydrographs (Stage Level & Hydraulic Mass Balance) */}
+      <div className={styles.chartsGrid}>
+        {/* Hydrograph 1: Reservoir Stage vs Adaptive Threshold */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartHeader}>
+            <div>
+              <div className={styles.chartTitle}>Reservoir Stage Hydrograph</div>
+              <div className={styles.chartDesc}>
+                Water Level percentage vs Real-time Adaptive Threshold (Dynamic Flood Buffer)
+              </div>
+            </div>
+            <div className={styles.chartBadge}>TELEMETRY CURVE (6H)</div>
+          </div>
+
+          <div className={styles.chartBox}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <LineChart
+                data={hydrographSeries}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} />
+                <XAxis
+                  dataKey="time"
+                  stroke="var(--text-muted)"
+                  tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={['auto', 'auto']}
+                  stroke="var(--text-muted)"
+                  tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
+                  tickLine={false}
+                  unit="%"
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border)',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                  }}
+                  itemStyle={{ padding: '2px 0' }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }}
+                  iconType="plainline"
+                />
+                <ReferenceLine
+                  y={100}
+                  stroke="#ef4444"
+                  strokeDasharray="4 4"
+                  label={{ value: 'FSL 100%', fill: '#ef4444', fontSize: 9, position: 'insideTopRight' }}
+                />
+                <ReferenceLine
+                  y={75}
+                  stroke="#ca8a04"
+                  strokeDasharray="4 4"
+                  label={{ value: 'Base 75%', fill: '#ca8a04', fontSize: 9, position: 'insideTopRight' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="waterLevel"
+                  name="Water Level (%)"
+                  stroke="#38bdf8"
+                  strokeWidth={2}
+                  dot={false}
+                  isAnimationActive={false}
+                />
+                <Line
+                  type="stepAfter"
+                  dataKey="threshold"
+                  name="Adaptive Threshold (%)"
+                  stroke="#f59e0b"
+                  strokeWidth={1.5}
+                  strokeDasharray="3 3"
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Hydrograph 2: Hydraulic Mass Balance (Inflow vs Outflow) */}
+        <div className={styles.chartCard}>
+          <div className={styles.chartHeader}>
+            <div>
+              <div className={styles.chartTitle}>Hydraulic Mass Balance Curve</div>
+              <div className={styles.chartDesc}>
+                Catchment River Inflow (Qin) vs Recommended Sluice Discharge (Qrelease)
+              </div>
+            </div>
+            <div className={styles.chartBadge}>DISCHARGE (m³/s)</div>
+          </div>
+
+          <div className={styles.chartBox}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+              <LineChart
+                data={hydraulicBalanceSeries}
+                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} />
+                <XAxis
+                  dataKey="time"
+                  stroke="var(--text-muted)"
+                  tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={['auto', 'auto']}
+                  stroke="var(--text-muted)"
+                  tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
+                  tickLine={false}
+                  unit=" m³/s"
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border)',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                  }}
+                  itemStyle={{ padding: '2px 0' }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }}
+                  iconType="plainline"
+                />
+                <ReferenceLine
+                  y={selectedDam?.downstream_capacity || 600}
+                  stroke="#f97316"
+                  strokeDasharray="4 4"
+                  label={{
+                    value: 'Safe River Limit (600 m³/s)',
+                    fill: '#f97316',
+                    fontSize: 9,
+                    position: 'insideTopRight',
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="inflow"
+                  name="Inflow Qin (m³/s)"
+                  stroke="#818cf8"
+                  strokeWidth={2}
+                  dot={false}
+                  isAnimationActive={false}
+                />
+                <Line
+                  type="stepAfter"
+                  dataKey="release"
+                  name="Sluice Release Qout (m³/s)"
+                  stroke="#10b981"
+                  strokeWidth={1.8}
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. Technical Engineering Tables (Catchment Network & Recent Alerts) */}
+      <div className={styles.tablesGrid}>
+        {/* Table A: Catchment Gauging Network (Sub-basin Stations) */}
+        <Card>
+          <CardHeader
+            action={
+              <Link href="/rainfall" style={{ fontSize: '0.72rem', color: 'var(--accent)' }}>
+                View Catchment Model →
+              </Link>
+            }
+          >
+            <CardTitle>Catchment Hydrometric Gauging Stations</CardTitle>
+            <CardDescription>
+              Isochrone weighted precipitation stations contributing to {selectedDam?.dam_name || 'reservoir'} (Weighted Net: {rNetNum} mm/hr)
+            </CardDescription>
+          </CardHeader>
+          <CardContent noPadding>
+            <div className={styles.tableContainer}>
+              <table className={styles.scadaTable}>
+                <thead>
+                  <tr>
+                    <th>Station Code</th>
+                    <th>Sub-Basin Location</th>
+                    <th>Elevation</th>
+                    <th>Lag Time</th>
+                    <th>Weight (Wi)</th>
+                    <th>Rainfall (mm/hr)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stations.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
+                        Loading hydrometric telemetry...
+                      </td>
+                    </tr>
+                  ) : (
+                    stations.map((st) => (
+                      <tr key={st.location_id}>
+                        <td className={styles.monoCell}>{st.station_code || `MET-0${st.location_id}`}</td>
+                        <td className={styles.primaryCell}>{st.location_name}</td>
+                        <td className={styles.monoCell}>
+                          {st.elevation_m ? `${st.elevation_m}m` : '—'}
+                        </td>
+                        <td className={styles.monoCell}>{st.delay_minutes} min</td>
+                        <td className={styles.monoCell}>{st.weight}</td>
+                        <td className={styles.monoCell} style={{ fontWeight: 600 }}>
+                          {Number(st.rainfall_mm_hr || 0).toFixed(1)} mm/hr
+                        </td>
+                        <td>
+                          <span className={`${styles.statusIndicator} ${styles.online}`}>
+                            <span className={styles.liveDot} />
+                            <span>ONLINE</span>
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Table B: SCADA Safety Audit & Event Log */}
+        <Card>
+          <CardHeader
+            action={
+              <Link href="/control" style={{ fontSize: '0.72rem', color: 'var(--accent)' }}>
+                Audit Console →
+              </Link>
+            }
+          >
+            <CardTitle>SCADA Early-Warning Log</CardTitle>
+            <CardDescription>Recent threshold violations and automated safety advisories</CardDescription>
+          </CardHeader>
+          <CardContent noPadding>
+            {alerts.length === 0 ? (
+              <div className={styles.emptyAlerts}>
+                <CheckCircle size={20} style={{ color: 'var(--status-green)' }} />
+                <span>All telemetry nominal • Zero active safety alerts</span>
+              </div>
+            ) : (
+              <div className={styles.alertsList}>
+                {alerts.map((al) => (
+                  <div key={al.alert_id} className={styles.alertItem}>
+                    <div className={styles.alertTop}>
+                      <Badge
+                        variant={
+                          al.severity === 'CRITICAL' || al.severity === 'RED'
+                            ? 'critical'
+                            : al.severity === 'WARNING' || al.severity === 'ORANGE'
+                            ? 'warning'
+                            : 'watch'
+                        }
+                      >
+                        {al.severity || 'ALERT'}
+                      </Badge>
+                      <span className={styles.alertTime}>
+                        {formatDateTime(al.alert_time || al.created_at)}
+                      </span>
+                    </div>
+                    <div className={styles.alertReason}>
+                      {al.message || al.trigger_reason || 'Hydraulic parameter exceeded safety margin.'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 7. Structural Safety Limits Matrix */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Hydraulic Operating Parameters & Structural Limits</CardTitle>
+          <CardDescription>
+            Design limits established under the National Dam Safety Framework for {selectedDam?.dam_name}
+          </CardDescription>
+        </CardHeader>
+        <CardContent noPadding>
+          <div className={styles.limitsGrid}>
+            <div className={styles.limitBox}>
+              <span className={styles.limitTitle}>Crest Elevation (AMSL)</span>
+              <span className={styles.limitVal}>{crestElev.toFixed(2)} m</span>
+              <span className={styles.limitSub}>Current Stage: {currentStageM} m</span>
+            </div>
+
+            <div className={styles.limitBox}>
+              <span className={styles.limitTitle}>Spillway Radial Sluices</span>
+              <span className={styles.limitVal}>8x Crest Radial Gates</span>
+              <span className={styles.limitSub}>
+                Max Discharge: {selectedDam?.max_gate_capacity || 8200} m³/s
+              </span>
+            </div>
+
+            <div className={styles.limitBox}>
+              <span className={styles.limitTitle}>Downstream River Capacity</span>
+              <span className={styles.limitVal}>{selectedDam?.downstream_capacity || 600} m³/s</span>
+              <span className={styles.limitSub}>Non-damage channel limit</span>
+            </div>
+
+            <div className={styles.limitBox}>
+              <span className={styles.limitTitle}>Operational Safety Margins</span>
+              <span className={styles.limitVal}>
+                Base: {selectedDam?.base_threshold || 75}% • Floor: {selectedDam?.threshold_floor || 30}%
+              </span>
+              <span className={styles.limitSub}>Adaptive Algorithm v2.4</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
-  );
-}
-
-// Station specific chart sub-component (client-side dynamic querying)
-function StationRainfallChart({ locationId, selectedDamId, timeframe, getFromTime }) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRain = async () => {
-      try {
-        const fromTime = getFromTime(timeframe);
-        let resHint = 'raw';
-        if (timeframe === '1D') resHint = '15m';
-        if (timeframe === '1W' || timeframe === '1M') resHint = '1h';
-
-        const res = await fetch(`/api/dams/${selectedDamId}/rainfall-stations/${locationId}/rainfall?from=${fromTime}&resolution=${resHint}`);
-        if (res.ok) {
-          const json = await res.json();
-          const parsed = (json.live || []).map(p => ({
-            ...p,
-            time: new Date(p.time).getTime()
-          }));
-          setData(parsed);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRain();
-  }, [locationId, selectedDamId, timeframe, getFromTime]);
-
-  if (loading) {
-    return <div className="h-full flex items-center justify-center font-mono text-[10px] text-muted">Reading telemetry...</div>;
-  }
-
-  if (data.length === 0) {
-    return <div className="h-full flex items-center justify-center font-mono text-[10px] text-muted border border-dashed border-[var(--border-color)]">No reading data</div>;
-  }
-
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data} margin={{ top: 5, right: 5, left: -35, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
-        <XAxis 
-          dataKey="time" 
-          type="number"
-          domain={['auto', 'auto']}
-          tickFormatter={(t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
-          stroke="var(--border-color)"
-          tick={{ fill: 'var(--text-muted)', fontSize: 8, fontFamily: 'var(--font-mono)' }}
-        />
-        <YAxis stroke="var(--border-color)" tick={{ fill: 'var(--text-muted)', fontSize: 8, fontFamily: 'var(--font-mono)' }} />
-        <Tooltip labelFormatter={(l) => new Date(l).toLocaleString()} contentStyle={{ fontSize: 10, fontFamily: 'var(--font-mono)' }} />
-        <Area type="monotone" dataKey="value" stroke="var(--rain-indigo)" fill="rgba(122, 140, 255, 0.15)" strokeWidth={1.5} dot={false} />
-      </AreaChart>
-    </ResponsiveContainer>
   );
 }
