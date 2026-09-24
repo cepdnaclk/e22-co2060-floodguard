@@ -338,15 +338,15 @@ export default function MonitoringPage() {
           action={
             <div className={styles.chartLegend}>
               <div className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: '#2563eb' }} />
+                <span className={styles.legendDot} style={{ background: '#38bdf8' }} />
                 <span>Water Level (%)</span>
               </div>
               <div className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: '#ea580c' }} />
+                <span className={styles.legendDot} style={{ background: '#f59e0b' }} />
                 <span>Adaptive Threshold (%)</span>
               </div>
               <div className={styles.legendItem}>
-                <span className={styles.legendDot} style={{ background: '#93c5fd', borderTop: '2px dashed #2563eb' }} />
+                <span className={styles.legendDot} style={{ background: 'transparent', borderTop: '2px dashed #38bdf8' }} />
                 <span>Forecast Curve</span>
               </div>
             </div>
@@ -361,11 +361,11 @@ export default function MonitoringPage() {
           <div className={styles.chartBox}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={levelChartSeries} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="time" stroke="#9ca3af" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} vertical={false} />
+                <XAxis dataKey="time" stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
                 <YAxis
-                  stroke="#9ca3af"
-                  fontSize={11}
+                  stroke="var(--text-muted)"
+                  tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
                   domain={['auto', 'auto']}
                   tickLine={false}
                   tickFormatter={(v) => `${v}%`}
@@ -375,18 +375,21 @@ export default function MonitoringPage() {
                     payload?.[0]?.payload?.iso ? formatDateTime(payload[0].payload.iso) : label
                   }
                   contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e5e9',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    backgroundColor: '#0f1523',
+                    borderColor: '#1e293b',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    color: '#f8fafc',
                   }}
+                  labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                  itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                 />
                 <Line
                   type="monotone"
                   dataKey="waterLevel"
                   name="Water Level"
-                  stroke="#2563eb"
+                  stroke="#38bdf8"
                   strokeWidth={2}
                   dot={false}
                   isAnimationActive={false}
@@ -395,7 +398,7 @@ export default function MonitoringPage() {
                   type="monotone"
                   dataKey="threshold"
                   name="Adaptive Threshold"
-                  stroke="#ea580c"
+                  stroke="#f59e0b"
                   strokeWidth={2}
                   dot={false}
                   isAnimationActive={false}
@@ -404,7 +407,7 @@ export default function MonitoringPage() {
                   type="monotone"
                   dataKey="predictedLevel"
                   name="Predicted Level"
-                  stroke="#2563eb"
+                  stroke="#38bdf8"
                   strokeWidth={2}
                   strokeDasharray="4 4"
                   dot={false}
@@ -414,7 +417,7 @@ export default function MonitoringPage() {
                   type="monotone"
                   dataKey="predictedThreshold"
                   name="Predicted Threshold"
-                  stroke="#ea580c"
+                  stroke="#f59e0b"
                   strokeWidth={2}
                   strokeDasharray="4 4"
                   dot={false}
@@ -437,26 +440,30 @@ export default function MonitoringPage() {
             <div className={styles.chartBox}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={inflowReleaseSeries} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                  <XAxis dataKey="time" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} />
+                  <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} vertical={false} />
+                  <XAxis dataKey="time" stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
+                  <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
                   <Tooltip
                     labelFormatter={(label, payload) =>
                       payload?.[0]?.payload?.iso ? formatDateTime(payload[0].payload.iso) : label
                     }
                     contentStyle={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e2e5e9',
-                      borderRadius: '6px',
-                      fontSize: '12px',
+                      backgroundColor: '#0f1523',
+                      borderColor: '#1e293b',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                      color: '#f8fafc',
                     }}
+                    labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                    itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                   <Line
                     type="monotone"
                     dataKey="inflow"
                     name="Inflow (m³/s)"
-                    stroke="#0284c7"
+                    stroke="#818cf8"
                     strokeWidth={1.8}
                     dot={false}
                     isAnimationActive={false}
@@ -465,7 +472,7 @@ export default function MonitoringPage() {
                     type="monotone"
                     dataKey="release"
                     name="Spillway Release (m³/s)"
-                    stroke="#16a34a"
+                    stroke="#10b981"
                     strokeWidth={1.8}
                     dot={false}
                     isAnimationActive={false}
@@ -485,26 +492,30 @@ export default function MonitoringPage() {
             <div className={styles.chartBox}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={riseRateSeries} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                  <XAxis dataKey="time" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} />
+                  <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} vertical={false} />
+                  <XAxis dataKey="time" stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
+                  <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
                   <Tooltip
                     labelFormatter={(label, payload) =>
                       payload?.[0]?.payload?.iso ? formatDateTime(payload[0].payload.iso) : label
                     }
                     contentStyle={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e2e5e9',
-                      borderRadius: '6px',
-                      fontSize: '12px',
+                      backgroundColor: '#0f1523',
+                      borderColor: '#1e293b',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                      color: '#f8fafc',
                     }}
+                    labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                    itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                   <Line
                     type="monotone"
                     dataKey="rr_short"
                     name="RR Short (15m)"
-                    stroke="#8b5cf6"
+                    stroke="#a78bfa"
                     strokeWidth={1.6}
                     dot={false}
                     isAnimationActive={false}
@@ -513,7 +524,7 @@ export default function MonitoringPage() {
                     type="monotone"
                     dataKey="rr_long"
                     name="RR Long (1h)"
-                    stroke="#ec4899"
+                    stroke="#f472b6"
                     strokeWidth={1.6}
                     dot={false}
                     isAnimationActive={false}

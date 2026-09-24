@@ -503,13 +503,15 @@ export default function OverviewPage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--bg-card)',
-                    borderColor: 'var(--border)',
+                    backgroundColor: '#0f1523',
+                    borderColor: '#1e293b',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    color: '#f8fafc',
                   }}
-                  itemStyle={{ padding: '2px 0' }}
+                  labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                  itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }}
@@ -523,9 +525,9 @@ export default function OverviewPage() {
                 />
                 <ReferenceLine
                   y={75}
-                  stroke="#ca8a04"
+                  stroke="#eab308"
                   strokeDasharray="4 4"
-                  label={{ value: 'Base 75%', fill: '#ca8a04', fontSize: 9, position: 'insideTopRight' }}
+                  label={{ value: 'Base 75%', fill: '#eab308', fontSize: 9, position: 'insideTopRight' }}
                 />
                 <Line
                   type="monotone"
@@ -585,13 +587,15 @@ export default function OverviewPage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--bg-card)',
-                    borderColor: 'var(--border)',
+                    backgroundColor: '#0f1523',
+                    borderColor: '#1e293b',
                     borderRadius: '4px',
                     fontSize: '11px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    color: '#f8fafc',
                   }}
-                  itemStyle={{ padding: '2px 0' }}
+                  labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                  itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }}

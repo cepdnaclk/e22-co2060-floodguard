@@ -196,8 +196,9 @@ export default function RainfallPage() {
                             padding: '4px 8px',
                             border: '1px solid var(--border)',
                             borderRadius: '4px',
-                            background: isSelected ? 'var(--accent)' : '#ffffff',
-                            color: isSelected ? '#ffffff' : 'var(--text-secondary)',
+                            background: isSelected ? 'var(--accent)' : 'var(--bg-card)',
+                            color: isSelected ? '#070a12' : 'var(--text-secondary)',
+                            fontWeight: isSelected ? 600 : 400,
                             cursor: 'pointer',
                           }}
                         >
@@ -265,26 +266,30 @@ export default function RainfallPage() {
           <div className={styles.chartBox}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={netRainfallChart} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="time" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} unit=" mm/h" />
+                <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} vertical={false} />
+                <XAxis dataKey="time" stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
+                <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} unit=" mm/h" />
                 <Tooltip
                   labelFormatter={(label, payload) =>
                     payload?.[0]?.payload?.iso ? formatDateTime(payload[0].payload.iso) : label
                   }
                   contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e5e9',
-                    borderRadius: '6px',
-                    fontSize: '12px',
+                    backgroundColor: '#0f1523',
+                    borderColor: '#1e293b',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    color: '#f8fafc',
                   }}
+                  labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                  itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                 <Line
                   type="monotone"
                   dataKey="intensity"
                   name="Net Catchment Rainfall (mm/hr)"
-                  stroke="#2563eb"
+                  stroke="#38bdf8"
                   strokeWidth={2}
                   dot={false}
                   isAnimationActive={false}
@@ -306,24 +311,28 @@ export default function RainfallPage() {
             <div className={styles.chartBox}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stationHistoryChart} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                  <XAxis dataKey="time" stroke="#9ca3af" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} unit=" mm/h" />
+                  <CartesianGrid strokeDasharray="2 2" stroke="var(--border)" opacity={0.6} vertical={false} />
+                  <XAxis dataKey="time" stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} />
+                  <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} tickLine={false} unit=" mm/h" />
                   <Tooltip
                     labelFormatter={(label, payload) =>
                       payload?.[0]?.payload?.iso ? formatDateTime(payload[0].payload.iso) : label
                     }
                     contentStyle={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e2e5e9',
-                      borderRadius: '6px',
-                      fontSize: '12px',
+                      backgroundColor: '#0f1523',
+                      borderColor: '#1e293b',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                      color: '#f8fafc',
                     }}
+                    labelStyle={{ color: '#f8fafc', fontWeight: 600, marginBottom: '4px' }}
+                    itemStyle={{ color: '#94a3b8', padding: '2px 0' }}
                   />
                   <Bar
                     dataKey="rainfall"
                     name={`${selectedStation.location_name} (mm/hr)`}
-                    fill="#3b82f6"
+                    fill="#38bdf8"
                     radius={[2, 2, 0, 0]}
                     isAnimationActive={false}
                   />

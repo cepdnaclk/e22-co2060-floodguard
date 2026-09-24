@@ -11,7 +11,7 @@
 }
 
 .card:hover {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
 }
 
 .topRow {

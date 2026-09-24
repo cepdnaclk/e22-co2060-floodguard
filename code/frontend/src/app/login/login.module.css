@@ -137,9 +137,9 @@
 }
 
 .input:focus {
-  background: #ffffff;
+  background: var(--bg-hover);
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 2px var(--accent-light);
 }
 
 .submitBtn {
@@ -147,9 +147,9 @@
   width: 100%;
   padding: 11px 16px;
   background: var(--accent);
-  color: #ffffff;
+  color: #070a12;
   border-radius: var(--radius);
-  font-weight: 550;
+  font-weight: 600;
   font-size: 0.88rem;
   display: flex;
   align-items: center;
@@ -160,10 +160,11 @@
 
 .submitBtn:hover:not(:disabled) {
   background: var(--accent-hover);
+  color: #ffffff;
 }
 
 .submitBtn:disabled {
-  opacity: 0.65;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -196,21 +197,22 @@
 }
 
 .demoBtn {
-  padding: 6px 4px;
-  background: #ffffff;
+  padding: 7px 4px;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-weight: 550;
+  color: var(--text-secondary);
   text-align: center;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .demoBtn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .demoHint {
@@ -222,17 +224,17 @@
 .demoHint code {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  background: #ffffff;
-  padding: 1px 4px;
+  background: var(--bg-hover);
+  padding: 1px 5px;
   border-radius: 3px;
-  border: 1px solid var(--border-light);
-  color: var(--text-primary);
+  border: 1px solid var(--border);
+  color: var(--accent);
 }
 
 .footer {
   padding: 14px 28px;
-  background: #fafbfc;
-  border-top: 1px solid var(--border-light);
+  background: var(--bg-input);
+  border-top: 1px solid var(--border);
   text-align: center;
 }
 

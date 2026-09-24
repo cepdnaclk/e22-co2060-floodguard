@@ -60,15 +60,16 @@
   gap: 8px;
   padding: 10px 20px;
   background: var(--accent);
-  color: #ffffff;
+  color: #070a12;
   border-radius: var(--radius);
-  font-weight: 550;
+  font-weight: 600;
   font-size: 0.85rem;
   text-decoration: none;
 }
 
 .loginPromptBtn:hover {
   background: var(--accent-hover);
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -152,7 +153,7 @@
   font-size: 0.76rem;
   font-weight: 600;
   background: var(--accent);
-  color: #ffffff;
+  color: #070a12;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -160,6 +161,7 @@
 
 .ackBtn:hover:not(:disabled) {
   background: var(--accent-hover);
+  color: #ffffff;
 }
 
 .ackBtn:disabled {

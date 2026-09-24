@@ -21,29 +21,29 @@
 .normal, .green {
   background: var(--status-green-bg);
   color: var(--status-green);
-  border-color: rgba(22, 163, 74, 0.25);
+  border-color: var(--status-green-border);
 }
 
 .watch, .yellow {
   background: var(--status-yellow-bg);
   color: var(--status-yellow);
-  border-color: rgba(202, 138, 4, 0.25);
+  border-color: var(--status-yellow-border);
 }
 
 .warning, .orange {
   background: var(--status-orange-bg);
   color: var(--status-orange);
-  border-color: rgba(234, 88, 12, 0.25);
+  border-color: var(--status-orange-border);
 }
 
 .critical, .red {
   background: var(--status-red-bg);
   color: var(--status-red);
-  border-color: rgba(220, 38, 38, 0.25);
+  border-color: var(--status-red-border);
 }
 
 .blue {
   background: var(--accent-light);
   color: var(--accent);
-  border-color: rgba(37, 99, 235, 0.25);
+  border-color: var(--accent-border);
 }

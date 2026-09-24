@@ -5,11 +5,12 @@
   bottom: 0;
   width: var(--sidebar-width);
   background-color: var(--bg-sidebar);
-  color: var(--text-inverse);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   z-index: 40;
   overflow-y: auto;
+  border-right: 1px solid var(--border);
 }
 
 /* Logo */
@@ -17,26 +18,28 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
 }
 
 .logoTitle {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  color: var(--text-primary);
 }
 
 .logoSub {
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   letter-spacing: 0.01em;
 }
 
 /* Dam selector */
 .damSelector {
-  padding: 16px 16px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .selectorLabel {
@@ -44,9 +47,9 @@
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--text-muted);
   margin-bottom: 6px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .selectWrapper {
@@ -56,10 +59,10 @@
 .select {
   width: 100%;
   appearance: none;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  color: var(--text-inverse);
+  color: var(--text-primary);
   padding: 8px 30px 8px 10px;
   font-size: 0.8rem;
   font-family: var(--font-sans);
@@ -69,7 +72,12 @@
 }
 
 .select:focus {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: var(--accent);
+}
+
+.select option {
+  background: #0f1523;
+  color: #f8fafc;
 }
 
 .selectIcon {
@@ -78,7 +86,7 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
 }
 
 /* Navigation */
@@ -94,31 +102,32 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  color: rgba(255, 255, 255, 0.65);
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
   font-size: 0.82rem;
-  font-weight: 450;
+  font-weight: 500;
   text-decoration: none;
   transition: all 0.15s;
 }
 
 .navItem:hover {
-  background: var(--bg-sidebar-hover);
-  color: var(--text-inverse);
+  background: var(--bg-hover);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
 .navItemActive {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-inverse);
-  font-weight: 550;
+  background: var(--bg-hover);
+  color: var(--accent);
+  font-weight: 600;
+  border-left: 2px solid var(--accent);
 }
 
 /* Footer */
 .footer {
   padding: 12px 16px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -132,7 +141,7 @@
 
 .statusText {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
 }
 
 .userSection {
@@ -148,7 +157,8 @@
 
 .userName {
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -156,36 +166,39 @@
 
 .userRole {
   font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--text-muted);
+  text-transform: capitalize;
 }
 
 .logoutBtn {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   padding: 6px;
   border-radius: var(--radius-sm);
   transition: all 0.15s;
 }
 
 .logoutBtn:hover {
-  color: var(--text-inverse);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .loginLink {
   display: block;
   text-align: center;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-primary);
   font-size: 0.8rem;
+  font-weight: 550;
   text-decoration: none;
   transition: all 0.15s;
 }
 
 .loginLink:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-inverse);
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--accent);
   text-decoration: none;
 }
